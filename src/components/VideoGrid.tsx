@@ -125,9 +125,10 @@ const VideoGrid = () => {
                   alt={video.title}
                   className="w-full h-52 object-cover group-hover:scale-110 transition-smooth"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-smooth flex items-center justify-center">
-                  <div className="bg-white/95 rounded-full p-4 shadow-glow">
-                    <Play className="w-8 h-8 text-primary" />
+                {/* Subtle hover overlay */}
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-smooth flex items-center justify-center">
+                  <div className="bg-white/20 rounded-full p-4 backdrop-blur-sm shadow-lg">
+                    <Play className="w-8 h-8 text-white" />
                   </div>
                 </div>
                 
