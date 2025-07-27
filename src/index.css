@@ -8,45 +8,51 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 220 15% 20%;
+    --background: 250 100% 99%;
+    --foreground: 270 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 15% 20%;
+    --card-foreground: 270 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 20%;
+    --popover-foreground: 270 15% 15%;
 
-    --primary: 200 95% 45%;
+    --primary: 262 83% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 145 25% 85%;
-    --secondary-foreground: 220 15% 20%;
+    --secondary: 270 20% 95%;
+    --secondary-foreground: 270 15% 25%;
 
-    --muted: 210 30% 96%;
-    --muted-foreground: 220 10% 50%;
+    --muted: 270 20% 96%;
+    --muted-foreground: 270 8% 45%;
 
-    --accent: 170 60% 92%;
-    --accent-foreground: 220 15% 20%;
+    --accent: 262 100% 97%;
+    --accent-foreground: 270 15% 25%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 95%;
-    --ring: 200 95% 45%;
+    --border: 270 20% 92%;
+    --input: 270 20% 94%;
+    --ring: 262 83% 58%;
 
-    /* Wellness-specific design tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(200 95% 45%), hsl(170 70% 50%));
-    --gradient-secondary: linear-gradient(135deg, hsl(210 20% 98%), hsl(170 60% 95%));
-    --gradient-hero: linear-gradient(135deg, hsl(200 95% 45% / 0.1), hsl(170 70% 50% / 0.1));
+    /* Futuristic purple design tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(280 100% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(250 100% 99%), hsl(270 100% 98%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100% / 0.8), hsl(270 100% 98% / 0.9));
+    --gradient-hero: linear-gradient(135deg, hsl(262 83% 58% / 0.1), hsl(280 100% 70% / 0.05));
     
-    --shadow-soft: 0 4px 20px hsl(200 95% 45% / 0.08);
-    --shadow-card: 0 2px 12px hsl(220 15% 20% / 0.06);
-    --shadow-hover: 0 8px 25px hsl(200 95% 45% / 0.15);
+    --shadow-soft: 0 4px 24px hsl(262 83% 58% / 0.12);
+    --shadow-card: 0 8px 32px hsl(270 15% 15% / 0.04);
+    --shadow-hover: 0 12px 40px hsl(262 83% 58% / 0.2);
+    --shadow-glow: 0 0 60px hsl(262 83% 58% / 0.3);
     
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    --border-radius: 24px;
+    --border-radius-lg: 32px;
+    --border-radius-xl: 40px;
 
     --radius: 0.5rem;
 

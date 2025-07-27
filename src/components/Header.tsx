@@ -1,66 +1,105 @@
-import { Search, User, Menu } from "lucide-react";
+import { Search, User, Menu, Sparkles, BookOpen, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import wellnessIcon from "@/assets/wellness-icon.jpg";
+import { Badge } from "@/components/ui/badge";
+import betterBlissLogo from "@/assets/better-bliss-logo.jpg";
+
+const searchSuggestions = [
+  "anxiety relief techniques",
+  "meditation for beginners", 
+  "stress management",
+  "building confidence",
+  "healthy habits"
+];
 
 const Header = () => {
   return (
-    <header className="bg-background/95 backdrop-blur-sm border-b sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
+    <header className="bg-gradient-card/80 backdrop-blur-xl border-b border-border/20 sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <img 
-              src={wellnessIcon} 
-              alt="MindWell" 
-              className="w-10 h-10 rounded-lg object-cover"
-            />
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <img 
+                src={betterBlissLogo} 
+                alt="Better & Bliss" 
+                className="w-12 h-12 rounded-2xl object-cover shadow-soft"
+              />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-primary rounded-full flex items-center justify-center">
+                <Sparkles className="w-2 h-2 text-white" />
+              </div>
+            </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">MindWell</h1>
-              <p className="text-xs text-muted-foreground">Mental Wellness Platform</p>
+              <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                Better & Bliss
+              </h1>
+              <p className="text-xs text-muted-foreground font-medium">.com</p>
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          {/* Enhanced Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-xl mx-8">
+            <div className="relative w-full group">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 group-focus-within:text-primary transition-smooth" />
               <Input
-                placeholder="Search wellness topics, experts..."
-                className="pl-10 bg-background border-border"
+                placeholder="Search wellness topics, experts, case studies..."
+                className="pl-12 pr-4 h-14 rounded-3xl bg-gradient-card border-2 border-border/20 focus:border-primary/40 shadow-card text-base placeholder:text-muted-foreground/70"
               />
+              
+              {/* Search Suggestions */}
+              <div className="absolute top-full left-0 right-0 mt-2 opacity-0 group-focus-within:opacity-100 transition-smooth pointer-events-none group-focus-within:pointer-events-auto">
+                <div className="bg-gradient-card border border-border/20 rounded-2xl shadow-hover p-3 backdrop-blur-sm">
+                  <p className="text-xs text-muted-foreground mb-2 font-medium">Popular searches:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {searchSuggestions.map((suggestion, index) => (
+                      <Badge 
+                        key={index}
+                        variant="secondary" 
+                        className="cursor-pointer hover:bg-primary hover:text-white transition-smooth text-xs rounded-full"
+                      >
+                        {suggestion}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <a href="#" className="text-foreground hover:text-primary transition-smooth">
+            <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
               Browse
             </a>
-            <a href="#" className="text-foreground hover:text-primary transition-smooth">
+            <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium">
               Categories
             </a>
-            <a href="#" className="text-foreground hover:text-primary transition-smooth">
+            <div className="relative group">
+              <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium flex items-center gap-1">
+                Case Studies
+                <ChevronDown className="w-4 h-4" />
+              </a>
+            </div>
+            <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium">
               Experts
-            </a>
-            <a href="#" className="text-foreground hover:text-primary transition-smooth">
-              My Learning
             </a>
           </nav>
 
           {/* User Actions */}
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Search className="w-4 h-4" />
+            <Button variant="ghost" size="icon" className="md:hidden rounded-full">
+              <Search className="w-5 h-5" />
             </Button>
-            <Button variant="outline" className="hidden sm:flex">
+            <Button variant="outline" className="hidden sm:flex rounded-full">
               Sign In
             </Button>
-            <Button variant="wellness">
+            <Button variant="futuristic" className="rounded-full">
+              <Sparkles className="w-4 h-4 mr-2" />
               Get Started
             </Button>
-            <Button variant="ghost" size="icon" className="lg:hidden">
-              <Menu className="w-4 h-4" />
+            <Button variant="ghost" size="icon" className="lg:hidden rounded-full">
+              <Menu className="w-5 h-5" />
             </Button>
           </div>
         </div>
