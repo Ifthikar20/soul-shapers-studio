@@ -14,11 +14,12 @@ const Hero = () => {
         <div className="absolute inset-0 bg-gradient-hero"></div>
       </div>
 
-      {/* Floating Elements */}
+      {/* Curved Floating Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-32 h-32 bg-purple-400/10 rounded-full blur-xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-32 left-1/4 w-24 h-24 bg-primary/10 rounded-full blur-xl animate-pulse delay-500"></div>
+        <div className="absolute top-20 left-10 w-[400px] h-[300px] bg-primary/8 rounded-[60%_40%_50%_50%] blur-3xl animate-pulse rotate-12"></div>
+        <div className="absolute top-40 right-20 w-[500px] h-[350px] bg-purple-400/8 rounded-[40%_60%_70%_30%] blur-3xl animate-pulse delay-1000 -rotate-12"></div>
+        <div className="absolute bottom-32 left-1/4 w-[350px] h-[250px] bg-primary/6 rounded-[70%_30%_40%_60%] blur-3xl animate-pulse delay-500 rotate-45"></div>
+        <div className="absolute bottom-10 right-10 w-[300px] h-[200px] bg-purple-500/6 rounded-[50%_50%_60%_40%] blur-2xl animate-pulse delay-700"></div>
       </div>
 
       {/* Content */}
@@ -42,11 +43,7 @@ const Hero = () => {
             Break limiting patterns and unlock your infinite potential with our futuristic learning platform.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-            <Button variant="futuristic" size="lg" className="min-w-[220px] h-14 text-base rounded-full">
-              <Play className="w-5 h-5 mr-3" />
-              Start Your Journey
-            </Button>
+          <div className="flex justify-center items-center mb-16">
             <Button variant="outline" size="lg" className="min-w-[220px] h-14 text-base rounded-full">
               <Brain className="w-5 h-5 mr-3" />
               Explore Content

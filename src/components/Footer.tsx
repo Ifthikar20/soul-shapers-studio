@@ -1,5 +1,5 @@
 import { Heart, Mail, Phone, MapPin, Sparkles, Brain } from "lucide-react";
-import betterBlissLogo from "@/assets/better-bliss-logo.jpg";
+import betterBlissLogo from "@/assets/betterandblisslogo.png";
 
 const Footer = () => {
   return (
@@ -28,7 +28,7 @@ const Footer = () => {
             </div>
             <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
               Transforming lives through cutting-edge mental health and wellness content. 
-              Your journey to better mental health starts here.
+              Your path to better mental health starts here.
             </p>
             <div className="flex items-center text-muted-foreground text-sm">
               <Heart className="w-4 h-4 mr-2 text-red-500" />

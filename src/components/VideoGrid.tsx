@@ -97,7 +97,7 @@ const VideoGrid = () => {
               </span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-xl">
-              Expert-curated videos to transform your mental wellness journey
+              Expert-curated videos for your wellness needs
             </p>
           </div>
           <div className="hidden lg:flex space-x-3">

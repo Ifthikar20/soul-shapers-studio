@@ -1,8 +1,14 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, User, Menu, Sparkles, BookOpen, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import betterBlissLogo from "@/assets/better-bliss-logo.jpg";
+import betterBlissLogo from "@/assets/betterandblisslogo.png";
+
+interface HeaderProps {
+  onShowAuth?: (mode: 'signin' | 'signup') => void;
+}
 
 const searchSuggestions = [
   "anxiety relief techniques",
@@ -12,7 +18,24 @@ const searchSuggestions = [
   "healthy habits"
 ];
 
-const Header = () => {
+const Header = ({ onShowAuth }: HeaderProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    }
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch(searchQuery);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    handleSearch(suggestion);
+  };
   return (
     <header className="bg-gradient-card/80 backdrop-blur-xl border-b border-border/20 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-6">
@@ -39,10 +62,12 @@ const Header = () => {
 
           {/* Enhanced Search Bar */}
           <div className="hidden md:flex flex-1 max-w-xl mx-8">
-            <div className="relative w-full group">
+            <form onSubmit={handleSearchSubmit} className="relative w-full group">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 group-focus-within:text-primary transition-smooth" />
               <Input
                 placeholder="Search wellness topics, experts, case studies..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-12 pr-4 h-14 rounded-3xl bg-gradient-card border-2 border-border/20 focus:border-primary/40 shadow-card text-base placeholder:text-muted-foreground/70"
               />
               
@@ -56,6 +81,7 @@ const Header = () => {
                         key={index}
                         variant="secondary" 
                         className="cursor-pointer hover:bg-primary hover:text-white transition-smooth text-xs rounded-full"
+                        onClick={() => handleSuggestionClick(suggestion)}
                       >
                         {suggestion}
                       </Badge>
@@ -63,7 +89,7 @@ const Header = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
 
           {/* Navigation */}
@@ -91,10 +117,18 @@ const Header = () => {
             <Button variant="ghost" size="icon" className="md:hidden rounded-full">
               <Search className="w-5 h-5" />
             </Button>
-            <Button variant="outline" className="hidden sm:flex rounded-full">
+            <Button 
+              variant="outline" 
+              className="hidden sm:flex rounded-full"
+              onClick={() => onShowAuth?.('signin')}
+            >
               Sign In
             </Button>
-            <Button variant="futuristic" className="rounded-full">
+            <Button 
+              variant="futuristic" 
+              className="rounded-full"
+              onClick={() => onShowAuth?.('signup')}
+            >
               <Sparkles className="w-4 h-4 mr-2" />
               Get Started
             </Button>
