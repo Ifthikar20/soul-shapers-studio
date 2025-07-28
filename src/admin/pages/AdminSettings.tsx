@@ -1,0 +1,15 @@
+const AdminSettings = () => {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold text-foreground mb-2">Platform Settings</h2>
+          <p className="text-muted-foreground">Configure your platform preferences and settings</p>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Settings functionality coming soon...</p>
+        </div>
+      </div>
+    );
+  };
+  
+  export default AdminSettings;

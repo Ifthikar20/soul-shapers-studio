@@ -89,7 +89,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
 
           {/* Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium flex items-center gap-2">
+            <a href="/browse" className="text-foreground hover:text-primary transition-smooth font-medium flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               Browse
             </a>
