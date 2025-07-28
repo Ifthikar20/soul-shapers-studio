@@ -134,12 +134,6 @@ const SearchResults = () => {
                     className="w-12 h-12 rounded-2xl object-cover shadow-soft"
                   />
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                    Better & Bliss
-                  </h1>
-                  <p className="text-xs text-muted-foreground font-medium">.com</p>
-                </div>
               </div>
 
               {/* Search Bar */}

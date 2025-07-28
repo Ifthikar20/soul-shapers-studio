@@ -45,7 +45,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             <div className="relative">
               <img 
                 src={betterBlissLogo} 
-                alt="Better & Bliss" 
                 className="w-12 h-12 rounded-2xl object-cover shadow-soft"
               />
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-primary rounded-full flex items-center justify-center">
@@ -53,10 +52,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Better & Bliss
-              </h1>
-              <p className="text-xs text-muted-foreground font-medium">.com</p>
             </div>
           </div>
 

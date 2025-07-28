@@ -12,7 +12,6 @@ const Footer = () => {
               <div className="relative">
                 <img 
                   src={betterBlissLogo} 
-                  alt="Better & Bliss" 
                   className="w-12 h-12 rounded-2xl object-cover shadow-soft"
                 />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-primary rounded-full flex items-center justify-center">

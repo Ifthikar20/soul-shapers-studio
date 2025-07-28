@@ -136,7 +136,6 @@ const AuthPage = ({ mode, onModeChange, onBack }: AuthPageProps) => {
             <div className="relative">
               <img 
                 src={betterBlissLogo} 
-                alt="Better & Bliss" 
                 className="w-16 h-16 rounded-3xl object-cover shadow-glow"
               />
               <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-primary rounded-full flex items-center justify-center">
