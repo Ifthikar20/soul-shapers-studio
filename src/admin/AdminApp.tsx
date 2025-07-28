@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminAuthWrapper from "./components/shared/AdminAuthWrapper";
-import AdminLayout from "./components/layout/AdminLayout";
+import AdminLayout from "./pages/AdminLayout";
 
 const AdminApp = () => {
   return (
