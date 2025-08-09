@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Play, Clock, User, Star, TrendingUp, Bookmark, X } from "lucide-react";
+import { 
+  Play, Clock, User, Star, TrendingUp, Bookmark, X, 
+  Calendar, BookOpen, ChevronRight, Filter, Search, 
+  Heart, Share2, MoreVertical, Eye, Users, Award, 
+  Target, Zap, Pause, Volume2, Settings, Plus, 
+  ThumbsUp, Check 
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +31,13 @@ interface VideoContent {
   learningObjectives?: string[];
   expertAvatar?: string;
 }
+
+// [Keep all your videos array data as is]
+
+// [Keep your VideoModal component as is]
+
+// [Keep your VideoGrid component as is]
+
 
 const videos: VideoContent[] = [
   {
@@ -168,6 +181,361 @@ const videos: VideoContent[] = [
 ];
 
 // Video Modal Component with Fixed Scrolling
+// const VideoModal = ({ 
+//   video, 
+//   open, 
+//   onOpenChange 
+// }: { 
+//   video: VideoContent, 
+//   open: boolean, 
+//   onOpenChange: (open: boolean) => void 
+// }) => {
+//   return (
+//     <Dialog open={open} onOpenChange={onOpenChange}>
+//       <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
+//         {/* Fixed Header */}
+//         <DialogHeader className="p-6 pb-4 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-10">
+//           <div className="flex items-start justify-between">
+//             <DialogTitle className="text-2xl font-bold pr-8 leading-tight">
+//               {video.title}
+//             </DialogTitle>
+//             <Button
+//               variant="ghost"
+//               size="sm"
+//               onClick={() => onOpenChange(false)}
+//               className="h-8 w-8 p-0 rounded-full hover:bg-accent"
+//             >
+//               <X className="h-4 w-4" />
+//             </Button>
+//           </div>
+//         </DialogHeader>
+        
+//         {/* Scrollable Content */}
+//         <div className="overflow-y-auto max-h-[calc(90vh-100px)] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+//           <div className="p-6">
+//             {/* Video Player */}
+//             {video.videoUrl && (
+//               <div className="w-full aspect-video rounded-lg overflow-hidden mb-6 bg-black">
+//                 <iframe 
+//                   width="100%" 
+//                   height="100%" 
+//                   src={video.videoUrl} 
+//                   title={video.title}
+//                   frameBorder="0"
+//                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+//                   allowFullScreen
+//                   className="w-full h-full"
+//                 ></iframe>
+//               </div>
+//             )}
+            
+//             {/* Video Details */}
+//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+//               {/* Left Column: Video Info */}
+//               <div className="lg:col-span-2">
+//                 <div className="flex items-center justify-between mb-6">
+//                   <div className="flex items-center space-x-4">
+//                     <Badge variant="secondary" className="text-xs px-3 py-1">
+//                       {video.category}
+//                     </Badge>
+//                     <div className="flex items-center text-muted-foreground">
+//                       <Clock className="w-4 h-4 mr-2" />
+//                       <span>{video.duration}</span>
+//                     </div>
+//                     <div className="flex items-center text-muted-foreground">
+//                       <span>{video.views} views</span>
+//                     </div>
+//                   </div>
+//                   <div className="flex items-center space-x-2">
+//                     <Button variant="outline" size="sm" className="rounded-full">
+//                       <Bookmark className="w-4 h-4 mr-2" />
+//                       Save
+//                     </Button>
+//                   </div>
+//                 </div>
+                
+//                 {/* Expert Information */}
+//                 <div className="flex items-center mb-6 space-x-4 p-4 bg-accent/30 rounded-lg">
+//                   {video.expertAvatar && (
+//                     <img 
+//                       src={video.expertAvatar} 
+//                       alt={video.expert} 
+//                       className="w-14 h-14 rounded-full object-cover"
+//                     />
+//                   )}
+//                   <div className="flex-1">
+//                     <div className="flex items-center">
+//                       <User className="w-5 h-5 mr-2 text-primary" />
+//                       <span className="font-semibold text-lg">{video.expert}</span>
+//                     </div>
+//                     {video.expertCredentials && (
+//                       <p className="text-sm text-muted-foreground mt-1">
+//                         {video.expertCredentials}
+//                       </p>
+//                     )}
+//                   </div>
+//                   <div className="flex items-center">
+//                     <Star className="w-5 h-5 mr-1 text-yellow-500 fill-current" />
+//                     <span className="font-semibold">{video.rating}</span>
+//                   </div>
+//                 </div>
+                
+//                 <div className="prose prose-sm max-w-none mb-8">
+//                   <p className="text-muted-foreground text-base leading-relaxed">
+//                     {video.fullDescription || video.description}
+//                   </p>
+//                 </div>
+                
+//                 {/* Learning Objectives */}
+//                 {video.learningObjectives && (
+//                   <div className="mb-8 relative overflow-hidden">
+//                     {/* Background Pattern */}
+//                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-50 rounded-2xl"></div>
+//                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-200/30 to-transparent rounded-full blur-2xl"></div>
+//                     <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/30 to-transparent rounded-full blur-xl"></div>
+                    
+//                     {/* Content */}
+//                     <div className="relative p-8 border border-emerald-100/50 rounded-2xl backdrop-blur-sm">
+//                       <div className="flex items-center mb-6">
+//                         <div className="p-3 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-xl shadow-lg">
+//                           <Star className="w-6 h-6 text-white" />
+//                         </div>
+//                         <div className="ml-4">
+//                           <h4 className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-blue-700 bg-clip-text text-transparent">
+//                             What You'll Learn
+//                           </h4>
+//                           <p className="text-sm text-muted-foreground">Key outcomes from this session</p>
+//                         </div>
+//                       </div>
+                      
+//                       <div className="grid gap-4">
+//                         {video.learningObjectives.map((objective, index) => (
+//                           <div key={index} className="flex items-start group">
+//                             <div className="flex-shrink-0 mr-4 mt-1">
+//                               <div className="w-8 h-8 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-lg flex items-center justify-center group-hover:from-emerald-200 group-hover:to-blue-200 transition-all duration-300">
+//                                 <span className="text-sm font-bold text-emerald-700">{index + 1}</span>
+//                               </div>
+//                             </div>
+//                             <div className="flex-1 pt-1">
+//                               <span className="text-foreground font-medium leading-relaxed group-hover:text-emerald-800 transition-colors duration-300">
+//                                 {objective}
+//                               </span>
+//                             </div>
+//                           </div>
+//                         ))}
+//                       </div>
+                      
+//                       {/* Progress indicator */}
+//                       <div className="mt-6 pt-6 border-t border-emerald-100/50">
+//                         <div className="flex items-center text-sm text-muted-foreground">
+//                           <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+//                           <span>Complete all objectives to master this topic</span>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 )}
+                
+//                 {/* Related Topics */}
+//                 {video.relatedTopics && (
+//                   <div>
+//                     <h4 className="text-lg font-semibold mb-4">
+//                       Related Topics
+//                     </h4>
+//                     <div className="flex flex-wrap gap-2">
+//                       {video.relatedTopics.map((topic, index) => (
+//                         <Badge 
+//                           key={index} 
+//                           variant="secondary" 
+//                           className="cursor-pointer hover:bg-primary hover:text-white transition-all duration-300 px-3 py-1"
+//                         >
+//                           {topic}
+//                         </Badge>
+//                       ))}
+//                     </div>
+//                   </div>
+//                 )}
+//               </div>
+              
+//               {/* Right Column: Video Chapters */}
+//               <div className="lg:border-l lg:pl-8">
+//                 <h4 className="text-lg font-semibold mb-6 flex items-center">
+//                   <Play className="w-5 h-5 mr-2 text-primary" />
+//                   Video Chapters
+//                 </h4>
+//                 <div className="space-y-3">
+//                   {/* Chapter 1 */}
+//                   <div className="flex items-start bg-primary/5 rounded-lg p-3 hover:bg-primary/10 transition-all duration-300 cursor-pointer group border border-primary/20">
+//                     <div className="flex-shrink-0 mr-3 relative">
+//                       <img 
+//                         src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=60&fit=crop&crop=center"
+//                         alt="Behavioral patterns discussion"
+//                         className="w-16 h-12 object-cover rounded-md"
+//                       />
+//                       <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+//                         <Play className="w-4 h-4 text-white" />
+//                       </div>
+//                       <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+//                         3:45
+//                       </span>
+//                     </div>
+//                     <div className="flex-1 min-w-0">
+//                       <div className="flex items-center justify-between mb-1">
+//                         <h5 className="font-semibold text-sm group-hover:text-primary transition-colors">
+//                           Understanding Behavioral Patterns
+//                         </h5>
+//                         <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded font-medium">
+//                           Playing
+//                         </span>
+//                       </div>
+//                       <p className="text-xs text-muted-foreground leading-relaxed">
+//                         Explore how behavioral patterns form and their impact on anxiety responses
+//                       </p>
+//                       <div className="mt-2 flex items-center text-xs text-muted-foreground">
+//                         <div className="w-1 h-1 bg-primary rounded-full mr-1"></div>
+//                         <span>0:00 - 3:45</span>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Chapter 2 */}
+//                   <div className="flex items-start bg-accent/20 rounded-lg p-3 hover:bg-accent/40 transition-all duration-300 cursor-pointer group">
+//                     <div className="flex-shrink-0 mr-3 relative">
+//                       <img 
+//                         src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=80&h=60&fit=crop&crop=center"
+//                         alt="Wellness facts discussion"
+//                         className="w-16 h-12 object-cover rounded-md"
+//                       />
+//                       <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+//                         <Play className="w-4 h-4 text-white" />
+//                       </div>
+//                       <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+//                         1:35
+//                       </span>
+//                     </div>
+//                     <div className="flex-1 min-w-0">
+//                       <div className="flex items-center justify-between mb-1">
+//                         <h5 className="font-semibold text-sm group-hover:text-emerald-700 transition-colors">
+//                           Unknown Facts About Wellness
+//                         </h5>
+//                         <span className="text-xs text-muted-foreground bg-white/80 px-2 py-1 rounded">
+//                           Next
+//                         </span>
+//                       </div>
+//                       <p className="text-xs text-muted-foreground leading-relaxed">
+//                         Surprising wellness insights that challenge common misconceptions
+//                       </p>
+//                       <div className="mt-2 flex items-center text-xs text-muted-foreground">
+//                         <div className="w-1 h-1 bg-emerald-500 rounded-full mr-1"></div>
+//                         <span>3:45 - 5:20</span>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Chapter 3 */}
+//                   <div className="flex items-start bg-accent/20 rounded-lg p-3 hover:bg-accent/40 transition-all duration-300 cursor-pointer group">
+//                     <div className="flex-shrink-0 mr-3 relative">
+//                       <img 
+//                         src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=80&h=60&fit=crop&crop=center"
+//                         alt="Coping strategies demonstration"
+//                         className="w-16 h-12 object-cover rounded-md"
+//                       />
+//                       <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+//                         <Play className="w-4 h-4 text-white" />
+//                       </div>
+//                       <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+//                         3:55
+//                       </span>
+//                     </div>
+//                     <div className="flex-1 min-w-0">
+//                       <div className="flex items-center justify-between mb-1">
+//                         <h5 className="font-semibold text-sm group-hover:text-orange-700 transition-colors">
+//                           Practical Coping Strategies
+//                         </h5>
+//                       </div>
+//                       <p className="text-xs text-muted-foreground leading-relaxed">
+//                         Actionable techniques you can implement immediately for anxiety relief
+//                       </p>
+//                       <div className="mt-2 flex items-center text-xs text-muted-foreground">
+//                         <div className="w-1 h-1 bg-orange-500 rounded-full mr-1"></div>
+//                         <span>5:20 - 9:15</span>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Chapter 4 */}
+//                   <div className="flex items-start bg-accent/20 rounded-lg p-3 hover:bg-accent/40 transition-all duration-300 cursor-pointer group">
+//                     <div className="flex-shrink-0 mr-3 relative">
+//                       <img 
+//                         src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=80&h=60&fit=crop&crop=center"
+//                         alt="Building resilience discussion"
+//                         className="w-16 h-12 object-cover rounded-md"
+//                       />
+//                       <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+//                         <Play className="w-4 h-4 text-white" />
+//                       </div>
+//                       <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+//                         3:25
+//                       </span>
+//                     </div>
+//                     <div className="flex-1 min-w-0">
+//                       <div className="flex items-center justify-between mb-1">
+//                         <h5 className="font-semibold text-sm group-hover:text-purple-700 transition-colors">
+//                           Building Long-term Resilience
+//                         </h5>
+//                       </div>
+//                       <p className="text-xs text-muted-foreground leading-relaxed">
+//                         Developing sustainable practices for lasting mental health improvement
+//                       </p>
+//                       <div className="mt-2 flex items-center text-xs text-muted-foreground">
+//                         <div className="w-1 h-1 bg-purple-500 rounded-full mr-1"></div>
+//                         <span>9:15 - 12:40</span>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Chapter 5 */}
+//                   <div className="flex items-start bg-accent/20 rounded-lg p-3 hover:bg-accent/40 transition-all duration-300 cursor-pointer group">
+//                     <div className="flex-shrink-0 mr-3 relative">
+//                       <img 
+//                         src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=80&h=60&fit=crop&crop=center"
+//                         alt="Q&A session"
+//                         className="w-16 h-12 object-cover rounded-md"
+//                       />
+//                       <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+//                         <Play className="w-4 h-4 text-white" />
+//                       </div>
+//                       <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
+//                         5:50
+//                       </span>
+//                     </div>
+//                     <div className="flex-1 min-w-0">
+//                       <div className="flex items-center justify-between mb-1">
+//                         <h5 className="font-semibold text-sm group-hover:text-indigo-700 transition-colors">
+//                           Q&A and Final Thoughts
+//                         </h5>
+//                       </div>
+//                       <p className="text-xs text-muted-foreground leading-relaxed">
+//                         Common questions answered and key takeaways for your journey
+//                       </p>
+//                       <div className="mt-2 flex items-center text-xs text-muted-foreground">
+//                         <div className="w-1 h-1 bg-indigo-500 rounded-full mr-1"></div>
+//                         <span>12:40 - 18:30</span>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+
+
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </DialogContent>
+//     </Dialog>
+//   );
+// };
+// Video Modal Component - Netflix/Streaming Style
 const VideoModal = ({ 
   video, 
   open, 
@@ -177,343 +545,283 @@ const VideoModal = ({
   open: boolean, 
   onOpenChange: (open: boolean) => void 
 }) => {
+  const [activeTab, setActiveTab] = useState('overview');
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
-        {/* Fixed Header */}
-        <DialogHeader className="p-6 pb-4 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-10">
-          <div className="flex items-start justify-between">
-            <DialogTitle className="text-2xl font-bold pr-8 leading-tight">
-              {video.title}
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              className="h-8 w-8 p-0 rounded-full hover:bg-accent"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </DialogHeader>
-        
-        {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-100px)] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-          <div className="p-6">
-            {/* Video Player */}
-            {video.videoUrl && (
-              <div className="w-full aspect-video rounded-lg overflow-hidden mb-6 bg-black">
-                <iframe 
-                  width="100%" 
-                  height="100%" 
-                  src={video.videoUrl} 
-                  title={video.title}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                ></iframe>
+      <DialogContent className="max-w-[100vw] w-full h-[100vh] m-0 p-0 bg-black border-0 rounded-none overflow-hidden">
+        {/* Make this container scrollable */}
+        <div className="relative w-full h-full overflow-y-auto overflow-x-hidden bg-gradient-to-b from-zinc-900 to-black">
+          
+          {/* Close button - now fixed position */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onOpenChange(false)}
+            className="fixed top-4 right-4 z-50 rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-white w-10 h-10"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+          
+          {/* Video Player Section */}
+          <div className="relative w-full">
+            {video.videoUrl ? (
+              <div className="relative w-full bg-black">
+                <div className="relative mx-auto" style={{ maxWidth: '1400px' }}>
+                  <div className="relative aspect-video w-full">
+                    <iframe 
+                      width="100%" 
+                      height="100%" 
+                      src={video.videoUrl} 
+                      title={video.title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                      allowFullScreen
+                      className="w-full h-full"
+                    />
+                    
+                    {/* Video Controls Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/70 to-transparent p-8 pb-12">
+                      <div className="max-w-[1400px] mx-auto">
+                        {/* Playback controls */}
+                        <div className="flex items-center gap-3 mb-4">
+                          <Button 
+                            size="icon" 
+                            className="rounded-full bg-white/20 backdrop-blur hover:bg-white/30 text-white"
+                          >
+                            <Pause className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="icon" 
+                            className="rounded-full bg-white/20 backdrop-blur hover:bg-white/30 text-white"
+                          >
+                            <Volume2 className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="icon" 
+                            className="rounded-full bg-white/20 backdrop-blur hover:bg-white/30 text-white"
+                          >
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="relative w-full h-[50vh] bg-gradient-to-b from-zinc-800 to-zinc-900 flex items-center justify-center">
+                <Play className="w-20 h-20 text-white/50" />
               </div>
             )}
-            
-            {/* Video Details */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Column: Video Info */}
-              <div className="lg:col-span-2">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-4">
-                    <Badge variant="secondary" className="text-xs px-3 py-1">
-                      {video.category}
-                    </Badge>
-                    <div className="flex items-center text-muted-foreground">
-                      <Clock className="w-4 h-4 mr-2" />
-                      <span>{video.duration}</span>
-                    </div>
-                    <div className="flex items-center text-muted-foreground">
-                      <span>{video.views} views</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" className="rounded-full">
-                      <Bookmark className="w-4 h-4 mr-2" />
-                      Save
-                    </Button>
-                  </div>
+          </div>
+          
+          {/* Content Section - Remove the negative margin that might cause issues */}
+          <div className="relative px-8 lg:px-12 pb-20">
+            <div className="max-w-[1400px] mx-auto">
+              
+              {/* Title and Actions Row */}
+              <div className="mb-8">
+                <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+                  {video.title}
+                </h1>
+                
+                <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400 mb-6">
+                  <span className="text-green-500 font-semibold">95% Match</span>
+                  <span>{new Date().getFullYear()}</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {video.duration}
+                  </span>
+                  <span className="px-2 py-0.5 border border-zinc-600 rounded text-xs">
+                    HD
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    {video.views}
+                  </span>
                 </div>
                 
-                {/* Expert Information */}
-                <div className="flex items-center mb-6 space-x-4 p-4 bg-accent/30 rounded-lg">
-                  {video.expertAvatar && (
-                    <img 
-                      src={video.expertAvatar} 
-                      alt={video.expert} 
-                      className="w-14 h-14 rounded-full object-cover"
-                    />
-                  )}
-                  <div className="flex-1">
-                    <div className="flex items-center">
-                      <User className="w-5 h-5 mr-2 text-primary" />
-                      <span className="font-semibold text-lg">{video.expert}</span>
-                    </div>
-                    {video.expertCredentials && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {video.expertCredentials}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center">
-                    <Star className="w-5 h-5 mr-1 text-yellow-500 fill-current" />
-                    <span className="font-semibold">{video.rating}</span>
-                  </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button 
+                    size="lg"
+                    className="bg-white hover:bg-white/90 text-black font-bold rounded px-8"
+                  >
+                    <Play className="w-5 h-5 mr-2 fill-black" />
+                    Play
+                  </Button>
+                  <Button 
+                    size="lg"
+                    variant="outline"
+                    className="bg-zinc-800/80 hover:bg-zinc-700 text-white border-zinc-700 rounded px-8"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    My List
+                  </Button>
+                  <Button 
+                    size="icon"
+                    variant="outline"
+                    className="rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-white border-zinc-700 w-12 h-12"
+                  >
+                    <ThumbsUp className="w-5 h-5" />
+                  </Button>
+                  <Button 
+                    size="icon"
+                    variant="outline"
+                    className="rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-white border-zinc-700 w-12 h-12"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </Button>
                 </div>
-                
-                <div className="prose prose-sm max-w-none mb-8">
-                  <p className="text-muted-foreground text-base leading-relaxed">
-                    {video.fullDescription || video.description}
-                  </p>
-                </div>
-                
-                {/* Learning Objectives */}
-                {video.learningObjectives && (
-                  <div className="mb-8 relative overflow-hidden">
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-50 rounded-2xl"></div>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-200/30 to-transparent rounded-full blur-2xl"></div>
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-200/30 to-transparent rounded-full blur-xl"></div>
-                    
-                    {/* Content */}
-                    <div className="relative p-8 border border-emerald-100/50 rounded-2xl backdrop-blur-sm">
-                      <div className="flex items-center mb-6">
-                        <div className="p-3 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-xl shadow-lg">
-                          <Star className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="ml-4">
-                          <h4 className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-blue-700 bg-clip-text text-transparent">
-                            What You'll Learn
-                          </h4>
-                          <p className="text-sm text-muted-foreground">Key outcomes from this session</p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid gap-4">
-                        {video.learningObjectives.map((objective, index) => (
-                          <div key={index} className="flex items-start group">
-                            <div className="flex-shrink-0 mr-4 mt-1">
-                              <div className="w-8 h-8 bg-gradient-to-br from-emerald-100 to-blue-100 rounded-lg flex items-center justify-center group-hover:from-emerald-200 group-hover:to-blue-200 transition-all duration-300">
-                                <span className="text-sm font-bold text-emerald-700">{index + 1}</span>
-                              </div>
-                            </div>
-                            <div className="flex-1 pt-1">
-                              <span className="text-foreground font-medium leading-relaxed group-hover:text-emerald-800 transition-colors duration-300">
-                                {objective}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* Progress indicator */}
-                      <div className="mt-6 pt-6 border-t border-emerald-100/50">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
-                          <span>Complete all objectives to master this topic</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Related Topics */}
-                {video.relatedTopics && (
-                  <div>
-                    <h4 className="text-lg font-semibold mb-4">
-                      Related Topics
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {video.relatedTopics.map((topic, index) => (
-                        <Badge 
-                          key={index} 
-                          variant="secondary" 
-                          className="cursor-pointer hover:bg-primary hover:text-white transition-all duration-300 px-3 py-1"
-                        >
-                          {topic}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
               
-              {/* Right Column: Video Chapters */}
-              <div className="lg:border-l lg:pl-8">
-                <h4 className="text-lg font-semibold mb-6 flex items-center">
-                  <Play className="w-5 h-5 mr-2 text-primary" />
-                  Video Chapters
-                </h4>
-                <div className="space-y-3">
-                  {/* Chapter 1 */}
-                  <div className="flex items-start bg-primary/5 rounded-lg p-3 hover:bg-primary/10 transition-all duration-300 cursor-pointer group border border-primary/20">
-                    <div className="flex-shrink-0 mr-3 relative">
-                      <img 
-                        src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=60&fit=crop&crop=center"
-                        alt="Behavioral patterns discussion"
-                        className="w-16 h-12 object-cover rounded-md"
-                      />
-                      <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Play className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
-                        3:45
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h5 className="font-semibold text-sm group-hover:text-primary transition-colors">
-                          Understanding Behavioral Patterns
-                        </h5>
-                        <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded font-medium">
-                          Playing
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Explore how behavioral patterns form and their impact on anxiety responses
-                      </p>
-                      <div className="mt-2 flex items-center text-xs text-muted-foreground">
-                        <div className="w-1 h-1 bg-primary rounded-full mr-1"></div>
-                        <span>0:00 - 3:45</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Chapter 2 */}
-                  <div className="flex items-start bg-accent/20 rounded-lg p-3 hover:bg-accent/40 transition-all duration-300 cursor-pointer group">
-                    <div className="flex-shrink-0 mr-3 relative">
-                      <img 
-                        src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=80&h=60&fit=crop&crop=center"
-                        alt="Wellness facts discussion"
-                        className="w-16 h-12 object-cover rounded-md"
-                      />
-                      <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Play className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
-                        1:35
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h5 className="font-semibold text-sm group-hover:text-emerald-700 transition-colors">
-                          Unknown Facts About Wellness
-                        </h5>
-                        <span className="text-xs text-muted-foreground bg-white/80 px-2 py-1 rounded">
-                          Next
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Surprising wellness insights that challenge common misconceptions
-                      </p>
-                      <div className="mt-2 flex items-center text-xs text-muted-foreground">
-                        <div className="w-1 h-1 bg-emerald-500 rounded-full mr-1"></div>
-                        <span>3:45 - 5:20</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Chapter 3 */}
-                  <div className="flex items-start bg-accent/20 rounded-lg p-3 hover:bg-accent/40 transition-all duration-300 cursor-pointer group">
-                    <div className="flex-shrink-0 mr-3 relative">
-                      <img 
-                        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=80&h=60&fit=crop&crop=center"
-                        alt="Coping strategies demonstration"
-                        className="w-16 h-12 object-cover rounded-md"
-                      />
-                      <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Play className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
-                        3:55
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h5 className="font-semibold text-sm group-hover:text-orange-700 transition-colors">
-                          Practical Coping Strategies
-                        </h5>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Actionable techniques you can implement immediately for anxiety relief
-                      </p>
-                      <div className="mt-2 flex items-center text-xs text-muted-foreground">
-                        <div className="w-1 h-1 bg-orange-500 rounded-full mr-1"></div>
-                        <span>5:20 - 9:15</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Chapter 4 */}
-                  <div className="flex items-start bg-accent/20 rounded-lg p-3 hover:bg-accent/40 transition-all duration-300 cursor-pointer group">
-                    <div className="flex-shrink-0 mr-3 relative">
-                      <img 
-                        src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=80&h=60&fit=crop&crop=center"
-                        alt="Building resilience discussion"
-                        className="w-16 h-12 object-cover rounded-md"
-                      />
-                      <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Play className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
-                        3:25
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h5 className="font-semibold text-sm group-hover:text-purple-700 transition-colors">
-                          Building Long-term Resilience
-                        </h5>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Developing sustainable practices for lasting mental health improvement
-                      </p>
-                      <div className="mt-2 flex items-center text-xs text-muted-foreground">
-                        <div className="w-1 h-1 bg-purple-500 rounded-full mr-1"></div>
-                        <span>9:15 - 12:40</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Chapter 5 */}
-                  <div className="flex items-start bg-accent/20 rounded-lg p-3 hover:bg-accent/40 transition-all duration-300 cursor-pointer group">
-                    <div className="flex-shrink-0 mr-3 relative">
-                      <img 
-                        src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=80&h=60&fit=crop&crop=center"
-                        alt="Q&A session"
-                        className="w-16 h-12 object-cover rounded-md"
-                      />
-                      <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Play className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
-                        5:50
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h5 className="font-semibold text-sm group-hover:text-indigo-700 transition-colors">
-                          Q&A and Final Thoughts
-                        </h5>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Common questions answered and key takeaways for your journey
-                      </p>
-                      <div className="mt-2 flex items-center text-xs text-muted-foreground">
-                        <div className="w-1 h-1 bg-indigo-500 rounded-full mr-1"></div>
-                        <span>12:40 - 18:30</span>
-                      </div>
-                    </div>
-                  </div>
+              {/* Expert/Instructor Info */}
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                  <User className="w-6 h-6 text-white" />
                 </div>
-
-
+                <div>
+                  <p className="text-white font-semibold">{video.expert}</p>
+                  <p className="text-zinc-400 text-sm">Wellness Expert</p>
+                </div>
+              </div>
+              
+              {/* Tabs Navigation */}
+              <div className="border-b border-zinc-800 mb-8">
+                <div className="flex gap-8 overflow-x-auto">
+                  {['Overview', 'Lessons', 'Resources', 'Stories'].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab.toLowerCase())}
+                      className={`pb-4 px-1 text-lg font-semibold transition-all relative whitespace-nowrap ${
+                        activeTab === tab.toLowerCase()
+                          ? 'text-white'
+                          : 'text-zinc-500 hover:text-zinc-300'
+                      }`}
+                    >
+                      {tab}
+                      {activeTab === tab.toLowerCase() && (
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-purple-500 rounded-t" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Tab Content */}
+              <div className="pb-12">
+                {activeTab === 'overview' && (
+                  <div className="grid lg:grid-cols-3 gap-8">
+                    {/* Stats Cards */}
+                    <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                      <div className="bg-zinc-900/50 backdrop-blur rounded-lg p-6 border border-zinc-800">
+                        <div className="flex items-center gap-3 mb-2">
+                          <BookOpen className="w-5 h-5 text-purple-400" />
+                          <span className="text-2xl font-bold text-white">7 Lessons</span>
+                        </div>
+                        <p className="text-zinc-500 text-sm">Interactive content</p>
+                      </div>
+                      <div className="bg-zinc-900/50 backdrop-blur rounded-lg p-6 border border-zinc-800">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Clock className="w-5 h-5 text-blue-400" />
+                          <span className="text-2xl font-bold text-white">1 hour 7 mins</span>
+                        </div>
+                        <p className="text-zinc-500 text-sm">Total duration</p>
+                      </div>
+                      <div className="bg-zinc-900/50 backdrop-blur rounded-lg p-6 border border-zinc-800">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Users className="w-5 h-5 text-green-400" />
+                          <span className="text-2xl font-bold text-white">88,800 Enrolled</span>
+                        </div>
+                        <p className="text-zinc-500 text-sm">Active learners</p>
+                      </div>
+                    </div>
+                    
+                    {/* Main Content */}
+                    <div className="lg:col-span-2">
+                      <h2 className="text-3xl font-bold text-white mb-4">
+                        Stop craving, start living!
+                      </h2>
+                      <p className="text-zinc-300 text-lg leading-relaxed mb-6">
+                        {video.fullDescription || video.description}
+                      </p>
+                      
+                      <div className="prose prose-invert max-w-none">
+                        <p className="text-zinc-400 leading-relaxed">
+                          This program uses behavioural psychology and pattern interruption to modify the way 
+                          your mind craves sugar. Transform your habits and enhance your life—start today!
+                        </p>
+                      </div>
+                      
+                      {/* Learning Points */}
+                      {video.learningObjectives && (
+                        <div className="mt-8">
+                          <h3 className="text-xl font-bold text-white mb-4">What you'll learn</h3>
+                          <div className="space-y-3">
+                            {video.learningObjectives.map((objective, index) => (
+                              <div key={index} className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                  <Check className="w-3 h-3 text-purple-400" />
+                                </div>
+                                <span className="text-zinc-300">{objective}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Sidebar - Remove sticky positioning for mobile */}
+                    <div className="lg:col-span-1">
+                      <div className="bg-zinc-900/50 backdrop-blur rounded-lg p-6 border border-zinc-800">
+                        <h3 className="text-lg font-bold text-white mb-4">Course Details</h3>
+                        <div className="space-y-4">
+                          <div className="flex justify-between">
+                            <span className="text-zinc-500">Category</span>
+                            <span className="text-white">{video.category}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-zinc-500">Level</span>
+                            <span className="text-white">All Levels</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-zinc-500">Rating</span>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                              <span className="text-white">{video.rating}</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-zinc-500">Last Updated</span>
+                            <span className="text-white">Dec 2024</span>
+                          </div>
+                        </div>
+                        
+                        <Button className="w-full mt-6 bg-purple-600 hover:bg-purple-700 text-white">
+                          Start Learning
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {activeTab === 'lessons' && (
+                  <div className="space-y-4">
+                    <p className="text-zinc-400">Course lessons will appear here...</p>
+                  </div>
+                )}
+                
+                {activeTab === 'resources' && (
+                  <div className="space-y-4">
+                    <p className="text-zinc-400">Downloadable resources will appear here...</p>
+                  </div>
+                )}
+                
+                {activeTab === 'stories' && (
+                  <div className="space-y-4">
+                    <p className="text-zinc-400">Success stories will appear here...</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
