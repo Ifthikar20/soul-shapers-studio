@@ -1,16 +1,44 @@
-// src/pages/UpgradePage.tsx (continued from previous)
-import { useNavigate, useLocation } from "react-router-dom";
+// src/pages/UpgradePage.tsx
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Crown, Zap, Star } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { getUpgradeContextFromUrl, trackUpgradeEvent } from '@/utils/upgradeTracking';
+import { UpgradeContext } from '@/types/video.types';  // ADD this import
 
 const UpgradePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { upgradeId } = useParams();
   
+  // Get context from URL parameters
+  const context = getUpgradeContextFromUrl();
   const message = location.state?.message;
+
+  // Track upgrade page view
+  useEffect(() => {
+    if (upgradeId) {
+      trackUpgradeEvent('Upgrade Page Viewed', context);
+      
+      if (context.source === 'video_locked') {
+        trackUpgradeEvent('Video Lock Triggered Upgrade', context);
+      }
+    }
+  }, [upgradeId]);
+
+  // Generate personalized message
+  const getPersonalizedMessage = () => {
+    if (context.source === 'video_locked' && context.videoTitle) {
+      return `Unlock "${context.videoTitle}" and access the complete series!`;
+    }
+    if (context.source === 'upgrade_button') {
+      return `Upgrade to access premium content and exclusive features!`;
+    }
+    return message || 'Choose the plan that works best for you';
+  };
 
   const plans = [
     {
@@ -40,9 +68,15 @@ const UpgradePage = () => {
       name: "Premium",
       price: "$9.99",
       period: "/month",
-      features: [
+      features: context.source === 'video_locked' ? [
+        `✅ Unlock "${context.videoTitle || 'this video'}"`,
+        `✅ Access full ${context.seriesId ? 'series' : 'content library'}`,
+        "✅ 1-on-1 expert sessions",
+        "✅ Download for offline viewing",
+        "✅ Priority support"
+      ] : [
         "Everything in Basic",
-        "Unlimited premium content",
+        "Unlimited premium content", 
         "1-on-1 expert sessions",
         "Download for offline",
         "Priority support"
@@ -53,15 +87,24 @@ const UpgradePage = () => {
   ];
 
   const handleSelectPlan = (planName: string) => {
+    // Track upgrade button click
+    if (upgradeId) {
+      trackUpgradeEvent('Upgrade Button Clicked', {
+        ...context,
+        plan: planName,
+      }); // Removed the type casting
+    }
+  
     if (planName === 'Free') {
       // Downgrade logic
       console.log('Downgrading to free');
     } else {
       // Upgrade logic - integrate with Stripe
-      console.log(`Upgrading to ${planName}`);
+      const checkoutUrl = `/checkout?plan=${planName.toLowerCase()}${upgradeId ? `&upgrade_id=${upgradeId}` : ''}`;
+      window.location.href = checkoutUrl;
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gradient-secondary py-12">
       <div className="container mx-auto px-4">
@@ -69,8 +112,23 @@ const UpgradePage = () => {
           <h1 className="text-4xl font-bold mb-4">
             Choose Your Wellness Journey
           </h1>
-          {message && (
-            <p className="text-lg text-muted-foreground mb-4">{message}</p>
+          
+          <p className="text-lg text-muted-foreground mb-4">
+            {getPersonalizedMessage()}
+          </p>
+
+          {/* Show source context if available */}
+          {context.source && (
+            <div className="text-sm text-muted-foreground mb-4">
+              {context.source === 'video_locked' && context.videoTitle && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 max-w-md mx-auto">
+                  <p className="text-orange-700">
+                    🔒 You tried to watch: <strong>"{context.videoTitle}"</strong>
+                    {context.episode && <span> (Episode {context.episode})</span>}
+                  </p>
+                </div>
+              )}
+            </div>
           )}
         </div>
         

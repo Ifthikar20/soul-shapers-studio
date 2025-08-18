@@ -33,27 +33,29 @@ const App = () => (
             <Route path="/search" element={<SearchResults />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             <Route path="/upgrade" element={<UpgradePage />} />
-            
+            <Route path="/upgrade" element={<UpgradePage />} />
+            <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
+
             {/* Protected Routes - Requires Authentication */}
-            <Route 
-              path="/browse" 
+            <Route
+              path="/browse"
               element={
                 <ProtectedRoute>
                   <BrowsePage />
                 </ProtectedRoute>
-              } 
+              }
             />
-            
+
             {/* Admin Routes - Requires Admin Role */}
-            <Route 
-              path="/admin/*" 
+            <Route
+              path="/admin/*"
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminApp />
                 </ProtectedRoute>
-              } 
+              }
             />
-            
+
             {/* Catch all - 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
