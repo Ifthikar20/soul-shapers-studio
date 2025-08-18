@@ -40,6 +40,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       const userData = await authService.getCurrentUser();
       setUser(userData);
     } catch (error) {
+      // Don't log error for expected 401s when not logged in
       setUser(null);
     } finally {
       setLoading(false);
@@ -47,6 +48,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     }
   }, [isInitialized]);
 
+  // THIS WAS MISSING - Call checkAuthStatus on component mount
   useEffect(() => {
     checkAuthStatus();
   }, [checkAuthStatus]);
@@ -73,7 +75,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     } catch (error: any) {
       toast({
         title: "Login failed",
-        description: error.response?.data?.detail || "Invalid credentials",
+        description: error.message || "Invalid credentials", // Fixed: use error.message instead of error.response?.data?.detail
         variant: "destructive",
       });
       throw error;
@@ -91,7 +93,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     } catch (error: any) {
       toast({
         title: "Registration failed",
-        description: error.response?.data?.detail || "Could not create account",
+        description: error.message || "Could not create account", // Fixed: use error.message instead of error.response?.data?.detail
         variant: "destructive",
       });
       throw error;

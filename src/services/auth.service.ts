@@ -56,37 +56,50 @@ class AuthService {
       }
     );
     
-    // Response interceptor for token refresh
-    this.api.interceptors.response.use(
-      (response) => response,
-      async (error: AxiosError) => {
-        const originalRequest = error.config as any;
-        
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-          
-          // Prevent multiple refresh calls
-          if (!this.refreshPromise) {
-            this.refreshPromise = this.refreshToken();
-          }
-          
-          try {
-            await this.refreshPromise;
-            this.refreshPromise = null;
-            return this.api.request(originalRequest);
-          } catch (refreshError) {
-            this.refreshPromise = null;
-            // Only redirect if not already on login page
-            if (window.location.pathname !== '/login') {
-              window.location.href = '/login';
-            }
-            return Promise.reject(refreshError);
-          }
-        }
-        
-        return Promise.reject(error);
+// Replace the existing response interceptor with this:
+
+this.api.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as any;
+    
+    // Only retry token refresh for specific routes and if we haven't tried already
+    if (
+      error.response?.status === 401 && 
+      !originalRequest._retry &&
+      // DON'T retry for these auth endpoints:
+      originalRequest.url !== '/auth/me' &&
+      originalRequest.url !== '/auth/refresh' &&
+      originalRequest.url !== '/auth/login' &&
+      originalRequest.url !== '/auth/register' &&
+      originalRequest.url !== '/auth/google' &&
+      originalRequest.url !== '/auth/logout'
+    ) {
+      originalRequest._retry = true;
+      
+      // Prevent multiple refresh calls
+      if (!this.refreshPromise) {
+        this.refreshPromise = this.refreshToken();
       }
-    );
+      
+      try {
+        await this.refreshPromise;
+        this.refreshPromise = null;
+        return this.api.request(originalRequest);
+      } catch (refreshError) {
+        this.refreshPromise = null;
+        // Only redirect if not already on login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(refreshError);
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
   }
   
   private getCSRFToken(): string | null {
