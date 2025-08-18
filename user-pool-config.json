@@ -1,0 +1,58 @@
+{
+  "PoolName": "soul-shapers-studio-new",
+  "Policies": {
+    "PasswordPolicy": {
+      "MinimumLength": 8,
+      "RequireUppercase": true,
+      "RequireLowercase": true,
+      "RequireNumbers": true,
+      "RequireSymbols": false
+    }
+  },
+  "Schema": [
+    {
+      "Name": "email",
+      "AttributeDataType": "String",
+      "Required": true,
+      "Mutable": true
+    },
+    {
+      "Name": "given_name",
+      "AttributeDataType": "String",
+      "Required": false,
+      "Mutable": true
+    },
+    {
+      "Name": "family_name",
+      "AttributeDataType": "String",
+      "Required": false,
+      "Mutable": true
+    },
+    {
+      "Name": "subscription_tier",
+      "AttributeDataType": "String",
+      "Required": false,
+      "Mutable": true,
+      "DeveloperOnlyAttribute": false
+    },
+    {
+      "Name": "role",
+      "AttributeDataType": "String",
+      "Required": false,
+      "Mutable": true,
+      "DeveloperOnlyAttribute": false
+    },
+    {
+      "Name": "permissions",
+      "AttributeDataType": "String",
+      "Required": false,
+      "Mutable": true,
+      "DeveloperOnlyAttribute": false
+    }
+  ],
+  "AutoVerifiedAttributes": ["email"],
+  "UsernameAttributes": ["email"],
+  "UsernameConfiguration": {
+    "CaseSensitive": false
+  }
+}
