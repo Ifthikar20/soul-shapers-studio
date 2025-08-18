@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useVideoAccess } from '@/hooks/useVideoAccess';
+import { useNavigationTracking } from '@/hooks/useNavigationTracking';
 import { 
   Play, Clock, User, Star, TrendingUp, Bookmark, X, 
   Calendar, BookOpen, ChevronRight, Filter, Search, 
@@ -13,86 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-// Enhanced Video Content Interface with Access Control
-interface VideoContent {
-  id: number;
-  title: string;
-  expert: string;
-  expertCredentials?: string;
-  duration: string;
-  category: string;
-  rating: number;
-  views: string;
-  thumbnail: string;
-  videoUrl?: string;
-  isNew: boolean;
-  isTrending: boolean;
-  description: string;
-  fullDescription?: string;
-  relatedTopics?: string[];
-  learningObjectives?: string[];
-  expertAvatar?: string;
-  
-  // Access control fields
-  accessTier: 'free' | 'basic' | 'premium';
-  isFirstEpisode?: boolean;
-  seriesId?: string;
-  episodeNumber?: number;
-}
-
-// Video Access Hook
-const useVideoAccess = () => {
-  const { user, canAccessContent } = useAuth();
-
-  const canWatchVideo = (video: VideoContent, allVideosInSeries?: VideoContent[]): boolean => {
-    // Free tier access rules
-    if (!user || user.subscription_tier === 'free') {
-      // Always allow access to free content
-      if (video.accessTier === 'free') return true;
-      
-      // Allow first episode of any series for free users
-      if (video.isFirstEpisode || video.episodeNumber === 1) return true;
-      
-      // If it's part of a series, check if it's the first video
-      if (allVideosInSeries && video.seriesId) {
-        const sortedVideos = allVideosInSeries
-          .filter(v => v.seriesId === video.seriesId)
-          .sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
-        
-        return sortedVideos[0]?.id === video.id;
-      }
-      
-      return false;
-    }
-
-    // Premium/Basic users can access content based on their tier
-    return canAccessContent(video.accessTier);
-  };
-
-  const getAccessMessage = (video: VideoContent): string => {
-    if (!user) {
-      return "Sign in to watch this content";
-    }
-
-    if (user.subscription_tier === 'free') {
-      if (video.episodeNumber && video.episodeNumber > 1) {
-        return "Upgrade to Premium to watch full series";
-      }
-      return "Upgrade to Premium to access this content";
-    }
-
-    if (!canAccessContent(video.accessTier)) {
-      return `Upgrade to ${video.accessTier} to watch this content`;
-    }
-
-    return "";
-  };
-
-  return {
-    canWatchVideo,
-    getAccessMessage
-  };
-};
+// Import the VideoContent type instead of defining it locally
+import { VideoContent } from '@/types/video.types';
 
 const videos: VideoContent[] = [
   {
@@ -1026,24 +950,66 @@ const VideoGrid = () => {
   const [selectedVideo, setSelectedVideo] = useState<VideoContent | null>(null);
   const [visibleVideos, setVisibleVideos] = useState(6);
   
-  // Add access control hooks
-  const navigate = useNavigate();
+  // Use the new hooks
   const { user } = useAuth();
   const { canWatchVideo, getAccessMessage } = useVideoAccess();
+  const { 
+    navigateToUpgrade, 
+    trackNavigationEvent, 
+    getNavigationContextFromUrl 
+  } = useNavigationTracking();
+
+  // Track page view with context when component mounts
+  useEffect(() => {
+    const context = getNavigationContextFromUrl();
+    if (context.trackingId) {
+      trackNavigationEvent('Video Grid Viewed', {
+        ...context,
+        from: context.from || 'direct',
+        section: 'featured_content'
+      });
+    } else {
+      // Regular page view without tracking context
+      trackNavigationEvent('Video Grid Viewed', {
+        source: 'direct',
+        section: 'featured_content'
+      });
+    }
+  }, []);
 
   const handleVideoPlay = (video: VideoContent) => {
     const canWatch = canWatchVideo(video, videos);
     
     if (canWatch) {
+      // Track successful video open
+      trackNavigationEvent('Video Opened', {
+        videoId: video.id.toString(),
+        source: 'video_grid',
+        feature: video.title,
+        section: video.category
+      });
       setSelectedVideo(video);
     } else {
-      // Show upgrade prompt or redirect to upgrade page
-      navigate('/upgrade');
+      // Navigate to upgrade with full tracking context
+      navigateToUpgrade({
+        source: 'video_locked',
+        videoId: video.id,
+        videoTitle: video.title,
+        seriesId: video.seriesId,
+        episodeNumber: video.episodeNumber,
+      });
     }
   };
 
   const handleLoadMore = () => {
     setVisibleVideos(prev => prev + 3);
+    
+    // Track load more action
+    trackNavigationEvent('Load More Videos', {
+      source: 'pagination',
+      feature: 'load_more',
+      section: 'video_grid'
+    });
   };
 
   return (
@@ -1199,7 +1165,16 @@ const VideoGrid = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => navigate('/upgrade')}
+                        onClick={() => {
+                          // Track upgrade button click with context
+                          navigateToUpgrade({
+                            source: 'upgrade_button',
+                            videoId: video.id,
+                            videoTitle: video.title,
+                            seriesId: video.seriesId,
+                            episodeNumber: video.episodeNumber,
+                          });
+                        }}
                         className="text-orange-600 border-orange-200 hover:bg-orange-50 rounded-full"
                       >
                         <Crown className="w-4 h-4 mr-1" />
