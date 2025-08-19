@@ -46,7 +46,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, loading } = useAuth();
 
-  // FIXED: Optimized scroll handler with throttling
+  // Optimized scroll handler with throttling
   useEffect(() => {
     let ticking = false;
     
@@ -107,7 +107,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
         }
       `}
       style={{
-        // FIXED: Force hardware acceleration and prevent layout shifts
         transform: 'translateZ(0)',
         willChange: 'background-color, backdrop-filter',
         backfaceVisibility: 'hidden',
@@ -116,7 +115,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     >
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo - FIXED: Simplified to prevent re-renders */}
+          {/* Logo - Updated with scroll-based text color */}
           <div 
             className="flex items-center space-x-3 cursor-pointer" 
             onClick={() => navigate('/')}
@@ -126,7 +125,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                 src={betterBlissLogo} 
                 className="w-10 h-10 rounded-xl object-cover"
                 alt="Better & Bliss"
-                // FIXED: Prevent image re-loading flicker
                 loading="eager"
                 style={{ imageRendering: 'crisp-edges' }}
               />
@@ -135,29 +133,38 @@ const Header = ({ onShowAuth }: HeaderProps) => {
               </div>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg font-semibold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              <h1 className={`text-lg font-semibold transition-all duration-300 ${
+                isScrolled 
+                  ? 'text-foreground' 
+                  : 'bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent'
+              }`}>
                 Better & Bliss
               </h1>
             </div>
           </div>
 
-          {/* Enhanced Search Bar - FIXED: Removed complex animations */}
+          {/* Enhanced Search Bar - Updated with scroll-based styling */}
           <div className="hidden md:flex flex-1 max-w-xl mx-8">
             <form onSubmit={handleSearchSubmit} className="relative w-full group">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 transition-colors group-focus-within:text-primary" />
+              <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-all duration-300 group-focus-within:text-primary ${
+                isScrolled ? 'text-muted-foreground' : 'text-white/70'
+              }`} />
               <Input
                 placeholder="Search wellness topics, experts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 pr-4 h-11 rounded-2xl bg-background/80 backdrop-blur-sm border border-border/40 focus:border-primary/60 text-sm placeholder:text-muted-foreground/70 transition-all duration-200"
+                className={`pl-11 pr-4 h-11 rounded-2xl transition-all duration-300 text-sm ${
+                  isScrolled 
+                    ? 'bg-background/80 backdrop-blur-sm border border-border/40 focus:border-primary/60 text-foreground placeholder:text-muted-foreground/70' 
+                    : 'bg-white/10 backdrop-blur-sm border border-white/20 focus:border-white/40 text-white placeholder:text-white/50'
+                }`}
                 style={{
-                  // FIXED: Prevent input styling conflicts
                   WebkitAppearance: 'none',
                   MozAppearance: 'none'
                 }}
               />
               
-              {/* FIXED: Simplified search suggestions without complex animations */}
+              {/* Search suggestions */}
               {searchQuery && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border/20 rounded-xl shadow-lg backdrop-blur-sm p-3 z-50">
                   <p className="text-xs text-muted-foreground mb-2 font-medium">Popular searches:</p>
@@ -178,17 +185,38 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             </form>
           </div>
 
-          {/* Navigation - FIXED: Simplified structure */}
+          {/* Navigation - Updated with scroll-based text color */}
           <nav className="hidden lg:flex items-center space-x-6">
-            <a href="/browse" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2">
+            <a 
+              href="/browse" 
+              className={`font-medium flex items-center gap-2 transition-all duration-300 ${
+                isScrolled 
+                  ? 'text-foreground hover:text-primary' 
+                  : 'text-white hover:text-white/80'
+              }`}
+            >
               <BookOpen className="w-4 h-4" />
               Browse
             </a>
-            <a href="#categories" className="text-foreground hover:text-primary transition-colors font-medium">
+            <a 
+              href="#categories" 
+              className={`font-medium transition-all duration-300 ${
+                isScrolled 
+                  ? 'text-foreground hover:text-primary' 
+                  : 'text-white hover:text-white/80'
+              }`}
+            >
               Categories
             </a>
             <div className="relative group">
-              <a href="#experts" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-1">
+              <a 
+                href="#experts" 
+                className={`font-medium flex items-center gap-1 transition-all duration-300 ${
+                  isScrolled 
+                    ? 'text-foreground hover:text-primary' 
+                    : 'text-white hover:text-white/80'
+                }`}
+              >
                 Experts
                 <ChevronDown className="w-3 h-3" />
               </a>
@@ -196,7 +224,11 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             {user?.role === 'admin' && (
               <a 
                 href="/admin" 
-                className="text-purple-600 hover:text-purple-700 transition-colors font-medium flex items-center gap-2"
+                className={`font-medium flex items-center gap-2 transition-all duration-300 ${
+                  isScrolled 
+                    ? 'text-purple-600 hover:text-purple-700' 
+                    : 'text-purple-300 hover:text-purple-200'
+                }`}
               >
                 <Shield className="w-4 h-4" />
                 Admin
@@ -204,14 +236,21 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             )}
           </nav>
 
-          {/* User Actions - FIXED: Prevent conditional rendering flicker */}
+          {/* User Actions - Updated with scroll-based styling */}
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="icon" className="md:hidden rounded-full">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className={`md:hidden rounded-full transition-all duration-300 ${
+                isScrolled 
+                  ? 'text-foreground hover:bg-accent' 
+                  : 'text-white hover:bg-white/10'
+              }`}
+            >
               <Search className="w-4 h-4" />
             </Button>
             
             {loading ? (
-              // FIXED: Consistent loading state size
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : isAuthenticated && user ? (
               // Authenticated user menu
@@ -326,7 +365,15 @@ const Header = ({ onShowAuth }: HeaderProps) => {
               </div>
             )}
             
-            <Button variant="ghost" size="icon" className="lg:hidden rounded-full">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className={`lg:hidden rounded-full transition-all duration-300 ${
+                isScrolled 
+                  ? 'text-foreground hover:bg-accent' 
+                  : 'text-white hover:bg-white/10'
+              }`}
+            >
               <Menu className="w-4 h-4" />
             </Button>
           </div>
