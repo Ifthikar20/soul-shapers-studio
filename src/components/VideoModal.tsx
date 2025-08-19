@@ -4,7 +4,7 @@ import { useVideoAccess } from '@/hooks/useVideoAccess';
 import { 
   Play, Clock, User, Star, Users, Crown, Lock, X, 
   Pause, Volume2, Settings, Plus, ThumbsUp, Share2, 
-  Check, BookOpen, ChevronRight
+  Check, BookOpen, ChevronRight, ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,21 @@ interface VideoModalProps {
   video: VideoContent;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+interface Episode {
+  id: number;
+  title: string;
+  description: string;
+  duration: string;
+  thumbnail: string;
+  accessTier: 'free' | 'premium';
+  isFirstEpisode: boolean;
+  seriesId?: string;
+  episodeNumber: number;
+  isCompleted?: boolean;
+  progress?: number; // 0-100
+  videoUrl?: string; // Added video URL for different courses
 }
 
 interface Lesson {
@@ -56,7 +71,252 @@ const VideoModal = ({ video, open, onOpenChange }: VideoModalProps) => {
   const canWatch = canWatchVideo(video, []);
   const accessMessage = getAccessMessage(video);
 
-  // Memoized mock data
+  // Mock episodes data - in real app, this would come from props or API
+  const upcomingEpisodes = useMemo<Episode[]>(() => {
+    // Different video content based on the current video category
+    const getEpisodesForCategory = (category: string): Episode[] => {
+      switch (category.toLowerCase()) {
+        case 'mental health':
+        case 'anxiety':
+          return [
+            {
+              id: 2,
+              title: "Advanced Anxiety Management Techniques",
+              description: "Deep dive into cognitive behavioral therapy and advanced coping strategies",
+              duration: "24:15",
+              thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 2,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/ZidGozDhOjg" // Anxiety management techniques
+            },
+            {
+              id: 3,
+              title: "Building Resilience in Daily Life",
+              description: "Practical exercises for developing emotional resilience and mental strength",
+              duration: "19:45",
+              thumbnail: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 3,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/DxIDKZHW3-E" // Building resilience
+            },
+            {
+              id: 4,
+              title: "Mindful Breathing Masterclass",
+              description: "Master advanced breathing techniques for immediate anxiety relief",
+              duration: "16:30",
+              thumbnail: "https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 4,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/inpok4MKVLM" // Breathing techniques
+            }
+          ];
+        
+        case 'mindfulness':
+        case 'meditation':
+          return [
+            {
+              id: 2,
+              title: "Body Scan Meditation Practice",
+              description: "Learn to systematically relax your body and mind through guided body scanning",
+              duration: "22:10",
+              thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 2,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/15q-N-_kkrU" // Body scan meditation
+            },
+            {
+              id: 3,
+              title: "Walking Meditation in Nature",
+              description: "Discover how to practice mindfulness while moving and connecting with nature",
+              duration: "18:30",
+              thumbnail: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 3,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/vmx0TXtWwRc" // Walking meditation
+            },
+            {
+              id: 4,
+              title: "Loving-Kindness Meditation",
+              description: "Cultivate compassion and love for yourself and others through this powerful practice",
+              duration: "20:45",
+              thumbnail: "https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 4,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/sz7cpV7ERsM" // Loving-kindness meditation
+            }
+          ];
+        
+        case 'relationships':
+        case 'emotional wellness':
+          return [
+            {
+              id: 2,
+              title: "Effective Communication Skills",
+              description: "Master the art of expressing yourself clearly and listening with empathy",
+              duration: "26:20",
+              thumbnail: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 2,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/HAnw168huqA" // Communication skills
+            },
+            {
+              id: 3,
+              title: "Setting Healthy Boundaries",
+              description: "Learn to protect your energy and maintain healthy relationships through boundaries",
+              duration: "21:15",
+              thumbnail: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 3,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/6_N_uvq41Pg" // Setting boundaries
+            },
+            {
+              id: 4,
+              title: "Conflict Resolution Strategies",
+              description: "Transform conflicts into opportunities for deeper understanding and connection",
+              duration: "23:50",
+              thumbnail: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 4,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/Yq5pJ0q3xuc" // Conflict resolution
+            }
+          ];
+        
+        case 'nutrition':
+        case 'wellness':
+          return [
+            {
+              id: 2,
+              title: "Meal Planning for Mental Clarity",
+              description: "Design meal plans that support cognitive function and emotional stability",
+              duration: "19:30",
+              thumbnail: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 2,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/TvQViPBAvPk" // Nutrition for mental health
+            },
+            {
+              id: 3,
+              title: "Understanding Gut-Brain Connection",
+              description: "Explore how your digestive health directly impacts your mental wellbeing",
+              duration: "24:40",
+              thumbnail: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 3,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/awtmTJW9ic8" // Gut-brain connection
+            },
+            {
+              id: 4,
+              title: "Anti-Inflammatory Foods for Mood",
+              description: "Discover foods that reduce inflammation and naturally boost your mood",
+              duration: "17:25",
+              thumbnail: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 4,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/jastdRMNDP8" // Anti-inflammatory foods
+            }
+          ];
+        
+        default:
+          // Personal Growth / General content
+          return [
+            {
+              id: 2,
+              title: "Morning Routines for Success",
+              description: "Build powerful morning rituals that set you up for productive, fulfilling days",
+              duration: "20:15",
+              thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 2,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/gA8xki3eFs4" // Morning routines
+            },
+            {
+              id: 3,
+              title: "Goal Setting That Actually Works",
+              description: "Learn science-backed strategies for setting and achieving meaningful goals",
+              duration: "25:30",
+              thumbnail: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 3,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/7bB_fVDlvhc" // Goal setting
+            },
+            {
+              id: 4,
+              title: "Building Unshakeable Confidence",
+              description: "Develop deep, lasting confidence that isn't dependent on external validation",
+              duration: "22:20",
+              thumbnail: "https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&h=250&fit=crop",
+              accessTier: 'premium' as const,
+              isFirstEpisode: false,
+              seriesId: video.seriesId,
+              episodeNumber: 4,
+              isCompleted: false,
+              progress: 0,
+              videoUrl: "https://www.youtube.com/embed/w-HYZv6HzAs" // Building confidence
+            }
+          ];
+      }
+    };
+
+    return getEpisodesForCategory(video.category);
+  }, [video.category, video.seriesId]);
+
+  // Memoized mock data for lessons
   const lessons = useMemo<Lesson[]>(() => [
     {
       id: 1,
@@ -85,42 +345,6 @@ const VideoModal = ({ video, open, onOpenChange }: VideoModalProps) => {
       accessTier: 'premium',
       isFirstEpisode: false
     },
-    {
-      id: 4,
-      title: "Healthy Alternatives",
-      description: "Discover satisfying alternatives to sugary foods and drinks",
-      duration: "14:15",
-      thumbnail: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop",
-      accessTier: 'premium',
-      isFirstEpisode: false
-    },
-    {
-      id: 5,
-      title: "Managing Withdrawal",
-      description: "Navigate the challenges of sugar withdrawal with proven strategies",
-      duration: "16:40",
-      thumbnail: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=250&fit=crop",
-      accessTier: 'premium',
-      isFirstEpisode: false
-    },
-    {
-      id: 6,
-      title: "Building New Habits",
-      description: "Create sustainable habits that support your sugar-free lifestyle",
-      duration: "20:10",
-      thumbnail: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=250&fit=crop",
-      accessTier: 'premium',
-      isFirstEpisode: false
-    },
-    {
-      id: 7,
-      title: "Long-term Success Strategies",
-      description: "Maintain your progress and prevent relapse with these techniques",
-      duration: "22:55",
-      thumbnail: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop",
-      accessTier: 'premium',
-      isFirstEpisode: false
-    }
   ], []);
 
   const communityPosts = useMemo<CommunityPost[]>(() => [
@@ -185,6 +409,17 @@ const VideoModal = ({ video, open, onOpenChange }: VideoModalProps) => {
       setCurrentLesson(lessonId);
     }
   }, [lessons, canWatchVideo]);
+
+  const handleEpisodeSelect = useCallback((episode: Episode) => {
+    if (canWatchVideo(episode as any, [])) {
+      // Navigate to the new episode
+      console.log('Playing episode:', episode);
+      // In real app, this would update the current video and reload the modal
+    } else {
+      // Show upgrade prompt
+      console.log('Episode locked, show upgrade prompt');
+    }
+  }, [canWatchVideo]);
 
   const handleAnswerSelect = useCallback((questionId: number, optionIndex: number) => {
     setSelectedAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
@@ -279,8 +514,8 @@ const VideoModal = ({ video, open, onOpenChange }: VideoModalProps) => {
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/70 to-transparent p-8 pb-12">
                       <div className="max-w-[1400px] mx-auto">
                         <div className="mb-4">
-                          <p className="text-white/80 text-sm">Lesson {currentLesson} of {lessons.length}</p>
-                          <h2 className="text-white text-2xl font-bold">{currentLessonData?.title}</h2>
+                          <p className="text-white/80 text-sm">Episode {video.episodeNumber || 1} of {upcomingEpisodes.length + 1}</p>
+                          <h2 className="text-white text-2xl font-bold">{video.title}</h2>
                         </div>
                         <div className="flex items-center gap-3">
                           <Button size="icon" className="rounded-full bg-white/20 backdrop-blur hover:bg-white/30 text-white">
@@ -387,9 +622,9 @@ const VideoModal = ({ video, open, onOpenChange }: VideoModalProps) => {
                       <div className="bg-zinc-900/50 backdrop-blur rounded-lg p-6 border border-zinc-800">
                         <div className="flex items-center gap-3 mb-2">
                           <BookOpen className="w-5 h-5 text-purple-400" />
-                          <span className="text-2xl font-bold text-white">{lessons.length} Lessons</span>
+                          <span className="text-2xl font-bold text-white">{upcomingEpisodes.length + 1} Episodes</span>
                         </div>
-                        <p className="text-zinc-500 text-sm">Interactive content</p>
+                        <p className="text-zinc-500 text-sm">Complete series</p>
                       </div>
                       <div className="bg-zinc-900/50 backdrop-blur rounded-lg p-6 border border-zinc-800">
                         <div className="flex items-center gap-3 mb-2">
@@ -434,8 +669,12 @@ const VideoModal = ({ video, open, onOpenChange }: VideoModalProps) => {
                     {/* Sidebar */}
                     <div className="lg:col-span-1">
                       <div className="bg-zinc-900/50 backdrop-blur rounded-lg p-6 border border-zinc-800">
-                        <h3 className="text-lg font-bold text-white mb-4">Course Details</h3>
+                        <h3 className="text-lg font-bold text-white mb-4">Series Details</h3>
                         <div className="space-y-4">
+                          <div className="flex justify-between">
+                            <span className="text-zinc-500">Episodes</span>
+                            <span className="text-white">{upcomingEpisodes.length + 1}</span>
+                          </div>
                           <div className="flex justify-between">
                             <span className="text-zinc-500">Category</span>
                             <span className="text-white">{video.category}</span>
@@ -466,65 +705,111 @@ const VideoModal = ({ video, open, onOpenChange }: VideoModalProps) => {
                 )}
                 
                 {activeTab === 'lessons' && (
-                  <div className="space-y-4">
-                    {lessons.map((lesson, index) => {
-                      const canWatchLesson = canWatchVideo(lesson as any, []);
-                      return (
-                        <div 
-                          key={lesson.id}
-                          onClick={() => handleLessonSelect(lesson.id)}
-                          className={`flex gap-4 p-4 rounded-lg transition-all ${
-                            currentLesson === lesson.id 
-                              ? 'bg-zinc-800/80 border border-purple-500/50' 
-                              : canWatchLesson
-                              ? 'bg-zinc-900/50 border border-zinc-800 hover:bg-zinc-800/50 cursor-pointer'
-                              : 'bg-zinc-900/30 border border-zinc-800 opacity-60'
-                          }`}
-                        >
-                          <div className="text-2xl font-bold text-zinc-600 w-12">{index + 1}</div>
-                          <div className="relative flex-shrink-0">
-                            <img 
-                              src={lesson.thumbnail} 
-                              alt={lesson.title}
-                              className="w-32 h-20 object-cover rounded"
-                            />
-                            <div className="absolute inset-0 bg-black/40 rounded flex items-center justify-center">
-                              {canWatchLesson ? (
-                                <Play className="w-8 h-8 text-white/80" />
-                              ) : (
-                                <Lock className="w-6 h-6 text-white/60" />
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-white font-semibold mb-1">{lesson.title}</h3>
-                            <p className="text-zinc-400 text-sm mb-2">{lesson.description}</p>
-                            <div className="flex items-center gap-3">
-                              <span className="text-zinc-500 text-xs">{lesson.duration}</span>
-                              {lesson.accessTier === 'premium' && !lesson.isFirstEpisode && (
-                                <Badge className="bg-orange-500/20 text-orange-400 text-xs">
-                                  <Crown className="w-3 h-3 mr-1" />
-                                  Premium
-                                </Badge>
-                              )}
-                              {lesson.isFirstEpisode && (
-                                <Badge className="bg-green-500/20 text-green-400 text-xs">
-                                  Free
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          {currentLesson === lesson.id && canWatchLesson && (
-                            <div className="text-purple-400 text-sm self-center">Currently Playing</div>
-                          )}
-                          {!canWatchLesson && (
-                            <div className="text-orange-400 text-sm self-center">
-                              <Crown className="w-5 h-5" />
-                            </div>
-                          )}
+                  <div className="space-y-8">
+                    <div className="bg-zinc-900/50 rounded-lg p-8 border border-zinc-800">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                          <User className="w-6 h-6 text-white" />
                         </div>
-                      );
-                    })}
+                        <div>
+                          <h3 className="text-xl font-bold text-white mb-1">Expert Notes from {video.expert}</h3>
+                          <p className="text-zinc-400 text-sm">Key insights and takeaways</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-8">
+                        {/* Main Lesson */}
+                        <div>
+                          <h4 className="text-2xl font-bold text-white mb-4">
+                            The Core Truth: <span className="bg-gradient-primary bg-clip-text text-transparent">Simple. Beats. Complex.</span>
+                          </h4>
+                          <p className="text-zinc-300 text-lg leading-relaxed mb-6">
+                            It sounds backwards, right? We're taught to believe the best solutions are big, complex, and full of features. 
+                            The more you build, the more valuable it should be. But the reality is almost the opposite.
+                          </p>
+                          
+                          <div className="bg-zinc-800/50 rounded-lg p-6 border-l-4 border-purple-500">
+                            <div className="space-y-3 text-zinc-300">
+                              <div className="flex items-start gap-3">
+                                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                                <span>The simpler the approach, the faster people "get it."</span>
+                              </div>
+                              <div className="flex items-start gap-3">
+                                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                                <span>The simpler the process, the easier it is to follow.</span>
+                              </div>
+                              <div className="flex items-start gap-3">
+                                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                                <span>And the simpler the idea, the bigger the transformation.</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Key Insights */}
+                        <div>
+                          <h4 className="text-xl font-bold text-white mb-6">Key Insights for Your Journey</h4>
+                          <div className="grid gap-6">
+                            
+                            <div className="bg-zinc-800/30 rounded-lg p-6">
+                              <h5 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                                <span className="text-2xl">🧠</span>
+                                Start with Self-Awareness
+                              </h5>
+                              <p className="text-zinc-300 leading-relaxed">
+                                Most people overcomplicate their healing journey. But some of the most profound breakthroughs 
+                                come from shockingly simple realizations about yourself.
+                              </p>
+                            </div>
+
+                            <div className="bg-zinc-800/30 rounded-lg p-6">
+                              <h5 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                                <span className="text-2xl">⚡</span>
+                                One Change at a Time
+                              </h5>
+                              <p className="text-zinc-300 leading-relaxed">
+                                A solo practitioner built lasting change with what? One simple habit shift. 
+                                When they launched their transformation, progress was slow. So they went all-in on one approach.
+                              </p>
+                            </div>
+
+                            <div className="bg-zinc-800/30 rounded-lg p-6">
+                              <h5 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                                <span className="text-2xl">🎯</span>
+                                Focus on What Works
+                              </h5>
+                              <p className="text-zinc-300 leading-relaxed">
+                                There are tons of complex strategies out there, but this approach wins for different reasons. 
+                                It grows steadily, appealing to people willing to commit to genuine change.
+                              </p>
+                            </div>
+
+                            <div className="bg-zinc-800/30 rounded-lg p-6">
+                              <h5 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                                <span className="text-2xl">🌱</span>
+                                Small Steps, Big Results
+                              </h5>
+                              <p className="text-zinc-300 leading-relaxed">
+                                You don't need fancy techniques or complicated systems. Just consistent action on the fundamentals. 
+                                That's the power of keeping it simple.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Call to Action */}
+                        <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg p-6 border border-purple-500/20">
+                          <h4 className="text-xl font-bold text-white mb-4">Your Next Step</h4>
+                          <p className="text-zinc-300 leading-relaxed mb-4">
+                            I hope you take these insights and apply them to your wellness journey. 
+                            Remember: progress over perfection, simple over complex.
+                          </p>
+                          <p className="text-purple-400 font-semibold">
+                            Start where you are. Use what you have. Do what you can.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
                 
@@ -656,6 +941,115 @@ const VideoModal = ({ video, open, onOpenChange }: VideoModalProps) => {
                   </div>
                 )}
               </div>
+
+              {/* Up Next Episodes Section - Netflix Style */}
+              {upcomingEpisodes.length > 0 && (
+                <div className="mt-12 pt-8 border-t border-zinc-800">
+                  <h3 className="text-2xl font-bold text-white mb-8">More Episodes</h3>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {upcomingEpisodes.map((episode) => {
+                      const canWatchEpisode = canWatchVideo(episode as any, []);
+                      return (
+                        <div 
+                          key={episode.id}
+                          onClick={() => canWatchEpisode && handleEpisodeSelect(episode)}
+                          className={`group relative transition-all duration-300 ${
+                            canWatchEpisode 
+                              ? 'cursor-pointer' 
+                              : 'cursor-pointer'
+                          }`}
+                        >
+                          {/* Main Thumbnail */}
+                          <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-zinc-800">
+                            <img 
+                              src={episode.thumbnail} 
+                              alt={episode.title}
+                              className="w-full h-full object-cover transition-all duration-300 group-hover:brightness-50"
+                            />
+                            
+                            {/* Episode Number Badge */}
+                            <div className="absolute top-3 left-3">
+                              <Badge className="bg-black/70 text-white text-sm px-2 py-1">
+                                {episode.episodeNumber}
+                              </Badge>
+                            </div>
+                            
+                            {/* Duration */}
+                            <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-sm">
+                              {episode.duration}
+                            </div>
+                            
+                            {/* Premium Badge */}
+                            {episode.accessTier === 'premium' && (
+                              <div className="absolute top-3 right-3">
+                                <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm">
+                                  <Crown className="w-4 h-4" />
+                                </Badge>
+                              </div>
+                            )}
+
+                            {/* Hover Overlay Content */}
+                            <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center p-4">
+                              {/* Lock Icon for Premium Content */}
+                              {!canWatchEpisode && (
+                                <div className="absolute top-4 left-4">
+                                  <Lock className="w-6 h-6 text-white" />
+                                </div>
+                              )}
+                              
+                              {/* Play Icon */}
+                              <div className="mb-4">
+                                {canWatchEpisode ? (
+                                  <div className="rounded-full p-4 bg-white/20 backdrop-blur-sm">
+                                    <Play className="w-8 h-8 text-white" />
+                                  </div>
+                                ) : (
+                                  <div className="rounded-full p-4 bg-orange-500/20 backdrop-blur-sm">
+                                    <Crown className="w-8 h-8 text-orange-400" />
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Episode Info */}
+                              <div className="text-center text-white">
+                                <h4 className="font-bold text-xl mb-2 line-clamp-2">
+                                  {episode.title}
+                                </h4>
+                                <p className="text-sm text-zinc-300 mb-4 line-clamp-3">
+                                  {episode.description}
+                                </p>
+                                
+                                {/* Action Button */}
+                                {canWatchEpisode && (
+                                  <Button 
+                                    size="sm" 
+                                    className="bg-white text-black hover:bg-white/90 font-medium"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEpisodeSelect(episode);
+                                    }}
+                                  >
+                                    <Play className="w-4 h-4 mr-2" />
+                                    Watch Now
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Episode Title Below */}
+                          <div className="mt-3">
+                            <h4 className="text-white font-semibold text-base line-clamp-2">
+                              {episode.episodeNumber}. {episode.title}
+                            </h4>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
