@@ -25,7 +25,7 @@ const videos: VideoContent[] = [
     isTrending: true,
     description: "A comprehensive guide to understanding anxiety disorders.",
     fullDescription: "Dive deep into the complexities of anxiety, exploring its psychological and physiological impacts. Learn evidence-based strategies for managing and overcoming anxiety in your daily life.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/watch?v=pcxuXfq118I",
     relatedTopics: ["Stress Management", "Cognitive Behavioral Techniques", "Mindfulness"],
     learningObjectives: [
       "Understand the different types of anxiety disorders",
@@ -52,7 +52,7 @@ const videos: VideoContent[] = [
     isTrending: true,
     description: "Learn advanced techniques for managing anxiety.",
     fullDescription: "Discover proven methods to reduce anxiety and improve your overall well-being through advanced techniques.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/watch?v=d9YM_9CVmtc",
     relatedTopics: ["Advanced CBT", "Exposure Therapy", "Mindfulness"],
     learningObjectives: [
       "Master advanced breathing techniques",
@@ -79,7 +79,7 @@ const videos: VideoContent[] = [
     isTrending: false,
     description: "Essential skills for maintaining healthy relationships.",
     fullDescription: "Explore the fundamentals of building and maintaining strong, healthy relationships in all areas of your life.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/watch?v=AznRJvAPtwM",
     relatedTopics: ["Communication", "Emotional Intelligence", "Conflict Resolution"],
     learningObjectives: [
       "Improve communication skills",
@@ -130,7 +130,7 @@ const videos: VideoContent[] = [
     isTrending: false,
     description: "Deepen your mindfulness practice with advanced techniques.",
     fullDescription: "Transform your mindfulness practice using advanced strategies for deeper awareness and presence.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/watch?v=d9YM_9CVmtc",
     relatedTopics: ["Deep Meditation", "Body Scanning", "Loving Kindness"],
     learningObjectives: [
       "Master advanced meditation techniques",
@@ -157,7 +157,7 @@ const videos: VideoContent[] = [
     isTrending: false,
     description: "How food choices impact your mental wellbeing.",
     fullDescription: "Discover the powerful connection between nutrition and mental health, learning which foods support optimal brain function.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/watch?v=D-ya6U-pbWo",
     relatedTopics: ["Brain Health", "Mood Foods", "Nutritional Psychology"],
     learningObjectives: [
       "Understand the gut-brain connection",

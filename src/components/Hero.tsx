@@ -6,7 +6,7 @@ import startdustVideo from "@/assets/startdustvid.mp4";
 const Hero = () => {
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
-      {/* Background Video with Curved Bottom */}
+      {/* Background Video - Straight Edges */}
       <div className="absolute inset-0 overflow-hidden">
         <video 
           autoPlay 
@@ -14,9 +14,6 @@ const Hero = () => {
           muted 
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            clipPath: 'polygon(0 0, 100% 0, 100% 90%, 0 100%)'
-          }}
         >
           <source src={startdustVideo} type="video/mp4" />
           Your browser does not support the video tag.
@@ -35,12 +32,7 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-5xl mx-auto">
-          {/* Badge */}
-          <Badge className="mb-6 px-6 py-2 bg-gradient-card border border-primary/20 text-primary font-medium rounded-full shadow-soft">
-            <Sparkles className="w-4 h-4 mr-2" />
-            Transforming Mental Wellness
-          </Badge>
-          
+   
           <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight">
             Better Mind,
             <span className="bg-gradient-primary bg-clip-text text-transparent block">
