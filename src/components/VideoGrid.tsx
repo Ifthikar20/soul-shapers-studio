@@ -5,8 +5,11 @@ import { useNavigationTracking } from '@/hooks/useNavigationTracking';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { VideoContent } from '@/types/video.types';
+import { 
+  Play, Clock, User, TrendingUp, 
+  ArrowRight, Crown, Bookmark, Star 
+} from 'lucide-react';
 
-import VideoCard from './VideoCard';
 import VideoModal from './VideoModal';
 
 const videos: VideoContent[] = [
@@ -168,6 +171,151 @@ const videos: VideoContent[] = [
   }
 ];
 
+// Enhanced Video Card Component
+const EnhancedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
+  video: VideoContent;
+  videos: VideoContent[];
+  onPlay: (video: VideoContent) => void;
+  onUpgrade: (video: VideoContent) => void;
+}) => {
+  const { canWatchVideo, getAccessMessage } = useVideoAccess();
+  
+  const canWatch = canWatchVideo(video, videos);
+  const accessMessage = getAccessMessage(video);
+  const isLocked = !canWatch;
+
+  return (
+    <div className="group cursor-pointer">
+      {/* Card Container */}
+      <div className="relative bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group-hover:scale-[1.02]">
+        
+        {/* Thumbnail Container */}
+        <div className="relative overflow-hidden h-52">
+          <img
+            src={video.thumbnail}
+            alt={video.title}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+          
+          {/* Overlay Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          
+          {/* Play Button Overlay */}
+          <div 
+            onClick={() => onPlay(video)}
+            className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center cursor-pointer"
+          >
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-transform duration-300 ${
+              isLocked ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-white/90 backdrop-blur-sm'
+            }`}>
+              {isLocked ? (
+                <Crown className="w-6 h-6 text-white" />
+              ) : (
+                <Play className="w-6 h-6 text-primary ml-0.5" />
+              )}
+            </div>
+          </div>
+          
+          {/* Top Badges */}
+          <div className="absolute top-4 left-4 flex flex-col gap-2">
+            {video.isNew && (
+              <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                NEW
+              </div>
+            )}
+            {video.isTrending && (
+              <div className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                Trending
+              </div>
+            )}
+            {video.isFirstEpisode && (
+              <div className="bg-gradient-to-r from-blue-400 to-blue-500 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg">
+                Free Episode
+              </div>
+            )}
+            {video.accessTier === 'premium' && !video.isFirstEpisode && (
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+                <Crown className="w-3 h-3" />
+                Premium
+              </div>
+            )}
+          </div>
+          
+          {/* Duration Badge */}
+          <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {video.duration}
+          </div>
+          
+          {/* Bookmark Button */}
+          <button className="absolute top-4 right-4 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 shadow-lg">
+            <Bookmark className="w-4 h-4 text-gray-700" />
+          </button>
+        </div>
+        
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          {/* Category Badge */}
+          <div>
+            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-primary/10 to-purple-500/10 text-primary text-xs font-medium px-3 py-1.5 rounded-full border border-primary/20">
+              <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+              {video.category}
+            </span>
+          </div>
+          
+          {/* Title */}
+          <h3 className="font-bold text-lg text-gray-900 line-clamp-2 group-hover:text-primary transition-colors duration-300 leading-tight">
+            {video.title}
+          </h3>
+          
+          {/* Expert */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full flex items-center justify-center">
+              <User className="w-4 h-4 text-primary" />
+            </div>
+            <span className="text-sm font-medium text-gray-700">{video.expert}</span>
+          </div>
+          
+          {/* Stats Row */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                <span className="text-sm font-medium text-gray-700">{video.rating}</span>
+              </div>
+              <div className="text-sm text-gray-500">{video.views} views</div>
+            </div>
+            
+            {isLocked ? (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => onUpgrade(video)}
+                className="text-orange-600 border-orange-300 hover:bg-gradient-to-r hover:from-orange-50 hover:to-yellow-50 rounded-full px-4 py-2 font-medium transition-all duration-300"
+              >
+                <Crown className="w-3 h-3 mr-1" />
+                Upgrade
+              </Button>
+            ) : (
+              <button 
+                onClick={() => onPlay(video)}
+                className="opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300 text-primary hover:text-primary/80 font-medium text-sm flex items-center gap-1 px-3 py-1 rounded-full hover:bg-primary/5"
+              >
+                Watch
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        </div>
+        
+        {/* Bottom Shine Effect */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      </div>
+    </div>
+  );
+};
+
 const VideoGrid = () => {
   const [selectedVideo, setSelectedVideo] = useState<VideoContent | null>(null);
   const [visibleVideos, setVisibleVideos] = useState(6);
@@ -246,45 +394,50 @@ const VideoGrid = () => {
 
   return (
     <section className="py-24 relative overflow-hidden">
-      {/* Background Elements */}
+      {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-40 right-20 w-48 h-48 bg-purple-400/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-[300px] h-[200px] bg-gradient-to-br from-primary/6 to-purple-400/4 rounded-[60%_40%_50%_50%] blur-3xl animate-pulse rotate-12"></div>
+        <div className="absolute bottom-40 right-20 w-[400px] h-[250px] bg-gradient-to-tl from-purple-500/6 to-primary/4 rounded-[40%_60%_70%_30%] blur-3xl animate-pulse delay-1000 -rotate-12"></div>
+        <div className="absolute top-1/2 left-1/4 w-[200px] h-[150px] bg-gradient-to-r from-primary/4 to-transparent rounded-[50%_30%_70%_50%] blur-2xl animate-pulse delay-500 rotate-45"></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
+        {/* Enhanced Section Header */}
         <div className="flex justify-between items-center mb-16">
           <div className="text-center md:text-left">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-purple-500/10 text-primary text-sm font-medium px-4 py-2 rounded-full border border-primary/20 mb-6">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+              Featured Content
+            </div>
             <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
-              Featured
+              Expert-Curated
               <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent block">
-                Content
+                Wellness Videos
               </span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-xl">
-              Expert-curated videos for your wellness needs
+              Transform your mental health with guidance from leading professionals
             </p>
           </div>
           
-          {/* Filter Badges */}
+          {/* Enhanced Filter Badges */}
           <div className="hidden lg:flex space-x-3">
-            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all duration-300 px-4 py-2 rounded-full">
-              All
+            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all duration-300 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border-white/30">
+              All Videos
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all duration-300 px-4 py-2 rounded-full">
+            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all duration-300 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border-white/30">
               Most Popular
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all duration-300 px-4 py-2 rounded-full">
+            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all duration-300 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border-white/30">
               New Releases
             </Badge>
           </div>
         </div>
 
-        {/* Video Grid */}
+        {/* Enhanced Video Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {videos.slice(0, visibleVideos).map((video) => (
-            <VideoCard
+            <EnhancedVideoCard
               key={video.id}
               video={video}
               videos={videos}
@@ -294,16 +447,17 @@ const VideoGrid = () => {
           ))}
         </div>
         
-        {/* Load More Button */}
+        {/* Enhanced Load More Button */}
         {visibleVideos < videos.length && (
           <div className="text-center mt-16">
             <Button 
               variant="outline" 
               size="lg"
               onClick={handleLoadMore}
-              className="rounded-full px-8 py-3 text-base hover:bg-primary hover:text-white transition-all duration-300"
+              className="rounded-full px-8 py-3 text-base hover:bg-primary hover:text-white transition-all duration-300 bg-white/80 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl"
             >
               Load More Videos
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
         )}
