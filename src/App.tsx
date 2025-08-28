@@ -16,53 +16,77 @@ import LoginPage from "./pages/LoginPage";
 import UpgradePage from "./pages/UpgradePage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import AdminApp from "./admin/AdminApp";
+import UnderConstructionPage from "./components/UnderConstructionPage";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="/unauthorized" element={<UnauthorizedPage />} />
-            <Route path="/upgrade" element={<UpgradePage />} />
-            <Route path="/upgrade" element={<UpgradePage />} />
-            <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
+const App = () => {
+  // Check environment variable for construction mode
+  const isConstructionMode = import.meta.env.VITE_CONSTRUCTION_MODE === 'true';
 
-            {/* Protected Routes - Requires Authentication */}
-            <Route
-              path="/browse"
-              element={
-                <ProtectedRoute>
-                  <BrowsePage />
-                </ProtectedRoute>
-              }
-            />
+  if (isConstructionMode) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="*" element={<UnderConstructionPage />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
 
-            {/* Admin Routes - Requires Admin Role */}
-            <Route
-              path="/admin/*"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminApp />
-                </ProtectedRoute>
-              }
-            />
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/search" element={<SearchResults />} />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
+              <Route path="/upgrade" element={<UpgradePage />} />
+              <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
 
-            {/* Catch all - 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+              {/* Protected Routes - Requires Authentication */}
+              <Route
+                path="/browse"
+                element={
+                  <ProtectedRoute>
+                    <BrowsePage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Admin Routes - Requires Admin Role */}
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminApp />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Catch all - 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
+
+// You'll need to add this to your .env file:
+// VITE_CONSTRUCTION_MODE=true
