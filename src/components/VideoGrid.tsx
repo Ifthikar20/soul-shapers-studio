@@ -187,14 +187,14 @@ const EnhancedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
   return (
     <div className="group cursor-pointer">
       {/* Card Container */}
-      <div className="relative bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group-hover:scale-[1.02]">
+      <div className="relative bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl overflow-hidden shadow-lg">
         
         {/* Thumbnail Container */}
         <div className="relative overflow-hidden h-52">
           <img
             src={video.thumbnail}
             alt={video.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-full object-cover"
           />
           
           {/* Overlay Gradient */}
@@ -203,9 +203,9 @@ const EnhancedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
           {/* Play Button Overlay */}
           <div 
             onClick={() => onPlay(video)}
-            className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center cursor-pointer"
+            className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center cursor-pointer"
           >
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-transform duration-300 ${
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl ${
               isLocked ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-white/90 backdrop-blur-sm'
             }`}>
               {isLocked ? (
@@ -249,7 +249,7 @@ const EnhancedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
           </div>
           
           {/* Bookmark Button */}
-          <button className="absolute top-4 right-4 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 shadow-lg">
+          <button className="absolute top-4 right-4 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg">
             <Bookmark className="w-4 h-4 text-gray-700" />
           </button>
         </div>
@@ -265,7 +265,7 @@ const EnhancedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
           </div>
           
           {/* Title */}
-          <h3 className="font-bold text-lg text-gray-900 line-clamp-2 group-hover:text-primary transition-colors duration-300 leading-tight">
+          <h3 className="font-bold text-lg text-gray-900 line-clamp-2 leading-tight">
             {video.title}
           </h3>
           
@@ -300,7 +300,7 @@ const EnhancedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
             ) : (
               <button 
                 onClick={() => onPlay(video)}
-                className="opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300 text-primary hover:text-primary/80 font-medium text-sm flex items-center gap-1 px-3 py-1 rounded-full hover:bg-primary/5"
+                className="opacity-0 group-hover:opacity-100 text-primary hover:text-primary/80 font-medium text-sm flex items-center gap-1 px-3 py-1 rounded-full hover:bg-primary/5"
               >
                 Watch
                 <ArrowRight className="w-3 h-3" />
@@ -310,7 +310,7 @@ const EnhancedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
         </div>
         
         {/* Bottom Shine Effect */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
     </div>
   );
@@ -394,11 +394,11 @@ const VideoGrid = () => {
 
   return (
     <section className="py-24 relative overflow-hidden">
-      {/* Enhanced Background Elements */}
+      {/* Simplified Background Elements - Static, no animations or heavy blur */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-[300px] h-[200px] bg-gradient-to-br from-primary/6 to-purple-400/4 rounded-[60%_40%_50%_50%] blur-3xl animate-pulse rotate-12"></div>
-        <div className="absolute bottom-40 right-20 w-[400px] h-[250px] bg-gradient-to-tl from-purple-500/6 to-primary/4 rounded-[40%_60%_70%_30%] blur-3xl animate-pulse delay-1000 -rotate-12"></div>
-        <div className="absolute top-1/2 left-1/4 w-[200px] h-[150px] bg-gradient-to-r from-primary/4 to-transparent rounded-[50%_30%_70%_50%] blur-2xl animate-pulse delay-500 rotate-45"></div>
+        <div className="absolute top-20 left-10 w-[300px] h-[200px] bg-gradient-to-br from-primary/4 to-purple-400/2 rounded-[60%_40%_50%_50%] opacity-60"></div>
+        <div className="absolute bottom-40 right-20 w-[400px] h-[250px] bg-gradient-to-tl from-purple-500/4 to-primary/2 rounded-[40%_60%_70%_30%] opacity-60"></div>
+        <div className="absolute top-1/2 left-1/4 w-[200px] h-[150px] bg-gradient-to-r from-primary/3 to-transparent rounded-[50%_30%_70%_50%] opacity-60"></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -406,7 +406,7 @@ const VideoGrid = () => {
         <div className="flex justify-between items-center mb-16">
           <div className="text-center md:text-left">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-purple-500/10 text-primary text-sm font-medium px-4 py-2 rounded-full border border-primary/20 mb-6">
-              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+              <div className="w-2 h-2 bg-primary rounded-full" />
               Featured Content
             </div>
             <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
