@@ -120,7 +120,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             className="flex items-center space-x-3 cursor-pointer" 
             onClick={() => navigate('/')}
           >
-            <div className="relative">
+            {/* <div className="relative">
               <img 
                 src={betterBlissLogo} 
                 className="w-10 h-10 rounded-xl object-cover"
@@ -131,7 +131,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
               <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center">
                 <Sparkles className="w-1.5 h-1.5 text-white" />
               </div>
-            </div>
+            </div> */}
             <div className="hidden sm:block">
               <h1 className={`text-lg font-semibold transition-all duration-300 ${
                 isScrolled 
