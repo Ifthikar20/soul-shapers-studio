@@ -1,4 +1,4 @@
-// src/pages/LoginPage.tsx
+// src/pages/LoginPage.tsx - FIXED REDIRECT LOGIC
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,8 +46,10 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Get the page user was trying to access
-  const from = location.state?.from?.pathname || "/";
+  // Get the page user was trying to access - THIS IS THE KEY FIX
+  const from = location.state?.from?.pathname || "/browse"; // Default to browse, not home
+  
+  console.log('🔍 Login Page - Redirect destination:', from);
 
   // Form validation
   const validateForm = () => {
@@ -98,21 +100,25 @@ const LoginPage = () => {
     
     try {
       if (mode === 'signin') {
+        console.log('🚀 Attempting login...');
         await login(email, password);
-        // Navigate to the page they were trying to access, or home
+        console.log('✅ Login successful, redirecting to:', from);
+        // Navigate to where they were trying to go
         navigate(from, { replace: true });
       } else {
+        console.log('📝 Attempting registration...');
         await register(email, password, fullName);
-        // After signup, go to home or dashboard
+        console.log('✅ Registration successful, redirecting to browse');
+        // After signup, go to browse page
         navigate('/browse', { replace: true });
       }
     } catch (error: any) {
-      console.error('Auth error:', error);
+      console.error('❌ Auth error:', error);
       setError(
-        error.response?.data?.detail || 
-        mode === 'signin' 
+        error.message || 
+        (mode === 'signin' 
           ? "Invalid email or password. Please try again."
-          : "Could not create account. Please try again."
+          : "Could not create account. Please try again.")
       );
     } finally {
       setIsLoading(false);
@@ -122,11 +128,11 @@ const LoginPage = () => {
   // Handle social login
   const handleGoogleLogin = () => {
     setIsLoading(true);
+    console.log('🔍 Google login initiated');
     authService.loginWithGoogle();
   };
 
   const handleGithubLogin = () => {
-    // Implement GitHub OAuth if needed
     console.log("GitHub login not implemented yet");
   };
 
@@ -157,6 +163,16 @@ const LoginPage = () => {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Link>
+
+        {/* Debug Info - REMOVE IN PRODUCTION */}
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-blue-700 text-sm">
+            <strong>Debug:</strong> Will redirect to: <code>{from}</code>
+          </p>
+          <p className="text-blue-600 text-xs mt-1">
+            Demo mode: Use any email/password to login
+          </p>
+        </div>
 
         {/* Main Card */}
         <Card className="shadow-glow border-border/50">

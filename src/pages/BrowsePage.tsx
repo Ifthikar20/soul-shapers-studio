@@ -1,23 +1,26 @@
+// src/pages/BrowsePage.tsx - Updated with API integration (fixed onUpgrade typing)
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVideoAccess } from '@/hooks/useVideoAccess';
 import { useNavigationTracking } from '@/hooks/useNavigationTracking';
+import { contentService } from '@/services/content.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Search, Play, Star, Clock, User, Crown, 
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Search, Play, Star, Clock, User, Crown,
   TrendingUp, ArrowRight, Bookmark, ChevronLeft, ChevronRight,
   Brain, Heart, Leaf, Target, Users as UsersIcon, Zap,
   Sparkles, Info, Plus, CheckCircle, Award, Volume2, VolumeX,
-  Gamepad2, Headphones, FileText, Video
+  Gamepad2, Headphones, FileText, Video, AlertCircle
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-// Updated VideoContent interface with missing properties
+// Updated VideoContent interface to match backend
 export interface VideoContent {
   id: number;
   title: string;
@@ -42,24 +45,52 @@ export interface VideoContent {
   isFirstEpisode?: boolean;
   seriesId?: string;
   episodeNumber?: number;
+  accessible: boolean;
 }
 
-// Content type helper function
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  color: string;
+  sort_order: number;
+}
+
+// Loading skeleton for video cards
+const VideoCardSkeleton = () => (
+  <Card className="overflow-hidden">
+    <Skeleton className="h-44 w-full" />
+    <CardContent className="p-5 space-y-3">
+      <Skeleton className="h-4 w-20" />
+      <Skeleton className="h-6 w-full" />
+      <div className="flex items-center gap-3">
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <div className="space-y-1">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+      </div>
+      <Skeleton className="h-3 w-full" />
+      <div className="flex justify-between">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-6 w-16" />
+      </div>
+    </CardContent>
+  </Card>
+);
+
+// Content type helper functions
 const getContentTypeIcon = (contentType: string) => {
   const iconClass = "w-3 h-3 text-gray-500";
   switch (contentType) {
-    case 'video':
-      return <Video className={iconClass} />;
-    case 'audio':
-      return <Headphones className={iconClass} />;
-    case 'game':
-      return <Gamepad2 className={iconClass} />;
-    case 'exercise':
-      return <Target className={iconClass} />;
-    case 'toolkit':
-      return <FileText className={iconClass} />;
-    default:
-      return <Video className={iconClass} />;
+    case 'video': return <Video className={iconClass} />;
+    case 'audio': return <Headphones className={iconClass} />;
+    case 'game': return <Gamepad2 className={iconClass} />;
+    case 'exercise': return <Target className={iconClass} />;
+    case 'toolkit': return <FileText className={iconClass} />;
+    default: return <Video className={iconClass} />;
   }
 };
 
@@ -71,7 +102,7 @@ const getContentTypeBadge = (contentType: string) => {
     'exercise': { text: 'Exercise', color: 'bg-orange-500' },
     'toolkit': { text: 'Toolkit', color: 'bg-teal-500' }
   };
-  
+
   const badge = badges[contentType as keyof typeof badges] || badges.video;
   return (
     <Badge className={`${badge.color} text-white text-xs font-medium px-2 py-1`}>
@@ -80,195 +111,38 @@ const getContentTypeBadge = (contentType: string) => {
   );
 };
 
-const mockVideos: VideoContent[] = [
-  {
-    id: 1,
-    title: "Understanding Anxiety: Complete Expert Guide",
-    expert: "Dr. Sarah Johnson",
-    expertCredentials: "Clinical Psychologist, PhD",
-    expertAvatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop&crop=face",
-    duration: "18:30",
-    category: "Mental Health",
-    contentType: "video",
-    hashtags: ["#AnxietyRelief", "#MentalHealth", "#ExpertGuidance"],
-    rating: 4.9,
-    views: "12.5k",
-    thumbnail: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop",
-    isNew: true,
-    isTrending: true,
-    description: "Master anxiety management with evidence-based techniques from leading mental health experts.",
-    fullDescription: "Comprehensive guide combining clinical expertise with practical strategies for lasting anxiety relief and emotional resilience.",
-    videoUrl: "https://www.youtube.com/watch?v=pcxuXfq118I",
-    relatedTopics: ["CBT", "Mindfulness", "Stress Management"],
-    learningObjectives: ["Understand anxiety science", "Learn coping strategies", "Build resilience"],
-    accessTier: 'free',
-    isFirstEpisode: true,
-    seriesId: "anxiety-mastery",
-    episodeNumber: 1
-  },
-  {
-    id: 2,
-    title: "5-Minute Breathing Exercise for Instant Calm",
-    expert: "Wellness Team",
-    expertCredentials: "Certified Wellness Coaches",
-    expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    duration: "5:00",
-    category: "Quick Relief",
-    contentType: "exercise",
-    hashtags: ["#QuickRelief", "#Breathing", "#StressRelief"],
-    rating: 4.8,
-    views: "28.3k",
-    thumbnail: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=250&fit=crop",
-    isNew: false,
-    isTrending: true,
-    description: "Interactive breathing exercise to reduce stress and anxiety in just 5 minutes.",
-    fullDescription: "Guided breathing technique with visual cues and calming sounds for immediate stress relief.",
-    videoUrl: "https://www.youtube.com/watch?v=d9YM_9CVmtc",
-    relatedTopics: ["Breathing", "Quick Relief", "Stress Management"],
-    learningObjectives: ["Learn 4-7-8 breathing", "Activate relaxation response", "Build daily practice"],
-    accessTier: 'free'
-  },
-  {
-    id: 3,
-    title: "Mindful Mood Tracker Game",
-    expert: "Better & Bliss Games",
-    expertCredentials: "Therapeutic Game Designers",
-    expertAvatar: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=100&h=100&fit=crop&crop=face",
-    duration: "Interactive",
-    category: "Wellness Games",
-    contentType: "game",
-    hashtags: ["#MoodTracking", "#Mindfulness", "#Interactive"],
-    rating: 4.7,
-    views: "15.7k",
-    thumbnail: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=250&fit=crop",
-    isNew: true,
-    isTrending: true,
-    description: "Gamified mood tracking to build emotional awareness and mindfulness habits.",
-    fullDescription: "Interactive game that helps you identify patterns, triggers, and build emotional intelligence through play.",
-    videoUrl: "https://www.youtube.com/watch?v=example",
-    relatedTopics: ["Emotional Intelligence", "Self-Awareness", "Habit Building"],
-    learningObjectives: ["Track emotional patterns", "Identify triggers", "Build mindfulness"],
-    accessTier: 'free'
-  },
-  {
-    id: 4,
-    title: "Cognitive Restructuring Masterclass",
-    expert: "Dr. Sarah Johnson",
-    expertCredentials: "Clinical Psychologist, PhD",
-    expertAvatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop&crop=face",
-    duration: "24:15",
-    category: "Mental Health",
-    contentType: "video",
-    hashtags: ["#CBT", "#ThoughtPatterns", "#CognitiveHealth"],
-    rating: 4.8,
-    views: "8.3k",
-    thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
-    isNew: false,
-    isTrending: true,
-    description: "Advanced cognitive behavioral techniques for challenging negative thought patterns.",
-    fullDescription: "Deep dive into sophisticated CBT protocols used by leading practitioners worldwide.",
-    videoUrl: "https://www.youtube.com/watch?v=d9YM_9CVmtc",
-    relatedTopics: ["Advanced CBT", "Therapy", "Clinical Skills"],
-    learningObjectives: ["Master CBT protocols", "Challenge thoughts", "Improve outcomes"],
-    accessTier: 'premium',
-    seriesId: "anxiety-mastery",
-    episodeNumber: 2
-  },
-  {
-    id: 5,
-    title: "Daily Affirmations for Self-Compassion",
-    expert: "Mindfulness Collective",
-    expertCredentials: "Meditation Teachers",
-    expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    duration: "10:00",
-    category: "Daily Practice",
-    contentType: "audio",
-    hashtags: ["#SelfCompassion", "#Affirmations", "#DailyPractice"],
-    rating: 4.9,
-    views: "22.4k",
-    thumbnail: "https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&h=250&fit=crop",
-    isNew: true,
-    isTrending: false,
-    description: "Guided affirmations to cultivate self-compassion and inner kindness.",
-    fullDescription: "Daily practice of positive affirmations designed to build self-acceptance and emotional resilience.",
-    videoUrl: "https://www.youtube.com/watch?v=example",
-    relatedTopics: ["Self-Compassion", "Positive Psychology", "Daily Rituals"],
-    learningObjectives: ["Build self-kindness", "Reduce self-criticism", "Create daily ritual"],
-    accessTier: 'free'
-  },
-  {
-    id: 6,
-    title: "Stress-Relief Memory Game",
-    expert: "Cognitive Wellness Lab",
-    expertCredentials: "Neuropsychology Research Team",
-    expertAvatar: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&h=100&fit=crop&crop=face",
-    duration: "Interactive",
-    category: "Wellness Games",
-    contentType: "game",
-    hashtags: ["#MemoryBoost", "#StressRelief", "#CognitiveHealth"],
-    rating: 4.6,
-    views: "18.9k",
-    thumbnail: "https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=400&h=250&fit=crop",
-    isNew: false,
-    isTrending: false,
-    description: "Cognitive training game that reduces stress while improving memory and focus.",
-    fullDescription: "Scientifically-designed memory game that activates the prefrontal cortex to reduce anxiety and improve cognitive function.",
-    videoUrl: "https://www.youtube.com/watch?v=example3",
-    relatedTopics: ["Cognitive Training", "Memory", "Stress Reduction"],
-    learningObjectives: ["Improve working memory", "Reduce mental fatigue", "Enhance focus"],
-    accessTier: 'premium'
-  },
-  {
-    id: 7,
-    title: "Sleep Stories: Forest Rain Meditation",
-    expert: "Sleep Wellness Collective",
-    expertCredentials: "Sleep Therapy Specialists",
-    expertAvatar: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=100&h=100&fit=crop&crop=face",
-    duration: "45:00",
-    category: "Sleep & Recovery",
-    contentType: "audio",
-    hashtags: ["#SleepStories", "#Meditation", "#Recovery"],
-    rating: 4.9,
-    views: "35.2k",
-    thumbnail: "https://images.unsplash.com/photo-1520206183501-b80df61043c2?w=400&h=250&fit=crop",
-    isNew: false,
-    isTrending: true,
-    description: "Calming forest soundscape with guided meditation for deep, restorative sleep.",
-    fullDescription: "Immersive audio experience combining nature sounds with sleep meditation for optimal rest and recovery.",
-    videoUrl: "https://www.youtube.com/watch?v=example4",
-    relatedTopics: ["Sleep Hygiene", "Nature Sounds", "Relaxation"],
-    learningObjectives: ["Improve sleep quality", "Reduce bedtime anxiety", "Create sleep ritual"],
-    accessTier: 'free'
-  },
-  {
-    id: 8,
-    title: "Relationship Communication Toolkit",
-    expert: "Dr. Emily Rodriguez",
-    expertCredentials: "Relationship Therapist, LMFT",
-    expertAvatar: "https://images.unsplash.com/photo-1594824388853-d0b8ccbfbb3d?w=100&h=100&fit=crop&crop=face",
-    duration: "32:10",
-    category: "Relationships",
-    contentType: "toolkit",
-    hashtags: ["#Communication", "#Relationships", "#Toolkit"],
-    rating: 4.8,
-    views: "11.2k",
-    thumbnail: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=250&fit=crop",
-    isNew: true,
-    isTrending: false,
-    description: "Comprehensive toolkit with exercises, scripts, and strategies for better communication.",
-    fullDescription: "Interactive resource pack including conversation templates, conflict resolution guides, and practice exercises.",
-    videoUrl: "https://www.youtube.com/watch?v=example2",
-    relatedTopics: ["Communication Skills", "Conflict Resolution", "Emotional Intelligence"],
-    learningObjectives: ["Master active listening", "Navigate difficult conversations", "Build deeper connections"],
-    accessTier: 'premium'
-  }
-];
-
-// Netflix-inspired Hero Section
-const HeroSection = ({ featuredVideo }: { featuredVideo: VideoContent }) => {
+// Hero Section Component
+const HeroSection = ({ featuredVideo, loading }: {
+  featuredVideo: VideoContent | null;
+  loading: boolean;
+}) => {
   const [isMuted, setIsMuted] = useState(true);
   const { canWatchVideo } = useVideoAccess();
-  const canWatch = canWatchVideo(featuredVideo, mockVideos);
+
+  if (loading) {
+    return (
+      <div className="relative h-[65vh] w-full overflow-hidden rounded-b-3xl bg-gradient-to-r from-slate-200 to-slate-100">
+        <div className="absolute inset-0 flex items-end pb-12">
+          <div className="container mx-auto px-6">
+            <div className="max-w-2xl space-y-4">
+              <Skeleton className="h-16 w-12 rounded-full" />
+              <Skeleton className="h-12 w-96" />
+              <Skeleton className="h-6 w-80" />
+              <Skeleton className="h-4 w-full" />
+              <div className="flex gap-4">
+                <Skeleton className="h-12 w-32" />
+                <Skeleton className="h-12 w-32" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!featuredVideo) return null;
+
+  const canWatch = canWatchVideo(featuredVideo, []);
 
   return (
     <div className="relative h-[65vh] w-full overflow-hidden rounded-b-3xl">
@@ -290,8 +164,8 @@ const HeroSection = ({ featuredVideo }: { featuredVideo: VideoContent }) => {
             {/* Expert Badge */}
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/30">
-                <img 
-                  src={featuredVideo.expertAvatar} 
+                <img
+                  src={featuredVideo.expertAvatar}
                   alt={featuredVideo.expert}
                   className="w-full h-full object-cover"
                 />
@@ -340,14 +214,6 @@ const HeroSection = ({ featuredVideo }: { featuredVideo: VideoContent }) => {
                 <Info className="w-5 h-5 mr-2" />
                 More Info
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMuted(!isMuted)}
-                className="text-white hover:bg-white/10 w-12 h-12 rounded-full border-2 border-white/30 backdrop-blur-sm"
-              >
-                {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-              </Button>
             </div>
           </div>
         </div>
@@ -356,7 +222,7 @@ const HeroSection = ({ featuredVideo }: { featuredVideo: VideoContent }) => {
   );
 };
 
-// Hybrid Video Card
+// Video Card Component
 const HybridVideoCard = ({ video, onPlay, onUpgrade }: {
   video: VideoContent;
   onPlay: (video: VideoContent) => void;
@@ -364,10 +230,10 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: {
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { canWatchVideo } = useVideoAccess();
-  const canWatch = canWatchVideo(video, mockVideos);
+  const canWatch = video.accessible; // Use backend's access determination
 
   return (
-    <Card 
+    <Card
       className="group cursor-pointer overflow-hidden border-0 bg-white/95 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 rounded-2xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -380,10 +246,10 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: {
           alt={video.title}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        
-        {/* Netflix-style overlay */}
+
+        {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
-        
+
         {/* Play overlay */}
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
           <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-transform duration-300 ${
@@ -416,17 +282,8 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: {
         {/* Duration & Access */}
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
           <div className="bg-black/80 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-md flex items-center gap-1">
-            {video.contentType === 'game' || video.contentType === 'exercise' ? (
-              <>
-                {getContentTypeIcon(video.contentType)}
-                <span>{video.duration}</span>
-              </>
-            ) : (
-              <>
-                <Clock className="w-2 h-2" />
-                {video.duration}
-              </>
-            )}
+            <Clock className="w-2 h-2" />
+            {video.duration}
           </div>
           {!canWatch && (
             <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-semibold px-2 py-1">
@@ -435,35 +292,15 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: {
             </Badge>
           )}
         </div>
-
-        {/* Bookmark */}
-        <button className="absolute top-3 right-3 w-7 h-7 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/80">
-          <Bookmark className="w-3 h-3 text-white" />
-        </button>
       </div>
 
       {/* Content */}
       <CardContent className="p-5 space-y-4">
-        {/* Category & Hashtags */}
+        {/* Category */}
         <div className="flex items-center justify-between mb-3">
           <Badge variant="outline" className="text-primary border-primary/30 bg-primary/5 text-xs font-medium">
             {video.category}
           </Badge>
-          <div className="flex items-center gap-1">
-            {getContentTypeIcon(video.contentType || 'video')}
-          </div>
-        </div>
-
-        {/* Hashtags */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          {video.hashtags?.slice(0, 2).map((hashtag, index) => (
-            <span 
-              key={index}
-              className="text-xs text-primary/70 bg-primary/5 px-2 py-1 rounded-full font-medium hover:bg-primary/10 transition-colors cursor-pointer"
-            >
-              {hashtag}
-            </span>
-          ))}
         </div>
 
         {/* Title */}
@@ -474,8 +311,8 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: {
         {/* Expert info */}
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
-            <img 
-              src={video.expertAvatar} 
+            <img
+              src={video.expertAvatar}
               alt={video.expert}
               className="w-full h-full object-cover"
             />
@@ -503,9 +340,9 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: {
 
           <div className="flex items-center gap-2">
             {!canWatch ? (
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   onUpgrade(video);
@@ -516,8 +353,8 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: {
                 Upgrade
               </Button>
             ) : (
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   onPlay(video);
@@ -535,10 +372,11 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: {
   );
 };
 
-// Horizontal scrolling row
-const VideoRow = ({ title, videos, onPlay, onUpgrade }: {
+// Video Row Component with loading state
+const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: {
   title: string;
   videos: VideoContent[];
+  loading: boolean;
   onPlay: (video: VideoContent) => void;
   onUpgrade: (video: VideoContent) => void;
 }) => {
@@ -549,10 +387,10 @@ const VideoRow = ({ title, videos, onPlay, onUpgrade }: {
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const scrollAmount = 320;
-      const newScrollLeft = direction === 'left' 
+      const newScrollLeft = direction === 'left'
         ? scrollRef.current.scrollLeft - scrollAmount
         : scrollRef.current.scrollLeft + scrollAmount;
-      
+
       scrollRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
     }
   };
@@ -572,15 +410,17 @@ const VideoRow = ({ title, videos, onPlay, onUpgrade }: {
       updateScrollButtons();
       return () => scrollElement.removeEventListener('scroll', updateScrollButtons);
     }
-  }, []);
+  }, [videos]);
+
+  if (videos.length === 0 && !loading) return null;
 
   return (
     <div className="relative group/row mb-10">
       <h2 className="text-xl font-bold text-gray-900 mb-6 px-6">{title}</h2>
-      
+
       <div className="relative">
         {/* Scroll buttons */}
-        {canScrollLeft && (
+        {canScrollLeft && !loading && (
           <button
             onClick={() => scroll('left')}
             className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/70 hover:bg-black/90 rounded-full flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300"
@@ -589,7 +429,7 @@ const VideoRow = ({ title, videos, onPlay, onUpgrade }: {
           </button>
         )}
 
-        {canScrollRight && (
+        {canScrollRight && !loading && (
           <button
             onClick={() => scroll('right')}
             className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/70 hover:bg-black/90 rounded-full flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300"
@@ -599,134 +439,197 @@ const VideoRow = ({ title, videos, onPlay, onUpgrade }: {
         )}
 
         {/* Scrollable content */}
-        <div 
+        <div
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto px-6 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
-          {videos.map((video) => (
-            <div key={video.id} className="flex-none w-72">
-              <HybridVideoCard
-                video={video}
-                onPlay={onPlay}
-                onUpgrade={onUpgrade}
-              />
-            </div>
-          ))}
+          {loading ? (
+            // Loading skeletons
+            Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="flex-none w-72">
+                <VideoCardSkeleton />
+              </div>
+            ))
+          ) : (
+            // Actual content
+            videos.map((video) => (
+              <div key={video.id} className="flex-none w-72">
+                <HybridVideoCard
+                  video={video}
+                  onPlay={onPlay}
+                  onUpgrade={onUpgrade}
+                />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-// Main Browse Page
+// Main Browse Page Component
 const BrowsePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { navigateToUpgrade, trackNavigationEvent } = useNavigationTracking();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Organize content into sections
-  const featuredVideo = mockVideos.find(v => v.isTrending && v.isNew) || mockVideos[0];
-  const trendingVideos = mockVideos.filter(v => v.isTrending);
-  const newReleases = mockVideos.filter(v => v.isNew);
-  const mentalHealthVideos = mockVideos.filter(v => v.category === 'Mental Health');
-  const mindfulnessVideos = mockVideos.filter(v => v.category === 'Mindfulness');
-  const expertPicks = mockVideos.filter(v => v.rating >= 4.8);
-  const freeContent = mockVideos.filter(v => v.accessTier === 'free');
+  // State for API data
+  const [allVideos, setAllVideos] = useState<VideoContent[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleVideoPlay = (video: VideoContent) => {
-    trackNavigationEvent('Video Opened', {
-      videoId: video.id.toString(),
-      source: 'hybrid_browse',
-      feature: video.title,
-      section: video.category
-    });
-    console.log('Playing video:', video.title);
-  };
+  // Load content from API
+  useEffect(() => {
+    const loadContent = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const handleUpgradeClick = (video: VideoContent) => {
+        // Load browse content and categories in parallel
+        const [browseData, categoriesData] = await Promise.all([
+          contentService.getBrowseContent(undefined, 50), // Get more content for filtering
+          contentService.getCategories()
+        ]);
+
+        // Helper: format views
+        const formatViews = (count: number): string => {
+          if (count >= 1000000) {
+            return `${(count / 1000000).toFixed(1)}M`;
+          } else if (count >= 1000) {
+            return `${(count / 1000).toFixed(1)}k`;
+          }
+          return count.toString();
+        };
+
+        // Convert to frontend format
+        const videos: VideoContent[] = browseData.content.map((item: any) => ({
+          id: parseInt(item.id),
+          title: item.title,
+          expert: item.expert?.name || 'Unknown',
+          expertCredentials: item.expert?.title || '',
+          expertAvatar: item.expert?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${item.expert?.name || 'unknown'}`,
+          duration: item.duration_formatted,
+          category: item.category?.name || 'General',
+          contentType: item.content_type,
+          rating: 4.8, // Default rating
+          views: formatViews(item.view_count || 0),
+          thumbnail: item.thumbnail_url || "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop",
+          isNew: !!item.is_new,
+          isTrending: !!item.trending,
+          description: item.description || '',
+          fullDescription: item.description || '',
+          videoUrl: item.video_url || "#",
+          relatedTopics: [],
+          learningObjectives: [],
+          accessTier: item.access_tier || 'free',
+          isFirstEpisode: item.access_tier === 'free',
+          accessible: !!item.accessible,
+          seriesId: item.series_id,
+          episodeNumber: item.episode_number,
+          hashtags: [`#${(item.category?.name || 'General').replace(/\s+/g, '')}`, `#${(item.expert?.name || 'Expert').split(' ')[0]}`]
+        }));
+
+        setAllVideos(videos);
+        setCategories(categoriesData.categories || []);
+      } catch (err) {
+        console.error('Failed to load content:', err);
+        setError('Failed to load content. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadContent();
+  }, []);
+
+  // Helper function to open upgrade flow with required context
+  const handleUpgrade = (video: VideoContent) => {
+    // adapt VideoContent -> expected context shape for navigateToUpgrade
     navigateToUpgrade({
-      source: 'hybrid_browse_locked',
+      source: 'browse_page',
       videoId: video.id,
       videoTitle: video.title,
       seriesId: video.seriesId,
-      episodeNumber: video.episodeNumber,
+      episodeNumber: video.episodeNumber
     });
   };
 
-  // Filtered videos for search
-  const filteredVideos = useMemo(() => {
-    if (!searchQuery) return [];
-    return mockVideos.filter(video =>
-      video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      video.expert.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      video.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery]);
+  // Helper function to navigate to watch
+  const handlePlay = (video: VideoContent) => {
+    navigate(`/watch/${video.id}`);
+  };
+
+  // Pick a featured video (prioritize trending, then first available)
+  const featuredVideo = allVideos.find(v => v.isTrending) || allVideos[0] || null;
+
+  // Organize into sections
+  const trendingVideos = allVideos.filter(v => v.isTrending);
+  const newVideos = allVideos.filter(v => v.isNew);
+  const freeVideos = allVideos.filter(v => v.accessTier === 'free');
+  const premiumVideos = allVideos.filter(v => v.accessTier === 'premium');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-      
-      {/* Background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-primary/4 to-purple-500/4 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-32 left-32 w-80 h-80 bg-gradient-to-tr from-blue-500/4 to-teal-500/4 rounded-full blur-3xl"></div>
-      </div>
 
-      <div className="relative z-10 pt-20">
-        {/* Hero Section */}
-        <HeroSection featuredVideo={featuredVideo} />
+      <HeroSection featuredVideo={featuredVideo} loading={loading} />
 
-        {/* Search Bar */}
-        <div className="container mx-auto px-6 -mt-8 mb-12 relative z-10">
-          <div className="max-w-2xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                placeholder="Search expert content..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 h-12 rounded-xl bg-white/90 backdrop-blur-sm border border-white/30 focus:border-primary/50 text-base shadow-lg"
+      <main className="flex-1 container mx-auto py-10">
+        {error && (
+          <div className="text-center text-red-600 mb-6">
+            <AlertCircle className="w-5 h-5 inline-block mr-2" />
+            {error}
+          </div>
+        )}
+
+        <VideoRow
+          title="Trending Now"
+          videos={trendingVideos}
+          loading={loading}
+          onPlay={handlePlay}
+          onUpgrade={handleUpgrade}
+        />
+
+        <VideoRow
+          title="New Releases"
+          videos={newVideos}
+          loading={loading}
+          onPlay={handlePlay}
+          onUpgrade={handleUpgrade}
+        />
+
+        <VideoRow
+          title="Free to Watch"
+          videos={freeVideos}
+          loading={loading}
+          onPlay={handlePlay}
+          onUpgrade={handleUpgrade}
+        />
+
+        <VideoRow
+          title="Premium Exclusives"
+          videos={premiumVideos}
+          loading={loading}
+          onPlay={handlePlay}
+          onUpgrade={handleUpgrade}
+        />
+
+        {/* OPTIONAL: generate category rows dynamically:
+            categories.map(cat => (
+              <VideoRow
+                key={cat.id}
+                title={cat.name}
+                videos={allVideos.filter(v => v.category === cat.name)}
+                loading={loading}
+                onPlay={handlePlay}
+                onUpgrade={handleUpgrade}
               />
-            </div>
-          </div>
-        </div>
-
-        {/* Search Results */}
-        {searchQuery && (
-          <div className="container mx-auto px-6 mb-12">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">
-              Search Results for "{searchQuery}" ({filteredVideos.length})
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredVideos.map((video) => (
-                <HybridVideoCard
-                  key={video.id}
-                  video={video}
-                  onPlay={handleVideoPlay}
-                  onUpgrade={handleUpgradeClick}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Content Rows */}
-        {!searchQuery && (
-          <div className="space-y-8 pb-20">
-            <VideoRow title="#Trending" videos={trendingVideos} onPlay={handleVideoPlay} onUpgrade={handleUpgradeClick} />
-            <VideoRow title="#JustDropped" videos={newReleases} onPlay={handleVideoPlay} onUpgrade={handleUpgradeClick} />
-            <VideoRow title="#QuickRelief" videos={mockVideos.filter(v => v.category === 'Quick Relief')} onPlay={handleVideoPlay} onUpgrade={handleUpgradeClick} />
-            <VideoRow title="#MentalHealth" videos={mentalHealthVideos} onPlay={handleVideoPlay} onUpgrade={handleUpgradeClick} />
-            <VideoRow title="#WellnessGames" videos={mockVideos.filter(v => v.category === 'Wellness Games')} onPlay={handleVideoPlay} onUpgrade={handleUpgradeClick} />
-            <VideoRow title="#DailyPractice" videos={mockVideos.filter(v => v.category === 'Daily Practice')} onPlay={handleVideoPlay} onUpgrade={handleUpgradeClick} />
-            <VideoRow title="#SleepAndRecovery" videos={mockVideos.filter(v => v.category === 'Sleep & Recovery')} onPlay={handleVideoPlay} onUpgrade={handleUpgradeClick} />
-            <VideoRow title="#ExpertPicks" videos={expertPicks} onPlay={handleVideoPlay} onUpgrade={handleUpgradeClick} />
-            <VideoRow title="#FreeForEveryone" videos={freeContent} onPlay={handleVideoPlay} onUpgrade={handleUpgradeClick} />
-          </div>
-        )}
-      </div>
+            ))
+        */}
+      </main>
 
       <Footer />
     </div>

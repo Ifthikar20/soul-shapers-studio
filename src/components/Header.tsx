@@ -1,18 +1,27 @@
-// src/components/Header.tsx
+// src/components/Header.tsx - Updated Navigation Structure
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  Search, 
-  User, 
-  Menu, 
-  Sparkles, 
-  BookOpen, 
+import {
+  Search,
+  User,
+  Menu,
+  Sparkles,
   ChevronDown,
   LogOut,
   Crown,
   Settings,
-  Shield
+  Shield,
+  BookOpen,
+  Users,
+  Brain,
+  Heart,
+  Leaf,
+  Target,
+  Star,
+  Zap,
+  MessageCircle,
+  PenTool
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +33,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import betterBlissLogo from "@/assets/betterandblisslogo.png";
@@ -34,10 +46,114 @@ interface HeaderProps {
 
 const searchSuggestions = [
   "anxiety relief techniques",
-  "meditation for beginners", 
+  "meditation for beginners",
   "stress management",
   "building confidence",
   "healthy habits"
+];
+
+// Categories data structure
+const categories = [
+  {
+    id: 'mental-health',
+    name: 'Mental Health',
+    icon: Brain,
+    subcategories: [
+      'Anxiety & Stress',
+      'Depression Support',
+      'Panic Disorders',
+      'Trauma Recovery',
+      'Cognitive Behavioral Therapy'
+    ]
+  },
+  {
+    id: 'mindfulness',
+    name: 'Mindfulness & Meditation',
+    icon: Leaf,
+    subcategories: [
+      'Guided Meditation',
+      'Breathing Techniques',
+      'Body Scan',
+      'Walking Meditation',
+      'Loving Kindness'
+    ]
+  },
+  {
+    id: 'emotional-wellness',
+    name: 'Emotional Wellness',
+    icon: Heart,
+    subcategories: [
+      'Emotional Intelligence',
+      'Mood Management',
+      'Self-Compassion',
+      'Emotional Regulation',
+      'Inner Child Work'
+    ]
+  },
+  {
+    id: 'relationships',
+    name: 'Relationships',
+    icon: Users,
+    subcategories: [
+      'Communication Skills',
+      'Boundary Setting',
+      'Conflict Resolution',
+      'Dating & Romance',
+      'Family Dynamics'
+    ]
+  },
+  {
+    id: 'personal-growth',
+    name: 'Personal Growth',
+    icon: Star,
+    subcategories: [
+      'Goal Setting',
+      'Habit Formation',
+      'Self-Discovery',
+      'Confidence Building',
+      'Life Transitions'
+    ]
+  },
+  {
+    id: 'breaking-habits',
+    name: 'Breaking Habits',
+    icon: Target,
+    subcategories: [
+      'Addiction Recovery',
+      'Smoking Cessation',
+      'Digital Detox',
+      'Negative Patterns',
+      'Compulsive Behaviors'
+    ]
+  }
+];
+
+// Expert specialties data
+const expertSpecialties = [
+  {
+    name: 'Clinical Psychologists',
+    description: 'Licensed mental health professionals'
+  },
+  {
+    name: 'Mindfulness Instructors',
+    description: 'Certified meditation teachers'
+  },
+  {
+    name: 'Relationship Therapists',
+    description: 'Marriage and family specialists'
+  },
+  {
+    name: 'Addiction Counselors',
+    description: 'Substance abuse experts'
+  },
+  {
+    name: 'Trauma Specialists',
+    description: 'PTSD and trauma recovery experts'
+  },
+  {
+    name: 'Life Coaches',
+    description: 'Personal development guides'
+  }
 ];
 
 const Header = ({ onShowAuth }: HeaderProps) => {
@@ -49,7 +165,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   // Optimized scroll handler with throttling
   useEffect(() => {
     let ticking = false;
-    
+
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
@@ -62,7 +178,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -97,12 +213,21 @@ const Header = ({ onShowAuth }: HeaderProps) => {
       .slice(0, 2);
   };
 
+  const handleCategoryClick = (categorySlug: string, subcategory?: string) => {
+    const searchParams = new URLSearchParams();
+    searchParams.set('category', categorySlug);
+    if (subcategory) {
+      searchParams.set('subcategory', subcategory);
+    }
+    navigate(`/browse?${searchParams.toString()}`);
+  };
+
   return (
-    <header 
+    <header
       className={`
         fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out
-        ${isScrolled 
-          ? 'bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm' 
+        ${isScrolled
+          ? 'bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm'
           : 'bg-transparent'
         }
       `}
@@ -115,64 +240,49 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     >
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo - Updated with scroll-based text color */}
-          <div 
-            className="flex items-center space-x-3 cursor-pointer" 
-            onClick={() => navigate('/')}
+          {/* Logo */}
+          <div
+            className="flex items-center space-x-3 cursor-pointer"
+            onClick={() => navigate(isAuthenticated ? '/browse' : '/')}
           >
-            {/* <div className="relative">
-              <img 
-                src={betterBlissLogo} 
-                className="w-10 h-10 rounded-xl object-cover"
-                alt="Better & Bliss"
-                loading="eager"
-                style={{ imageRendering: 'crisp-edges' }}
-              />
-              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center">
-                <Sparkles className="w-1.5 h-1.5 text-white" />
-              </div>
-            </div> */}
             <div className="hidden sm:block">
-              <h1 className={`text-lg font-semibold transition-all duration-300 ${
-                isScrolled 
-                  ? 'text-foreground' 
+              <h1 className={`text-lg font-semibold transition-all duration-300 ${isScrolled
+                  ? 'text-foreground'
                   : 'bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent'
-              }`}>
+                }`}>
                 Better & Bliss
               </h1>
             </div>
           </div>
 
-          {/* Enhanced Search Bar - Updated with scroll-based styling */}
+          {/* Enhanced Search Bar */}
           <div className="hidden md:flex flex-1 max-w-xl mx-8">
             <form onSubmit={handleSearchSubmit} className="relative w-full group">
-              <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-all duration-300 group-focus-within:text-primary ${
-                isScrolled ? 'text-muted-foreground' : 'text-white/70'
-              }`} />
+              <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-all duration-300 group-focus-within:text-primary ${isScrolled ? 'text-muted-foreground' : 'text-white/70'
+                }`} />
               <Input
                 placeholder="Search wellness topics, experts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`pl-11 pr-4 h-11 rounded-2xl transition-all duration-300 text-sm ${
-                  isScrolled 
-                    ? 'bg-background/80 backdrop-blur-sm border border-border/40 focus:border-primary/60 text-foreground placeholder:text-muted-foreground/70' 
+                className={`pl-11 pr-4 h-11 rounded-2xl transition-all duration-300 text-sm ${isScrolled
+                    ? 'bg-background/80 backdrop-blur-sm border border-border/40 focus:border-primary/60 text-foreground placeholder:text-muted-foreground/70'
                     : 'bg-white/10 backdrop-blur-sm border border-white/20 focus:border-white/40 text-white placeholder:text-white/50'
-                }`}
+                  }`}
                 style={{
                   WebkitAppearance: 'none',
                   MozAppearance: 'none'
                 }}
               />
-              
+
               {/* Search suggestions */}
               {searchQuery && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border/20 rounded-xl shadow-lg backdrop-blur-sm p-3 z-50">
                   <p className="text-xs text-muted-foreground mb-2 font-medium">Popular searches:</p>
                   <div className="flex flex-wrap gap-2">
                     {searchSuggestions.map((suggestion, index) => (
-                      <Badge 
+                      <Badge
                         key={index}
-                        variant="secondary" 
+                        variant="secondary"
                         className="cursor-pointer hover:bg-primary hover:text-white transition-colors text-xs rounded-full px-3 py-1"
                         onClick={() => handleSuggestionClick(suggestion)}
                       >
@@ -185,50 +295,180 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             </form>
           </div>
 
-          {/* Navigation - Updated with scroll-based text color */}
+          {/* Navigation - Updated for logged-in users */}
           <nav className="hidden lg:flex items-center space-x-6">
-            <a 
-              href="/browse" 
-              className={`font-medium flex items-center gap-2 transition-all duration-300 ${
-                isScrolled 
-                  ? 'text-foreground hover:text-primary' 
-                  : 'text-white hover:text-white/80'
-              }`}
-            >
-              <BookOpen className="w-4 h-4" />
-              Browse
-            </a>
-            <a 
-              href="#categories" 
-              className={`font-medium transition-all duration-300 ${
-                isScrolled 
-                  ? 'text-foreground hover:text-primary' 
-                  : 'text-white hover:text-white/80'
-              }`}
-            >
-              Categories
-            </a>
-            <div className="relative group">
-              <a 
-                href="#experts" 
-                className={`font-medium flex items-center gap-1 transition-all duration-300 ${
-                  isScrolled 
-                    ? 'text-foreground hover:text-primary' 
-                    : 'text-white hover:text-white/80'
-                }`}
-              >
-                Experts
-                <ChevronDown className="w-3 h-3" />
-              </a>
-            </div>
+            {isAuthenticated ? (
+              // Authenticated user navigation
+              <>
+                {/* Blog */}
+                <a
+                  href="/blog"
+                  className={`font-medium flex items-center gap-2 transition-all duration-300 ${isScrolled
+                      ? 'text-foreground hover:text-primary'
+                      : 'text-white hover:text-white/80'
+                    }`}
+                >
+                  <PenTool className="w-4 h-4" />
+                  Blog
+                </a>
+
+                {/* Community */}
+                <a
+                  href="/community"
+                  className={`font-medium flex items-center gap-2 transition-all duration-300 ${isScrolled
+                      ? 'text-foreground hover:text-primary'
+                      : 'text-white hover:text-white/80'
+                    }`}
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Community
+                </a>
+
+                {/* Categories Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className={`font-medium flex items-center gap-1 transition-all duration-300 focus:outline-none ${isScrolled
+                        ? 'text-foreground hover:text-primary'
+                        : 'text-white hover:text-white/80'
+                      }`}>
+                      Categories
+                      <ChevronDown className="w-3 h-3 transition-transform duration-200" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                   className="w-64 absolute"
+                    align="start"
+                    sideOffset={8}
+                    avoidCollisions={false}
+                  >
+                    <DropdownMenuLabel>Browse by Category</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {categories.map((category) => {
+                      const IconComponent = category.icon;
+                      return (
+                        <DropdownMenuSub key={category.id}>
+                          <DropdownMenuSubTrigger className="flex items-center gap-2">
+                            <IconComponent className="w-4 h-4 text-primary" />
+                            {category.name}
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent
+                            className="w-56"
+                            sideOffset={8}
+                            avoidCollisions={false}
+                          >
+                            <DropdownMenuLabel className="text-xs text-muted-foreground">
+                              {category.name} Topics
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => handleCategoryClick(category.id)}
+                              className="font-medium"
+                            >
+                              View All {category.name}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            {category.subcategories.map((subcategory) => (
+                              <DropdownMenuItem
+                                key={subcategory}
+                                onClick={() => handleCategoryClick(category.id, subcategory)}
+                                className="text-sm"
+                              >
+                                {subcategory}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Experts Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="min-w-[110px] flex items-center justify-between font-medium text-sm transition-colors"
+                    >
+                      Categories
+                      <ChevronDown className="w-3 h-3" />
+                    </button>
+
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-64 absolute"
+                    align="center"
+                    sideOffset={8}
+                    avoidCollisions={false}
+                  >
+                    <DropdownMenuLabel>Find Expert Help</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate('/experts')}>
+                      <Users className="w-4 h-4 mr-2 text-primary" />
+                      All Experts
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel className="text-xs text-muted-foreground">
+                      By Specialty
+                    </DropdownMenuLabel>
+                    {expertSpecialties.map((specialty) => (
+                      <DropdownMenuItem
+                        key={specialty.name}
+                        onClick={() => navigate(`/experts?specialty=${encodeURIComponent(specialty.name)}`)}
+                      >
+                        <div>
+                          <div className="font-medium text-sm">{specialty.name}</div>
+                          <div className="text-xs text-muted-foreground">{specialty.description}</div>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              // Non-authenticated navigation (original)
+              <>
+                <a
+                  href="/browse"
+                  className={`font-medium flex items-center gap-2 transition-all duration-300 ${isScrolled
+                      ? 'text-foreground hover:text-primary'
+                      : 'text-white hover:text-white/80'
+                    }`}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Browse
+                </a>
+                <a
+                  href="#categories"
+                  className={`font-medium transition-all duration-300 ${isScrolled
+                      ? 'text-foreground hover:text-primary'
+                      : 'text-white hover:text-white/80'
+                    }`}
+                >
+                  Categories
+                </a>
+                <div className="relative group">
+                  <a
+                    href="#experts"
+                    className={`font-medium flex items-center gap-1 transition-all duration-300 ${isScrolled
+                        ? 'text-foreground hover:text-primary'
+                        : 'text-white hover:text-white/80'
+                      }`}
+                  >
+                    Experts
+                    <ChevronDown className="w-3 h-3" />
+                  </a>
+                </div>
+              </>
+            )}
+
+            {/* Admin Link (if admin) */}
             {user?.role === 'admin' && (
-              <a 
-                href="/admin" 
-                className={`font-medium flex items-center gap-2 transition-all duration-300 ${
-                  isScrolled 
-                    ? 'text-purple-600 hover:text-purple-700' 
+              <a
+                href="/admin"
+                className={`font-medium flex items-center gap-2 transition-all duration-300 ${isScrolled
+                    ? 'text-purple-600 hover:text-purple-700'
                     : 'text-purple-300 hover:text-purple-200'
-                }`}
+                  }`}
               >
                 <Shield className="w-4 h-4" />
                 Admin
@@ -238,26 +478,25 @@ const Header = ({ onShowAuth }: HeaderProps) => {
 
           {/* User Actions - Updated with scroll-based styling */}
           <div className="flex items-center space-x-3">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className={`md:hidden rounded-full transition-all duration-300 ${
-                isScrolled 
-                  ? 'text-foreground hover:bg-accent' 
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`md:hidden rounded-full transition-all duration-300 ${isScrolled
+                  ? 'text-foreground hover:bg-accent'
                   : 'text-white hover:bg-white/10'
-              }`}
+                }`}
             >
               <Search className="w-4 h-4" />
             </Button>
-            
+
             {loading ? (
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : isAuthenticated && user ? (
               // Authenticated user menu
               <div className="flex items-center space-x-3">
                 {user.subscription_tier === 'free' && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="hidden sm:flex rounded-full"
                     onClick={() => navigate('/upgrade')}
@@ -266,7 +505,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                     Upgrade
                   </Button>
                 )}
-                
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -288,30 +527,30 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                         <p className="text-xs leading-none text-muted-foreground">
                           {user.email}
                         </p>
-                        <Badge 
-                          variant="secondary" 
+                        <Badge
+                          variant="secondary"
                           className="mt-2 w-fit text-xs"
                         >
-                          {user.subscription_tier === 'premium' ? '👑 Premium' : 
-                           user.subscription_tier === 'basic' ? '⭐ Basic' : 
-                           '🆓 Free'} Member
+                          {user.subscription_tier === 'premium' ? '👑 Premium' :
+                            user.subscription_tier === 'basic' ? '⭐ Basic' :
+                              '🆓 Free'} Member
                         </Badge>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    
+
                     <DropdownMenuItem onClick={() => navigate('/profile')}>
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuItem onClick={() => navigate('/settings')}>
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </DropdownMenuItem>
-                    
+
                     {user.subscription_tier === 'free' && (
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => navigate('/upgrade')}
                         className="text-primary"
                       >
@@ -319,11 +558,11 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                         <span>Upgrade to Premium</span>
                       </DropdownMenuItem>
                     )}
-                    
+
                     {user.role === 'admin' && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => navigate('/admin')}
                           className="text-purple-600"
                         >
@@ -332,9 +571,9 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                         </DropdownMenuItem>
                       </>
                     )}
-                    
+
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={handleLogout}
                       className="text-red-600"
                     >
@@ -347,15 +586,15 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             ) : (
               // Not authenticated - show login/signup buttons
               <div className="flex items-center space-x-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="hidden sm:flex rounded-full"
                   onClick={() => navigate('/login')}
                 >
                   Sign In
                 </Button>
-                <Button 
-                  variant="default" 
+                <Button
+                  variant="default"
                   className="rounded-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
                   onClick={() => navigate('/login')}
                 >
@@ -364,15 +603,14 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                 </Button>
               </div>
             )}
-            
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className={`lg:hidden rounded-full transition-all duration-300 ${
-                isScrolled 
-                  ? 'text-foreground hover:bg-accent' 
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`lg:hidden rounded-full transition-all duration-300 ${isScrolled
+                  ? 'text-foreground hover:bg-accent'
                   : 'text-white hover:bg-white/10'
-              }`}
+                }`}
             >
               <Menu className="w-4 h-4" />
             </Button>
