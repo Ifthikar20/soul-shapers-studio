@@ -1,4 +1,4 @@
-// src/App.tsx
+// Update your src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -47,6 +47,29 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+            {/* Add global styles for fixed header */}
+            <style>{`
+              body {
+                padding-top: 80px;
+              }
+              
+              .hero-fullscreen {
+                margin-top: -80px;
+                padding-top: 80px;
+              }
+              
+              @media (max-width: 768px) {
+                body {
+                  padding-top: 70px;
+                }
+                
+                .hero-fullscreen {
+                  margin-top: -70px;
+                  padding-top: 70px;
+                }
+              }
+            `}</style>
+            
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
@@ -87,6 +110,3 @@ const App = () => {
 };
 
 export default App;
-
-// You'll need to add this to your .env file:
-// VITE_CONSTRUCTION_MODE=true
