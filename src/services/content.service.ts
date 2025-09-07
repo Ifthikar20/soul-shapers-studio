@@ -87,7 +87,7 @@ class ContentService {
       contentType: item.content_type,
       rating: 4.8, // Default until you add ratings to backend
       views: this.formatViews(item.view_count),
-      thumbnail: item.thumbnail_url || "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop",
+      thumbnail: item.thumbnail_url || "Sample image",
       isNew: item.is_new,
       isTrending: item.trending,
       description: item.description,

@@ -1,4 +1,4 @@
-// Update your src/App.tsx
+// src/App.tsx - Updated with Community Route
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +15,7 @@ import BrowsePage from "./pages/BrowsePage";
 import LoginPage from "./pages/LoginPage";
 import UpgradePage from "./pages/UpgradePage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
+import CommunityPage from "./pages/CommunityPage"; // NEW: Community page
 import AdminApp from "./admin/AdminApp";
 import UnderConstructionPage from "./components/UnderConstructionPage";
 
@@ -47,29 +48,6 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            {/* Add global styles for fixed header */}
-            <style>{`
-              body {
-                padding-top: 80px;
-              }
-              
-              .hero-fullscreen {
-                margin-top: -80px;
-                padding-top: 80px;
-              }
-              
-              @media (max-width: 768px) {
-                body {
-                  padding-top: 70px;
-                }
-                
-                .hero-fullscreen {
-                  margin-top: -70px;
-                  padding-top: 70px;
-                }
-              }
-            `}</style>
-            
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
@@ -88,6 +66,9 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
+
+             {/* Make Community public temporarily for testing */}
+<Route path="/community" element={<CommunityPage />} />
 
               {/* Admin Routes - Requires Admin Role */}
               <Route
