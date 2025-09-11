@@ -71,7 +71,7 @@ const Hero = () => {
           <div className="text-center group">
             <div className="bg-gradient-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-card hover:shadow-hover transition-smooth border border-border/20">
               <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-3">10k+</div>
-              <div className="text-white/70 font-medium">Lives Transformed</div>
+              <div className="text-white/70 font-medium">Lives Transformed....</div>
               <Sparkles className="w-5 h-5 text-primary mx-auto mt-2 opacity-60" />
             </div>
           </div>
