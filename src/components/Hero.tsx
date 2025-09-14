@@ -52,8 +52,8 @@ const Hero = () => {
           </Button>
         </div>
 
-        {/* Enhanced Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
+        
+        {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
           <div className="text-center group">
             <div className="bg-gradient-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-card hover:shadow-hover transition-smooth border border-border/20">
               <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-3">1000+</div>
@@ -75,7 +75,7 @@ const Hero = () => {
               <Sparkles className="w-5 h-5 text-primary mx-auto mt-2 opacity-60" />
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

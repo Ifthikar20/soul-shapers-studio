@@ -4,10 +4,11 @@ import { useVideoAccess } from '@/hooks/useVideoAccess';
 import { useNavigationTracking } from '@/hooks/useNavigationTracking';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { VideoContent } from '@/types/video.types';
 import { 
   Play, Clock, User, TrendingUp, 
-  ArrowRight, Crown, Bookmark, Star 
+  ArrowRight, Crown, Star 
 } from 'lucide-react';
 
 import VideoModal from './VideoModal/VideoModal';
@@ -171,164 +172,116 @@ const videos: VideoContent[] = [
   }
 ];
 
-// Futuristic Video Card Component with curved edges
-const EnhancedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
+// Fixed Size Video Card Component
+const FixedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
   video: VideoContent;
   videos: VideoContent[];
   onPlay: (video: VideoContent) => void;
   onUpgrade: (video: VideoContent) => void;
 }) => {
-  const { canWatchVideo, getAccessMessage } = useVideoAccess();
+  const { canWatchVideo } = useVideoAccess();
   
   const canWatch = canWatchVideo(video, videos);
-  const accessMessage = getAccessMessage(video);
   const isLocked = !canWatch;
 
   return (
-    <div className="group cursor-pointer">
-      {/* Futuristic Card Container with organic curves */}
-      <div className="relative bg-gradient-to-br from-white/90 via-white/80 to-white/70 backdrop-blur-xl border border-white/40 overflow-hidden shadow-lg" 
-           style={{
-             borderRadius: '30px 10px 30px 10px',
-             clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px))'
-           }}>
+    <Card className="cursor-pointer group overflow-hidden hover:shadow-md transition-all duration-200 w-72 h-80">
+      <div className="relative">
+        <img
+          src={video.thumbnail}
+          alt={video.title}
+          className="w-full h-40 object-cover"
+        />
         
-        {/* Futuristic Thumbnail with curved clipping */}
-        <div className="relative overflow-hidden h-40"
-             style={{
-               borderRadius: '25px 5px 0 5px',
-               clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)'
-             }}>
-          <img
-            src={video.thumbnail}
-            alt={video.title}
-            className="w-full h-full object-cover"
-          />
-          
-          {/* Gradient Overlay with sci-fi feel */}
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/20 to-black/60" />
-          
-          {/* Futuristic Play Button */}
-          <div 
-            onClick={() => onPlay(video)}
-            className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center cursor-pointer"
-          >
-            <div className={`w-14 h-14 flex items-center justify-center shadow-2xl ${
-              isLocked 
-                ? 'bg-gradient-to-br from-orange-500 via-red-500 to-pink-500' 
-                : 'bg-gradient-to-br from-white/95 via-white/90 to-white/85 backdrop-blur-sm'
-            }`}
-                 style={{
-                   borderRadius: '50% 20% 50% 20%',
-                   clipPath: 'polygon(20% 0%, 80% 10%, 90% 80%, 10% 90%)'
-                 }}>
-              {isLocked ? (
-                <Crown className="w-5 h-5 text-white" />
-              ) : (
-                <Play className="w-5 h-5 text-primary ml-0.5" />
-              )}
-            </div>
-          </div>
-          
-          {/* Futuristic Badges with curved edges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1">
-            {video.isNew && (
-              <div className="bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 text-white text-xs font-bold px-3 py-1"
-                   style={{ borderRadius: '15px 5px 15px 5px' }}>
-                NEW
-              </div>
-            )}
-            {video.isTrending && (
-              <div className="bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 text-white text-xs font-medium px-3 py-1 flex items-center gap-1"
-                   style={{ borderRadius: '20px 8px 20px 8px' }}>
-                <TrendingUp className="w-3 h-3" />
-                Trending
-              </div>
-            )}
-            {video.accessTier === 'premium' && !video.isFirstEpisode && (
-              <div className="bg-gradient-to-r from-yellow-400 via-orange-500 to-amber-500 text-white text-xs font-medium px-3 py-1 flex items-center gap-1"
-                   style={{ borderRadius: '18px 6px 18px 6px' }}>
-                <Crown className="w-3 h-3" />
-                Premium
-              </div>
-            )}
-          </div>
-          
-          {/* Duration Badge with asymmetric curves */}
-          <div className="absolute bottom-3 right-3 bg-gradient-to-r from-black/80 to-black/60 backdrop-blur-sm text-white text-xs font-medium px-3 py-1 flex items-center gap-1"
-               style={{ borderRadius: '12px 4px 12px 4px' }}>
-            <Clock className="w-3 h-3" />
-            {video.duration}
-          </div>
-        </div>
-        
-        {/* Content with curved internal design */}
-        <div className="p-4 space-y-3 relative">
-          {/* Subtle internal accent line */}
-          <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
-          
-          {/* Category Badge with futuristic shape */}
-          <div>
-            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-primary/15 to-purple-500/10 text-primary text-xs font-medium px-3 py-1"
-                  style={{ borderRadius: '10px 3px 10px 3px' }}>
-              <div className="w-1 h-1 bg-primary rounded-full" />
-              {video.category}
-            </span>
-          </div>
-          
-          {/* Title */}
-          <h3 className="font-bold text-base text-gray-900 line-clamp-2 leading-tight">
-            {video.title}
-          </h3>
-          
-          {/* Expert with curved avatar */}
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-gradient-to-br from-primary/20 to-purple-500/15 flex items-center justify-center"
-                 style={{ borderRadius: '50% 20% 50% 20%' }}>
-              <User className="w-3 h-3 text-primary" />
-            </div>
-            <span className="text-sm text-gray-700">{video.expert}</span>
-          </div>
-          
-          {/* Stats Row */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                <span className="text-xs font-medium text-gray-700">{video.rating}</span>
-              </div>
-              <div className="text-xs text-gray-500">{video.views} views</div>
-            </div>
-            
+        {/* Play Overlay */}
+        <div 
+          onClick={() => onPlay(video)}
+          className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer"
+        >
+          <div className="rounded-full p-2 bg-white/90 shadow-lg">
             {isLocked ? (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => onUpgrade(video)}
-                className="text-orange-600 border-orange-300 hover:bg-gradient-to-r hover:from-orange-50 hover:to-yellow-50 text-xs px-3 py-1"
-                style={{ borderRadius: '12px 4px 12px 4px' }}
-              >
-                <Crown className="w-3 h-3 mr-1" />
-                Upgrade
-              </Button>
+              <Crown className="w-4 h-4 text-orange-500" />
             ) : (
-              <button 
-                onClick={() => onPlay(video)}
-                className="opacity-0 group-hover:opacity-100 text-primary hover:text-primary/80 text-xs flex items-center gap-1 px-3 py-1 hover:bg-primary/5 transition-all"
-                style={{ borderRadius: '10px 3px 10px 3px' }}
-              >
-                Watch
-                <ArrowRight className="w-3 h-3" />
-              </button>
+              <Play className="w-4 h-4 text-primary" />
             )}
           </div>
         </div>
         
-        {/* Futuristic corner accents */}
-        <div className="absolute top-0 right-0 w-4 h-4 bg-gradient-to-bl from-primary/20 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-4 h-4 bg-gradient-to-tr from-purple-500/20 to-transparent"></div>
+        {/* Compact Badges */}
+        <div className="absolute top-2 left-2 flex gap-1">
+          {video.isNew && (
+            <Badge className="bg-primary text-white text-xs px-2 py-0.5">
+              New
+            </Badge>
+          )}
+          {video.isTrending && (
+            <Badge variant="secondary" className="text-xs px-2 py-0.5">
+              <TrendingUp className="w-2.5 h-2.5 mr-0.5" />
+              Hot
+            </Badge>
+          )}
+          {video.accessTier === 'premium' && !video.isFirstEpisode && (
+            <Badge className="bg-orange-500 text-white text-xs px-2 py-0.5">
+              <Crown className="w-2.5 h-2.5 mr-0.5" />
+              Pro
+            </Badge>
+          )}
+        </div>
+        
+        {/* Duration */}
+        <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-0.5 rounded text-xs">
+          {video.duration}
+        </div>
       </div>
-    </div>
+      
+      <CardContent className="p-5 h-56 flex flex-col">
+        {/* Category */}
+        <Badge variant="outline" className="text-xs mb-2 w-fit">
+          {video.category}
+        </Badge>
+        
+        {/* Title - Fixed height */}
+        <h3 className="font-semibold text-base text-foreground mb-4 line-clamp-2 leading-tight h-12 overflow-hidden">
+          {video.title}
+        </h3>
+        
+        {/* Expert - Fixed height */}
+        <div className="flex items-center text-muted-foreground text-sm mb-4 h-5">
+          <User className="w-4 h-4 mr-2 flex-shrink-0" />
+          <span className="truncate">{video.expert}</span>
+        </div>
+
+        {/* Stats and Action - Fixed at bottom with proper spacing */}
+        <div className="flex items-center justify-between mt-auto pt-2">
+          <div className="flex items-center text-sm text-muted-foreground">
+            <Star className="w-4 h-4 mr-1 text-yellow-500 flex-shrink-0" />
+            <span>{video.rating}</span>
+            <span className="mx-2">•</span>
+            <span>{video.views}</span>
+          </div>
+          
+          {isLocked ? (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onUpgrade(video)}
+              className="text-orange-600 border-orange-200 hover:bg-orange-50 text-sm px-3 py-1.5 h-8 flex-shrink-0"
+            >
+              Upgrade
+            </Button>
+          ) : (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => onPlay(video)}
+              className="text-primary hover:bg-primary/10 text-sm px-3 py-1.5 h-8 flex-shrink-0"
+            >
+              Watch
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -409,18 +362,12 @@ const VideoGrid = () => {
   }, []);
 
   return (
-    <section className="py-16 relative overflow-hidden">
-      {/* Simpler Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-[200px] h-[150px] bg-primary/3 rounded-[60%_40%_50%_50%] opacity-50"></div>
-        <div className="absolute bottom-40 right-20 w-[250px] h-[180px] bg-purple-500/3 rounded-[40%_60%_70%_30%] opacity-50"></div>
-      </div>
-
+    <section className="py-12 relative">
       <div className="container mx-auto px-4 relative z-10">
-        {/* Well-structured Section Header */}
-        <div className="mb-12">
+        {/* Compact Section Header */}
+        <div className="mb-8">
           {/* Top Section - Badge and Filters */}
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex justify-between items-start mb-4">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full">
               <div className="w-1.5 h-1.5 bg-primary rounded-full" />
               Featured Content
@@ -440,22 +387,22 @@ const VideoGrid = () => {
             </div>
           </div>
 
-          {/* Main Content Section - Centered and structured */}
-          <div className="text-center max-w-4xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
+          {/* Main Content Section */}
+          <div className="text-center max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3 leading-tight">
               Expert-Curated
               <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent block">
                 Wellness Videos
               </span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
               Transform your mental health with guidance from leading professionals. 
               Access premium content designed to support your wellness journey.
             </p>
           </div>
 
           {/* Mobile Filter Badges */}
-          <div className="flex lg:hidden justify-center space-x-2 mt-6">
+          <div className="flex lg:hidden justify-center space-x-2 mt-4">
             <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full">
               All Videos
             </Badge>
@@ -468,10 +415,10 @@ const VideoGrid = () => {
           </div>
         </div>
 
-        {/* Video Grid with smaller gaps */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Fixed Size Video Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
           {videos.slice(0, visibleVideos).map((video) => (
-            <EnhancedVideoCard
+            <FixedVideoCard
               key={video.id}
               video={video}
               videos={videos}
@@ -481,17 +428,17 @@ const VideoGrid = () => {
           ))}
         </div>
         
-        {/* Smaller Load More Button */}
+        {/* Compact Load More Button */}
         {visibleVideos < videos.length && (
-          <div className="text-center mt-12">
+          <div className="text-center mt-8">
             <Button 
               variant="outline" 
               size="default"
               onClick={handleLoadMore}
-              className="rounded-full px-6 py-2 hover:bg-primary hover:text-white transition-all"
+              className="rounded-full px-5 py-2 hover:bg-primary hover:text-white transition-all"
             >
               Load More Videos
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-3 h-3 ml-1" />
             </Button>
           </div>
         )}

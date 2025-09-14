@@ -1,4 +1,4 @@
-// src/components/Header.tsx - Well-Structured Solution
+// src/components/Header.tsx - Reorganized and Structured
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,7 +20,8 @@ import {
   Heart,
   Users,
   Star,
-  Target
+  Target,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,39 +40,57 @@ interface HeaderProps {
   onShowAuth?: (mode: 'signin' | 'signup') => void;
 }
 
-const categories = [
-  { id: 'mental-health', name: 'Mental Health', icon: Brain },
-  { id: 'mindfulness', name: 'Mindfulness', icon: Leaf },
-  { id: 'emotional-wellness', name: 'Emotional Wellness', icon: Heart },
-  { id: 'relationships', name: 'Relationships', icon: Users },
-  { id: 'personal-growth', name: 'Personal Growth', icon: Star },
-  { id: 'breaking-habits', name: 'Breaking Habits', icon: Target }
-];
-
-const expertSpecialties = [
-  'Clinical Psychologists',
-  'Mindfulness Instructors', 
-  'Relationship Therapists',
-  'Addiction Counselors',
-  'Trauma Specialists',
-  'Life Coaches'
-];
-
-const searchSuggestions = [
-  "anxiety relief techniques",
-  "meditation for beginners", 
-  "stress management",
-  "building confidence",
-  "healthy habits"
-];
+// Configuration Objects
+const NAVIGATION_CONFIG = {
+  categories: [
+    { id: 'mental-health', name: 'Mental Health', icon: Brain },
+    { id: 'mindfulness', name: 'Mindfulness', icon: Leaf },
+    { id: 'emotional-wellness', name: 'Emotional Wellness', icon: Heart },
+    { id: 'relationships', name: 'Relationships', icon: Users },
+    { id: 'personal-growth', name: 'Personal Growth', icon: Star },
+    { id: 'breaking-habits', name: 'Breaking Habits', icon: Target }
+  ],
+  
+  expertSpecialties: [
+    'Clinical Psychologists',
+    'Mindfulness Instructors', 
+    'Relationship Therapists',
+    'Addiction Counselors',
+    'Trauma Specialists',
+    'Life Coaches'
+  ],
+  
+  searchSuggestions: [
+    "anxiety relief techniques",
+    "meditation for beginners", 
+    "stress management",
+    "building confidence",
+    "healthy habits"
+  ],
+  
+  mainNavItems: {
+    authenticated: [
+      { label: 'Browse', href: '/browse' },
+      { label: 'Blog', href: '/blog' },
+      { label: 'Community', href: '/community' }
+    ],
+    guest: [
+      { label: 'Browse', href: '/browse' },
+      { label: 'About', href: '/about' },
+      { label: 'Blog', href: '/blog' }
+    ]
+  }
+};
 
 const Header = ({ onShowAuth }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showNewsletter, setShowNewsletter] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, loading } = useAuth();
 
-  // Scroll handler
+  // Effects
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -88,6 +107,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Event Handlers
   const handleSearch = (query: string) => {
     if (query.trim()) {
       navigate(`/search?q=${encodeURIComponent(query.trim())}`);
@@ -104,6 +124,8 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     navigate('/');
   };
 
+
+  // Utility Functions
   const getUserInitials = (name: string) => {
     return name
       .split(' ')
@@ -113,357 +135,334 @@ const Header = ({ onShowAuth }: HeaderProps) => {
       .slice(0, 2);
   };
 
-  const handleCategoryClick = (categorySlug: string) => {
-    navigate(`/browse?category=${categorySlug}`);
+  const getHeaderClasses = () => {
+    return `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled
+        ? 'bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm'
+        : 'bg-transparent'
+    }`;
   };
 
-  const handleExpertClick = (specialty?: string) => {
-    const url = specialty ? `/experts?specialty=${encodeURIComponent(specialty)}` : '/experts';
-    navigate(url);
+  const getTextClasses = (variant: 'primary' | 'secondary' = 'primary') => {
+    if (variant === 'secondary') {
+      return isScrolled ? 'text-muted-foreground' : 'text-black/70';
+    }
+    return isScrolled ? 'text-foreground hover:text-primary' : 'text-black hover:text-black/80';
+  };
+
+  // Component Sections
+  const LogoSection = () => (
+    <div 
+      className="flex items-center space-x-3 cursor-pointer group"
+      onClick={() => navigate(isAuthenticated ? '/browse' : '/')}
+    >
+      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+        <Sparkles className="w-4 h-4 text-white" />
+      </div>
+      <h1 className={`text-xl font-bold transition-all duration-300 ${
+        isScrolled
+          ? 'text-foreground'
+          : 'bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent'
+      }`}>
+        Better & Bliss
+      </h1>
+    </div>
+  );
+
+  const SearchSection = () => (
+    <div className="relative max-w-md mx-auto">
+      <form onSubmit={handleSearchSubmit} className="relative group">
+        <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors ${
+          getTextClasses('secondary')
+        }`} />
+        <Input
+          placeholder="Search wellness topics, experts..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className={`pl-12 pr-4 h-11 rounded-full transition-all duration-300 focus:ring-2 focus:ring-primary/20 ${
+            isScrolled
+              ? 'bg-background/80 border-border/40 text-foreground placeholder:text-muted-foreground/70'
+              : 'bg-white/10 border-white/20 text-black placeholder:text-black/50'
+          }`}
+        />
+        
+        {/* Search Suggestions Dropdown */}
+        {searchQuery && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border/20 rounded-xl shadow-lg p-3 z-50 animate-in slide-in-from-top-2">
+            <p className="text-xs text-muted-foreground mb-2">Popular searches:</p>
+            <div className="flex flex-wrap gap-2">
+              {NAVIGATION_CONFIG.searchSuggestions.map((suggestion, index) => (
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="cursor-pointer hover:bg-primary hover:text-balck text-s rounded-full transition-colors"
+                  onClick={() => handleSearch(suggestion)}
+                >
+                  {suggestion}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
+  );
+
+  const CategoriesDropdown = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className={`font-medium flex items-center gap-1 transition-all hover:scale-105 ${getTextClasses()}`}>
+          Categories
+          <ChevronDown className="w-3 h-3 transition-transform" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-80 p-4">
+        <div className="grid grid-cols-2 gap-2">
+          {NAVIGATION_CONFIG.categories.map((category) => {
+            const IconComponent = category.icon;
+            return (
+              <Button
+                key={category.id}
+                variant="ghost"
+                onClick={() => navigate(`/browse?category=${category.id}`)}
+                className="flex items-center gap-2 p-3 h-auto justify-start hover:bg-accent"
+              >
+                <IconComponent className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium">{category.name}</span>
+              </Button>
+            );
+          })}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  const ExpertsDropdown = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className={`font-medium flex items-center gap-1 transition-all hover:scale-105 ${getTextClasses()}`}>
+          Experts
+          <ChevronDown className="w-3 h-3 transition-transform" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-64 p-4">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/experts')}
+          className="flex items-center gap-2 p-2 w-full justify-start mb-2 hover:bg-accent text-foreground"
+        >
+          <Users className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium">All Experts</span>
+        </Button>
+        
+        <div className="border-t pt-2">
+          <p className="text-xs text-muted-foreground mb-2 px-2">By Specialty:</p>
+          <div className="space-y-1">
+            {NAVIGATION_CONFIG.expertSpecialties.map((specialty) => (
+              <Button
+                key={specialty}
+                variant="ghost"
+                onClick={() => navigate(`/experts?specialty=${encodeURIComponent(specialty)}`)}
+                className="w-full justify-start text-sm hover:bg-accent p-2 h-auto text-foreground"
+              >
+                {specialty}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  const MainNavigation = () => {
+    const navItems = isAuthenticated 
+      ? NAVIGATION_CONFIG.mainNavItems.authenticated 
+      : NAVIGATION_CONFIG.mainNavItems.guest;
+
+    return (
+      <nav className="hidden lg:flex items-center gap-6">
+        {navItems.map((item) => (
+          <Button
+            key={item.href}
+            variant="ghost"
+            onClick={() => navigate(item.href)}
+            className={`font-medium transition-all hover:scale-105 ${getTextClasses()}`}
+          >
+            {item.label}
+          </Button>
+        ))}
+        
+        {isAuthenticated && (
+          <>
+            <CategoriesDropdown />
+            <ExpertsDropdown />
+          </>
+        )}
+
+        {/* Newsletter Button */}
+        <Button
+          variant="ghost"
+          onClick={() => setShowNewsletter(true)}
+          className={`font-medium flex items-center gap-2 transition-all hover:scale-105 ${getTextClasses()}`}
+        >
+         
+          Community
+        </Button>
+
+        {/* Admin Link */}
+        {user?.role === 'admin' && (
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/admin')}
+            className={`font-medium transition-all hover:scale-105 ${
+              isScrolled ? 'text-purple-600 hover:text-purple-700' : 'text-purple-300 hover:text-purple-200'
+            }`}
+          >
+            <Shield className="w-4 h-4 mr-1" />
+            Admin
+          </Button>
+        )}
+      </nav>
+    );
+  };
+
+  const UserActions = () => {
+    if (loading) {
+      return <div className="w-9 h-9 rounded-full bg-muted animate-pulse" />;
+    }
+
+    if (isAuthenticated && user) {
+      return (
+        <div className="flex items-center gap-3">
+          {/* Upgrade Button for Free Users */}
+          {user.subscription_tier === 'free' && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden sm:flex rounded-full border-yellow-300 text-yellow-600 hover:bg-yellow-50 transition-all hover:scale-105"
+              onClick={() => navigate('/upgrade')}
+            >
+              <Crown className="w-3 h-3 mr-2" />
+              Upgrade
+            </Button>
+          )}
+
+          {/* User Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:scale-105 transition-transform">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} />
+                  <AvatarFallback className="text-xs">
+                    {getUserInitials(user.name || user.email)}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end">
+              <DropdownMenuLabel>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                  {user.subscription_tier !== 'free' && (
+                    <Badge variant="secondary" className="w-fit text-xs">
+                      {user.subscription_tier}
+                    </Badge>
+                  )}
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              
+              <DropdownMenuItem onClick={() => navigate('/profile')}>
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => navigate('/settings')}>
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+              
+              {user.subscription_tier === 'free' && (
+                <DropdownMenuItem onClick={() => navigate('/upgrade')} className="text-primary">
+                  <Crown className="mr-2 h-4 w-4" />
+                  Upgrade to Premium
+                </DropdownMenuItem>
+              )}
+              
+              <DropdownMenuSeparator />
+              
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                <LogOut className="mr-2 h-4 w-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      );
+    }
+
+    // Guest Actions
+    return (
+      <div className="flex items-center gap-3">
+        <Button 
+          variant="ghost" 
+          className={`font-medium rounded-full hover:scale-105 transition-all ${
+            isScrolled 
+              ? 'text-foreground hover:text-primary border-border/40' 
+              : 'text-black hover:text-black/90 border-white/30'
+          } border`}
+          onClick={() => navigate('/login')}
+        >
+          Sign In
+        </Button>
+      </div>
+    );
   };
 
   return (
     <>
-      {/* Structured Header Styles */}
-      <style>{`
-        .header-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 1rem;
-        }
-        
-        .header-grid {
-          display: grid;
-          grid-template-columns: auto 1fr auto;
-          align-items: center;
-          gap: 2rem;
-          height: 80px;
-        }
-        
-        .search-section {
-          max-width: 500px;
-          margin: 0 auto;
-        }
-        
-        .nav-section {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-        }
-        
-        .dropdown-container {
-          position: relative;
-        }
-        
-        .dropdown-content {
-          position: absolute;
-          top: calc(100% + 0.5rem);
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 1000;
-          opacity: 0;
-          visibility: hidden;
-          transition: all 0.2s ease-in-out;
-        }
-        
-        .dropdown-container:hover .dropdown-content {
-          opacity: 1;
-          visibility: visible;
-        }
-        
-        @media (max-width: 1024px) {
-          .header-grid {
-            grid-template-columns: auto auto;
-            gap: 1rem;
-          }
-          
-          .search-section {
-            display: none;
-          }
-          
-          .nav-section {
-            display: none;
-          }
-        }
-        
-        @media (max-width: 768px) {
-          .header-container {
-            padding: 0 0.75rem;
-          }
-          
-          .header-grid {
-            height: 70px;
-          }
-        }
-      `}</style>
-
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? 'bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm'
-            : 'bg-transparent'
-        }`}
-      >
-        <div className="header-container">
-          <div className="header-grid">
+      <header className={getHeaderClasses()}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 lg:h-20">
             
-            {/* Section 1: Logo */}
-            <div className="logo-section">
-              <div
-                className="flex items-center space-x-3 cursor-pointer"
-                onClick={() => navigate(isAuthenticated ? '/browse' : '/')}
-              >
-                <h1 className={`text-xl font-bold transition-all duration-300 ${
-                  isScrolled
-                    ? 'text-foreground'
-                    : 'bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent'
-                }`}>
-                  Better & Bliss
-                </h1>
-              </div>
+            {/* Logo Section */}
+            <div className="flex-shrink-0">
+              <LogoSection />
             </div>
 
-            {/* Section 2: Search (Desktop) */}
-            <div className="search-section">
-              <form onSubmit={handleSearchSubmit} className="relative group">
-                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors ${
-                  isScrolled ? 'text-muted-foreground' : 'text-white/70'
-                }`} />
-                <Input
-                  placeholder="Search wellness topics, experts..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`pl-12 pr-4 h-11 rounded-full transition-all duration-300 ${
-                    isScrolled
-                      ? 'bg-background/80 border-border/40 text-foreground placeholder:text-muted-foreground/70'
-                      : 'bg-white/10 border-white/20 text-white placeholder:text-white/50'
-                  }`}
-                />
-                
-                {/* Search Suggestions */}
-                {searchQuery && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border/20 rounded-xl shadow-lg p-3 z-50">
-                    <p className="text-xs text-muted-foreground mb-2">Popular searches:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {searchSuggestions.map((suggestion, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="cursor-pointer hover:bg-primary hover:text-white text-xs rounded-full"
-                          onClick={() => handleSearch(suggestion)}
-                        >
-                          {suggestion}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </form>
+            {/* Search Section - Hidden on mobile */}
+            <div className="hidden lg:block flex-1 max-w-2xl mx-8">
+              <SearchSection />
             </div>
 
-            {/* Section 3: Navigation & User Actions */}
-            <div className="actions-section flex items-center gap-4">
+            {/* Navigation & Actions */}
+            <div className="flex items-center gap-4">
+              <MainNavigation />
+              <UserActions />
               
-              {/* Primary Navigation */}
-              <nav className="nav-section">
-                {isAuthenticated ? (
-                  <>
-                    {/* Core Links */}
-                    <a href="/blog" className={`font-medium transition-colors hover:scale-105 ${
-                      isScrolled ? 'text-foreground hover:text-primary' : 'text-white hover:text-white/80'
-                    }`}>
-                      Blog
-                    </a>
-                    
-                    <a href="/community" className={`font-medium transition-colors hover:scale-105 ${
-                      isScrolled ? 'text-foreground hover:text-primary' : 'text-white hover:text-white/80'
-                    }`}>
-                      Community
-                    </a>
-
-                    {/* Categories Dropdown */}
-                    <div className="dropdown-container">
-                      <button className={`font-medium flex items-center gap-1 transition-all hover:scale-105 ${
-                        isScrolled ? 'text-foreground hover:text-primary' : 'text-white hover:text-white/80'
-                      }`}>
-                        Categories
-                        <ChevronDown className="w-3 h-3 transition-transform" />
-                      </button>
-                      
-                      <div className="dropdown-content bg-background border border-border/20 rounded-xl shadow-lg p-4 w-80">
-                        <div className="grid grid-cols-2 gap-2">
-                          {categories.map((category) => {
-                            const IconComponent = category.icon;
-                            return (
-                              <button
-                                key={category.id}
-                                onClick={() => handleCategoryClick(category.id)}
-                                className="flex items-center gap-2 p-2 text-left hover:bg-accent rounded-lg transition-colors"
-                              >
-                                <IconComponent className="w-4 h-4 text-primary" />
-                                <span className="text-sm font-medium">{category.name}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Experts Dropdown */}
-                    <div className="dropdown-container">
-                      <button className={`font-medium flex items-center gap-1 transition-all hover:scale-105 ${
-                        isScrolled ? 'text-foreground hover:text-primary' : 'text-white hover:text-white/80'
-                      }`}>
-                        Experts
-                        <ChevronDown className="w-3 h-3 transition-transform" />
-                      </button>
-                      
-                      <div className="dropdown-content bg-background border border-border/20 rounded-xl shadow-lg p-4 w-64">
-                        <button
-                          onClick={() => handleExpertClick()}
-                          className="flex items-center gap-2 p-2 w-full text-left hover:bg-accent rounded-lg transition-colors mb-2"
-                        >
-                          <Users className="w-4 h-4 text-primary" />
-                          <span className="text-sm font-medium">All Experts</span>
-                        </button>
-                        
-                        <div className="border-t pt-2">
-                          <p className="text-xs text-muted-foreground mb-2">By Specialty:</p>
-                          {expertSpecialties.map((specialty) => (
-                            <button
-                              key={specialty}
-                              onClick={() => handleExpertClick(specialty)}
-                              className="block w-full text-left p-2 text-sm hover:bg-accent rounded transition-colors"
-                            >
-                              {specialty}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  // Guest Navigation
-                  <>
-                    <a href="/browse" className={`font-medium transition-all hover:scale-105 ${
-                      isScrolled ? 'text-foreground hover:text-primary' : 'text-white hover:text-white/80'
-                    }`}>
-                      Browse
-                    </a>
-                    <a href="#categories" className={`font-medium transition-all hover:scale-105 ${
-                      isScrolled ? 'text-foreground hover:text-primary' : 'text-white hover:text-white/80'
-                    }`}>
-                      Categories
-                    </a>
-                    <a href="#experts" className={`font-medium transition-all hover:scale-105 ${
-                      isScrolled ? 'text-foreground hover:text-primary' : 'text-white hover:text-white/80'
-                    }`}>
-                      Experts
-                    </a>
-                  </>
-                )}
-
-                {/* Admin Link */}
-                {user?.role === 'admin' && (
-                  <a href="/admin" className={`font-medium transition-all hover:scale-105 ${
-                    isScrolled ? 'text-purple-600 hover:text-purple-700' : 'text-purple-300 hover:text-purple-200'
-                  }`}>
-                    Admin
-                  </a>
-                )}
-              </nav>
-
-              {/* User Actions */}
-              <div className="flex items-center gap-3">
-                {loading ? (
-                  <div className="w-9 h-9 rounded-full bg-muted animate-pulse" />
-                ) : isAuthenticated && user ? (
-                  <>
-                    {/* Upgrade Button */}
-                    {user.subscription_tier === 'free' && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="hidden sm:flex rounded-full border-yellow-300 text-yellow-600 hover:bg-yellow-50"
-                        onClick={() => navigate('/upgrade')}
-                      >
-                        <Crown className="w-3 h-3 mr-2" />
-                        Upgrade
-                      </Button>
-                    )}
-
-                    {/* User Menu */}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:scale-105 transition-transform">
-                          <Avatar className="h-9 w-9">
-                            <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} />
-                            <AvatarFallback className="text-xs">{getUserInitials(user.name || user.email)}</AvatarFallback>
-                          </Avatar>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56" align="end">
-                        <DropdownMenuLabel>
-                          <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-medium">{user.name}</p>
-                            <p className="text-xs text-muted-foreground">{user.email}</p>
-                          </div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => navigate('/profile')}>
-                          <User className="mr-2 h-4 w-4" />
-                          Profile
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/settings')}>
-                          <Settings className="mr-2 h-4 w-4" />
-                          Settings
-                        </DropdownMenuItem>
-                        {user.subscription_tier === 'free' && (
-                          <DropdownMenuItem onClick={() => navigate('/upgrade')} className="text-primary">
-                            <Crown className="mr-2 h-4 w-4" />
-                            Upgrade to Premium
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                          <LogOut className="mr-2 h-4 w-4" />
-                          Log out
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </>
-                ) : (
-                  /* Guest Actions */
-                  <div className="flex items-center gap-3">
-                    <Button 
-                      variant="outline" 
-                      className="hidden sm:flex rounded-full" 
-                      onClick={() => navigate('/login')}
-                    >
-                      Sign In
-                    </Button>
-                    <Button 
-                      className="rounded-full hover:scale-105 transition-transform" 
-                      onClick={() => navigate('/login')}
-                    >
-                      <Sparkles className="w-3 h-3 mr-2" />
-                      Get Started
-                    </Button>
-                  </div>
-                )}
-
-                {/* Mobile Menu */}
-                <Button variant="ghost" size="icon" className="lg:hidden rounded-full hover:scale-105 transition-transform">
-                  <Menu className="w-4 h-4" />
-                </Button>
-              </div>
+              {/* Mobile Menu Button */}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="lg:hidden rounded-full hover:scale-105 transition-transform"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
             </div>
+          </div>
+
+          {/* Mobile Search - Shows below header on mobile */}
+          <div className="lg:hidden pb-4">
+            <SearchSection />
           </div>
         </div>
       </header>
 
       {/* Header Spacer */}
-      <div className="h-20"></div>
+      <div className="h-16 lg:h-20"></div>
+
+    
     </>
   );
 };
