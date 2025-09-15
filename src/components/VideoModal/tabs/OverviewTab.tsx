@@ -129,7 +129,7 @@ export const OverviewTab = ({ video, totalLessons }: OverviewTabProps) => {
 
         {/* Time Investment & Expectations */}
         <div className="bg-zinc-900/30 rounded-lg p-6 mb-8 border border-zinc-800">
-          <h3 className="text-xl font-bold text-white mb-4">Time Investment & Expected Outcomes</h3>
+          <h3 className="text-xl font-bold text-white mb-4">Time Investment & Expected Outcomesx</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h4 className="text-white font-medium mb-2">Recommended Schedule</h4>
