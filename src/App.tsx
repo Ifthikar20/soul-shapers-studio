@@ -6,6 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import BlogLandingPage from './pages/blog/BlogLandingPage';
+import BlogPostPage from './pages/blog/BlogPostPage';
+import BlogCategoryPage from './pages/blog/BlogCategoryPage';
 
 // Import pages
 import Index from "./pages/Index";
@@ -56,6 +59,10 @@ const App = () => {
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
               <Route path="/upgrade" element={<UpgradePage />} />
               <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
+              // Add these routes to your existing routes
+<Route path="/blog" element={<BlogLandingPage />} />
+<Route path="/blog/post/:slug" element={<BlogPostPage />} />
+<Route path="/blog/category/:category" element={<BlogCategoryPage />} />
 
               {/* Protected Routes - Requires Authentication */}
               <Route
