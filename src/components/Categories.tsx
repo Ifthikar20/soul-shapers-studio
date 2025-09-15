@@ -1,18 +1,25 @@
 "use client";
 
-import { Brain, Heart, Leaf, Target, Users, Star, TrendingUp, Zap } from "lucide-react";
+import React from "react";
+import { Users, Star, TrendingUp, Zap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+// Import custom logo images
+import logoBrain from "@/assets/logo-brain.png";
+import logoHeart from "@/assets/logo-heart.png";
+import logoLeaf from "@/assets/logo-leaf.png";
+import logoTarget from "@/assets/logo-target.png";
 
 const fadeInUp = "opacity-0 translate-y-6 animate-fadeInUp";
 
 const categories = [
-  { id: 1, title: "Mental Health", description: "Anxiety, depression, stress management", icon: Brain, videoCount: 150, color: "text-purple-500", trending: true },
-  { id: 2, title: "Mindfulness & Meditation", description: "Meditation techniques, mindful living", icon: Leaf, videoCount: 120, color: "text-green-500", trending: false },
-  { id: 3, title: "Emotional Wellness", description: "Emotional intelligence, relationships", icon: Heart, videoCount: 95, color: "text-pink-500", trending: true },
-  { id: 4, title: "Breaking Habits", description: "Addiction recovery, habit formation", icon: Target, videoCount: 80, color: "text-orange-500", trending: false },
-  { id: 5, title: "Social Wellness", description: "Communication, boundaries, relationships", icon: Users, videoCount: 75, color: "text-blue-500", trending: false },
-  { id: 6, title: "Personal Growth", description: "Self-improvement, goal setting", icon: Star, videoCount: 110, color: "text-yellow-500", trending: true }
+  { id: 1, title: "Mental Health", description: "Anxiety, depression, stress management", icon: logoBrain, videoCount: 150, color: "text-purple-500", trending: true, isImage: true },
+  { id: 2, title: "Mindfulness & Meditation", description: "Meditation techniques, mindful living", icon: logoLeaf, videoCount: 120, color: "text-green-500", trending: false, isImage: true },
+  { id: 3, title: "Emotional Wellness", description: "Emotional intelligence, relationships", icon: logoHeart, videoCount: 95, color: "text-pink-500", trending: true, isImage: true },
+  { id: 4, title: "Breaking Habits", description: "Addiction recovery, habit formation", icon: logoTarget, videoCount: 80, color: "text-orange-500", trending: false, isImage: true },
+  { id: 5, title: "Social Wellness", description: "Communication, boundaries, relationships", icon: Users, videoCount: 75, color: "text-blue-500", trending: false, isImage: false },
+  { id: 6, title: "Personal Growth", description: "Self-improvement, goal setting", icon: Star, videoCount: 110, color: "text-yellow-500", trending: true, isImage: false }
 ];
 
 const Categories = () => {
@@ -26,10 +33,10 @@ const Categories = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <Badge className="mb-4 px-6 py-2 bg-gradient-card border border-primary/20 text-primary rounded-full shadow-sm">
-            <Zap className="w-4 h-4 mr-2" />
+            <Zap className="w-3 h-4 mr-2" />
             Curated Categories
           </Badge>
-          <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-4">
+          <h2 className="text-4xl md:text-4xl font-bold text-foreground mb-4">
             Explore Wellness{" "}
             <span className="bg-gradient-primary bg-clip-text text-transparent">
               Categories
@@ -60,10 +67,16 @@ const Categories = () => {
               <CardContent className="p-6 group">
                 <div className="flex gap-4 items-start">
                   {/* Icon */}
-                  <div
-                    className={`p-4 rounded-xl bg-gradient-card shadow-md ${category.color} transform transition duration-500 group-hover:rotate-6`}
-                  >
-                    <category.icon className="w-8 h-8" />
+                  <div className="flex-shrink-0">
+                    {category.isImage ? (
+                      <img 
+                        src={category.icon as string} 
+                        alt={`${category.title} icon`}
+                        className="w-14 h-14"
+                      />
+                    ) : (
+                      <category.icon className={`w-14 h-14 ${category.color}`} />
+                    )}
                   </div>
 
                   {/* Text */}

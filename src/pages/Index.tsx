@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import Categories from "@/components/Categories";
 import VideoGrid from "@/components/VideoGrid";
 import Footer from "@/components/Footer";
+import ServicesSection from "@/components/ServicesSection";
 
 const Index = () => {
   return (
@@ -11,6 +12,7 @@ const Index = () => {
       <Header />
       <Hero />
       <Categories />
+      <ServicesSection />
       <VideoGrid />
       <Footer />
     </div>

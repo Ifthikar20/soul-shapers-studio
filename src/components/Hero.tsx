@@ -1,10 +1,101 @@
-// src/components/Hero.tsx - Updated for proper layout
-import { Play, ArrowRight, Sparkles, Brain, Heart } from "lucide-react";
+// src/components/Hero.tsx - Updated with black/purple text and white bottom fade
+import React, { useState, useEffect, useRef } from "react";
+import { ArrowRight, Sparkles, Brain, Heart, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import startdustVideo from "@/assets/startdustvid.mp4";
+import startdustVideo from "@/assets/stardustvid.mp4";
 
 const Hero = () => {
+  const [isDissolving, setIsDissolving] = useState(false);
+  const [particles, setParticles] = useState([]);
+  const [hasTriggered, setHasTriggered] = useState(false);
+  const textRef = useRef(null);
+
+  const createParticles = () => {
+    if (!textRef.current) return;
+
+    const rect = textRef.current.getBoundingClientRect();
+    const newParticles = [];
+
+    // Create particles based on text dimensions
+    const particleCount = 150;
+    
+    for (let i = 0; i < particleCount; i++) {
+      newParticles.push({
+        id: i,
+        x: Math.random() * rect.width,
+        y: Math.random() * rect.height,
+        size: Math.random() * 3 + 1,
+        opacity: Math.random() * 0.8 + 0.2,
+        velocityX: (Math.random() - 0.5) * 4,
+        velocityY: Math.random() * -3 - 1,
+        life: 1,
+        decay: Math.random() * 0.02 + 0.01
+      });
+    }
+    
+    setParticles(newParticles);
+  };
+
+  const startDissolve = () => {
+    setIsDissolving(true);
+    createParticles();
+  };
+
+  const resetEffect = () => {
+    setIsDissolving(false);
+    setParticles([]);
+  };
+
+  // One-time effect on page load
+  useEffect(() => {
+    if (!hasTriggered) {
+      const loadTimer = setTimeout(() => {
+        startDissolve();
+        setHasTriggered(true);
+      }, 3000); // Trigger after 3 seconds on page load
+
+      return () => clearTimeout(loadTimer);
+    }
+  }, [hasTriggered]);
+
+  // Reset effect after particles fade out
+  useEffect(() => {
+    if (isDissolving && particles.length === 0) {
+      const resetTimer = setTimeout(() => {
+        resetEffect();
+      }, 1500); // Wait a bit before resetting
+
+      return () => clearTimeout(resetTimer);
+    }
+  }, [isDissolving, particles.length]);
+
+  useEffect(() => {
+    if (!isDissolving || particles.length === 0) return;
+
+    const animationFrame = requestAnimationFrame(function animate() {
+      setParticles(prevParticles => {
+        const updatedParticles = prevParticles
+          .map(particle => ({
+            ...particle,
+            x: particle.x + particle.velocityX,
+            y: particle.y + particle.velocityY,
+            life: particle.life - particle.decay,
+            opacity: particle.opacity * (particle.life - particle.decay)
+          }))
+          .filter(particle => particle.life > 0);
+
+        if (updatedParticles.length > 0) {
+          requestAnimationFrame(animate);
+        }
+
+        return updatedParticles;
+      });
+    });
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isDissolving, particles.length]);
+
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden w-full">
       {/* Background Video - Full Width */}
@@ -19,7 +110,10 @@ const Hero = () => {
           <source src={startdustVideo} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
+        {/* Original overlay */}
         <div className="absolute inset-0 bg-gradient-hero opacity-60"></div>
+        {/* White fade at bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-white/80 via-white/40 to-transparent"></div>
       </div>
 
       {/* Curved Floating Elements */}
@@ -32,50 +126,59 @@ const Hero = () => {
 
       {/* Content - Now properly centered without container constraints */}
       <div className="relative z-10 w-full max-w-5xl mx-auto px-4 text-center">
-        <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight">
-          Better Mind,
-          <span className="bg-gradient-primary bg-clip-text text-transparent block">
-            Blissful Life
-          </span>
-        </h1>
+        {/* Main title with dust effect */}
+        <div className="relative mb-8">
+          <h1 
+            ref={textRef}
+            className={`text-6xl md:text-8xl font-bold text-black mb-8 leading-tight transition-all duration-1000 ${
+              isDissolving ? 'opacity-0 transform scale-110 blur-sm' : 'opacity-100'
+            }`}
+            style={{
+              textShadow: '0 0 20px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.1)',
+            }}
+          >
+            Better Mind,
+            <span className="bg-gradient-to-r from-purple-600 via-purple-800 to-purple-900 bg-clip-text text-transparent block">
+              Blissful Life
+            </span>
+          </h1>
+
+          {/* Particle system overlay */}
+          <div className="absolute inset-0 pointer-events-none">
+            {particles.map(particle => (
+              <div
+                key={particle.id}
+                className="absolute rounded-full"
+                style={{
+                  left: `${particle.x}px`,
+                  top: `${particle.y}px`,
+                  width: `${particle.size}px`,
+                  height: `${particle.size}px`,
+                  opacity: particle.opacity,
+                  boxShadow: `0 0 ${particle.size * 3}px rgba(147,51,234,0.8)`,
+                  background: particle.id % 3 === 0 
+                    ? 'linear-gradient(45deg, #9333ea, #7c3aed)' 
+                    : particle.id % 3 === 1 
+                    ? 'linear-gradient(45deg, #7c3aed, #6366f1)'
+                    : '#8b5cf6'
+                }}
+              />
+            ))}
+          </div>
+        </div>
         
-        <p className="text-xl md:text-2xl text-white/80 mb-10 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-xl md:text-2xl text-gray-800 mb-10 max-w-3xl mx-auto leading-relaxed font-medium">
           Discover expert-curated content on mental health, wellness, and personal transformation. 
           Break limiting patterns and unlock your infinite potential with our futuristic learning platform.
         </p>
 
         <div className="flex justify-center items-center mb-16">
-          <Button variant="outline" size="lg" className="min-w-[220px] h-14 text-base rounded-full">
-            <Brain className="w-5 h-5 mr-3" />
-            Explore Content
+          <Button variant="outline" size="lg" className="min-w-[240px] h-14 text-base rounded-full border-purple-600 text-purple-700 hover:bg-purple-50">
+            <Users className="w-5 h-5 mr-3" />
+            Join My Community
             <ArrowRight className="w-5 h-5 ml-3" />
           </Button>
         </div>
-
-        
-        {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
-          <div className="text-center group">
-            <div className="bg-gradient-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-card hover:shadow-hover transition-smooth border border-border/20">
-              <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-3">1000+</div>
-              <div className="text-white/70 font-medium">Expert Videos</div>
-              <Heart className="w-5 h-5 text-primary mx-auto mt-2 opacity-60" />
-            </div>
-          </div>
-          <div className="text-center group">
-            <div className="bg-gradient-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-card hover:shadow-hover transition-smooth border border-border/20">
-              <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-3">50+</div>
-              <div className="text-white/70 font-medium">Mental Health Experts</div>
-              <Brain className="w-5 h-5 text-primary mx-auto mt-2 opacity-60" />
-            </div>
-          </div>
-          <div className="text-center group">
-            <div className="bg-gradient-card/80 backdrop-blur-sm rounded-3xl p-6 shadow-card hover:shadow-hover transition-smooth border border-border/20">
-              <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-3">10k+</div>
-              <div className="text-white/70 font-medium">Lives Transformed....</div>
-              <Sparkles className="w-5 h-5 text-primary mx-auto mt-2 opacity-60" />
-            </div>
-          </div>
-        </div> */}
       </div>
     </section>
   );
