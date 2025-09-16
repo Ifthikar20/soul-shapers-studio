@@ -15,12 +15,17 @@ interface HybridVideoCardProps {
   onUpgrade: (video: VideoContent) => void;
 }
 
-
+const getContentTypeBadge = (contentType: string) => {
+  // Implementation for getContentTypeBadge
+  return null; // Replace with actual implementation
+};
 
 const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const { canWatchVideo } = useVideoAccess();
-  const canWatch = video.accessible; // Use backend's access determination
+  
+  // Use accessTier to determine if video is accessible
+  const canWatch = video.accessTier === 'free' || canWatchVideo(video);
 
   return (
     <Card
@@ -66,7 +71,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
               Trending
             </Badge>
           )}
-          {getContentTypeBadge(video.contentType || 'video')}
+      {getContentTypeBadge('video')}
         </div>
 
         {/* Duration & Access */}
@@ -152,7 +157,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
                 className="opacity-0 group-hover:opacity-100 transition-opacity bg-primary hover:bg-primary/90 text-xs h-7 px-3"
               >
                 <Play className="w-2 h-2 mr-1" />
-                Watch
+                View Details
               </Button>
             )}
           </div>

@@ -19,7 +19,6 @@ import LoginPage from "./pages/LoginPage";
 import UpgradePage from "./pages/UpgradePage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import CommunityPage from "./pages/CommunityPage"; // NEW: Community page
-import AdminApp from "./admin/AdminApp";
 import UnderConstructionPage from "./components/UnderConstructionPage";
 
 const queryClient = new QueryClient();
@@ -60,9 +59,9 @@ const App = () => {
               <Route path="/upgrade" element={<UpgradePage />} />
               <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
               // Add these routes to your existing routes
-<Route path="/blog" element={<BlogLandingPage />} />
-<Route path="/blog/post/:slug" element={<BlogPostPage />} />
-<Route path="/blog/category/:category" element={<BlogCategoryPage />} />
+              <Route path="/blog" element={<BlogLandingPage />} />
+              <Route path="/blog/post/:slug" element={<BlogPostPage />} />
+              <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
 
               {/* Protected Routes - Requires Authentication */}
               <Route
@@ -74,18 +73,10 @@ const App = () => {
                 }
               />
 
-             {/* Make Community public temporarily for testing */}
-<Route path="/community" element={<CommunityPage />} />
+              {/* Make Community public temporarily for testing */}
+              <Route path="/community" element={<CommunityPage />} />
 
-              {/* Admin Routes - Requires Admin Role */}
-              <Route
-                path="/admin/*"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminApp />
-                  </ProtectedRoute>
-                }
-              />
+             
 
               {/* Catch all - 404 */}
               <Route path="*" element={<NotFound />} />

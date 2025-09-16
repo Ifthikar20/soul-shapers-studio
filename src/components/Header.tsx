@@ -76,7 +76,6 @@ const NAVIGATION_CONFIG = {
     ],
     guest: [
       { label: 'Browse', href: '/browse' },
-      { label: 'About', href: '/about' },
       { label: 'Blog', href: '/blog' }
     ]
   }
