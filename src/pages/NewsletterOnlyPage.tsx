@@ -1,6 +1,6 @@
-// src/pages/NewsletterOnlyPage.tsx - Clean Aesthetic Newsletter Landing Page
-import React, { useState, useEffect } from 'react';
-import { Mail, Check, ArrowRight, Sparkles } from 'lucide-react';
+// src/pages/NewsletterOnlyPage.tsx - Minimized Security Version
+import React, { useState } from 'react';
+import { Mail, Check, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
@@ -10,49 +10,44 @@ import { newsletterService } from '@/services/newsletter.service';
 import { toast } from 'sonner';
 import watercolorImage from '@/assets/watercolor.png';
 
-const newsletterSchema = z.object({
+// Minimal validation - server does the real validation
+const emailSchema = z.object({
   email: z.string().email('Please enter a valid email'),
 });
 
-type NewsletterFormData = z.infer<typeof newsletterSchema>;
+type EmailFormData = z.infer<typeof emailSchema>;
 
 const NewsletterOnlyPage: React.FC = () => {
-  const [newsletterStep, setNewsletterStep] = useState<'form' | 'success'>('form');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [memberCount, setMemberCount] = useState(9247);
+  const [step, setStep] = useState<'form' | 'success'>('form');
+  const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<NewsletterFormData>({
-    resolver: zodResolver(newsletterSchema),
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<EmailFormData>({
+    resolver: zodResolver(emailSchema),
   });
 
-  // Simulate growing community counter
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMemberCount(prev => prev + Math.floor(Math.random() * 3) + 1);
-    }, 15000); // Update every 15 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const onNewsletterSubmit = async (data: NewsletterFormData) => {
-    setIsSubmitting(true);
+  const onSubmit = async (data: EmailFormData) => {
+    setLoading(true);
+    
     try {
-      await newsletterService.subscribe({
+      // Minimal client code - all logic server-side
+      const result = await newsletterService.subscribe({
         email: data.email,
-        source: 'newsletter_only_page',
+        source: 'newsletter_landing',
       });
-      setNewsletterStep('success');
-      setMemberCount(prev => prev + 1); // Increment count
-      reset();
-      toast.success('Welcome to our community!', {
-        description: 'Check your inbox for your welcome email.',
-      });
-    } catch (error: any) {
-      toast.error('Something went wrong', {
-        description: error.message || 'Please try again.',
-      });
+      
+      if (result.success) {
+        setStep('success');
+        reset();
+        toast.success('Welcome!');
+      } else {
+        toast.error('Failed to subscribe', {
+          description: result.error?.message,
+        });
+      }
+    } catch {
+      toast.error('Connection error');
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -61,24 +56,18 @@ const NewsletterOnlyPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-6 py-16">
         <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[80vh]">
           
-          {/* Left Side - Content */}
+          {/* Content */}
           <div className="space-y-8">
-
-
-            {newsletterStep === 'form' ? (
+            {step === 'form' ? (
               <>
-                {/* Main Content */}
                 <div className="space-y-6">
-                  <div className="space-y-4">
-                    <h2 className="text-5xl font-bold text-gray-900 leading-tight">
-                      Solving mental health by building community
-                    </h2>
-                    <p className="text-xl text-gray-600 leading-relaxed">
-                      Join our community and get expert wellness tips delivered to your inbox.
-                    </p>
-                  </div>
-
-                  {/* Benefits */}
+                  <h2 className="text-5xl font-bold text-gray-900 leading-tight">
+                    Solving mental health by building community
+                  </h2>
+                  <p className="text-xl text-gray-600 leading-relaxed">
+                    Join our community and get expert wellness tips delivered to your inbox.
+                  </p>
+                  
                   <div className="space-y-3 text-gray-700">
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
@@ -93,18 +82,9 @@ const NewsletterOnlyPage: React.FC = () => {
                       <span>Early access to our wellness platform</span>
                     </div>
                   </div>
-
-                  {/* Growing Community Counter */}
-                  <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium">
-                      {memberCount.toLocaleString()} people joined this week
-                    </span>
-                  </div>
                 </div>
 
-                {/* Newsletter Form */}
-                <form onSubmit={handleSubmit(onNewsletterSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   <div className="relative">
                     <Input
                       type="email"
@@ -125,10 +105,10 @@ const NewsletterOnlyPage: React.FC = () => {
 
                   <Button 
                     type="submit" 
-                    disabled={isSubmitting}
+                    disabled={loading}
                     className="w-full h-14 text-base rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                   >
-                    {isSubmitting ? (
+                    {loading ? (
                       <>
                         <div className="w-5 h-5 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         Joining...
@@ -147,7 +127,6 @@ const NewsletterOnlyPage: React.FC = () => {
                 </form>
               </>
             ) : (
-              /* Success State */
               <div className="space-y-6">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-2xl">
                   <Check className="w-8 h-8 text-green-600" />
@@ -181,23 +160,15 @@ const NewsletterOnlyPage: React.FC = () => {
             )}
           </div>
 
-          {/* Right Side - Image */}
+          {/* Image */}
           <div className="hidden lg:block">
             <div className="relative">
               <div className="aspect-[4/5] bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl overflow-hidden flex items-center justify-center">
                 <img
                   src={watercolorImage}
-                  alt="Watercolor wellness illustration"
+                  alt="Wellness illustration"
                   className="w-full h-full object-contain p-8"
                 />
-              </div>
-              
-              {/* Floating elements */}
-              <div className="absolute -bottom-4 -left-4 w-24 h-20 bg-white rounded-2xl shadow-lg flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-lg font-bold text-gray-900">10k+</div>
-                  <div className="text-xs text-gray-500">Members</div>
-                </div>
               </div>
             </div>
           </div>
