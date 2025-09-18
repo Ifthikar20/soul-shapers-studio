@@ -1,4 +1,4 @@
-// src/App.tsx - Updated with Community Route
+// src/App.tsx - Updated with Newsletter Mode Support
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,9 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import BlogLandingPage from './pages/blog/BlogLandingPage';
-import BlogPostPage from './pages/blog/BlogPostPage';
-import BlogCategoryPage from './pages/blog/BlogCategoryPage';
 
 // Import pages
 import Index from "./pages/Index";
@@ -18,15 +15,45 @@ import BrowsePage from "./pages/BrowsePage";
 import LoginPage from "./pages/LoginPage";
 import UpgradePage from "./pages/UpgradePage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
-import CommunityPage from "./pages/CommunityPage"; // NEW: Community page
+import CommunityPage from "./pages/CommunityPage";
+import BlogLandingPage from './pages/blog/BlogLandingPage';
+import BlogPostPage from './pages/blog/BlogPostPage';
+import BlogCategoryPage from './pages/blog/BlogCategoryPage';
+
+// Import components
 import UnderConstructionPage from "./components/UnderConstructionPage";
+import NewsletterOnlyPage from "./pages/NewsletterOnlyPage";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Check environment variable for construction mode
+  // Check environment variables for different modes
   const isConstructionMode = import.meta.env.VITE_CONSTRUCTION_MODE === 'true';
+  const isNewsletterOnlyMode = import.meta.env.VITE_NEWSLETTER_ONLY_MODE === 'true';
 
+  console.log('App Mode:', {
+    newsletterOnlyMode: isNewsletterOnlyMode,
+    constructionMode: isConstructionMode,
+  });
+
+  // Newsletter-only mode - show only newsletter signup
+  if (isNewsletterOnlyMode) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="*" element={<NewsletterOnlyPage />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  // Construction mode - show construction page
   if (isConstructionMode) {
     return (
       <QueryClientProvider client={queryClient}>
@@ -43,6 +70,7 @@ const App = () => {
     );
   }
 
+  // Normal application mode
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -58,7 +86,8 @@ const App = () => {
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
               <Route path="/upgrade" element={<UpgradePage />} />
               <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
-              // Add these routes to your existing routes
+              
+              {/* Blog Routes */}
               <Route path="/blog" element={<BlogLandingPage />} />
               <Route path="/blog/post/:slug" element={<BlogPostPage />} />
               <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
@@ -73,10 +102,8 @@ const App = () => {
                 }
               />
 
-              {/* Make Community public temporarily for testing */}
+              {/* Community Route */}
               <Route path="/community" element={<CommunityPage />} />
-
-             
 
               {/* Catch all - 404 */}
               <Route path="*" element={<NotFound />} />
