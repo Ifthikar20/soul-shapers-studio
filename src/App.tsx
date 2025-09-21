@@ -1,30 +1,41 @@
-// src/App.tsx - Updated with Newsletter Mode Support
+// src/App.tsx - Optimized with Code Splitting
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Suspense, lazy } from "react";
 
-// Import pages
-import Index from "./pages/Index";
-import SearchResults from "./pages/SearchResults";
-import NotFound from "./pages/NotFound";
-import BrowsePage from "./pages/BrowsePage";
-import LoginPage from "./pages/LoginPage";
-import UpgradePage from "./pages/UpgradePage";
-import UnauthorizedPage from "./pages/UnauthorizedPage";
-import CommunityPage from "./pages/CommunityPage";
-import BlogLandingPage from './pages/blog/BlogLandingPage';
-import BlogPostPage from './pages/blog/BlogPostPage';
-import BlogCategoryPage from './pages/blog/BlogCategoryPage';
-
-// Import components
-import UnderConstructionPage from "./components/UnderConstructionPage";
+// Only import components that are absolutely necessary for ALL modes
 import NewsletterOnlyPage from "./pages/NewsletterOnlyPage";
 
+// Lazy load ALL other components to prevent unnecessary loading
+const AuthProvider = lazy(() => import("@/contexts/AuthContext").then(module => ({ default: module.AuthProvider })));
+const ProtectedRoute = lazy(() => import("@/components/ProtectedRoute").then(module => ({ default: module.ProtectedRoute })));
+
+// Lazy load pages
+const Index = lazy(() => import("./pages/Index"));
+const SearchResults = lazy(() => import("./pages/SearchResults"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const BrowsePage = lazy(() => import("./pages/BrowsePage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const UpgradePage = lazy(() => import("./pages/UpgradePage"));
+const UnauthorizedPage = lazy(() => import("./pages/UnauthorizedPage"));
+const BlogLandingPage = lazy(() => import('./pages/blog/BlogLandingPage'));
+const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
+const BlogCategoryPage = lazy(() => import('./pages/blog/BlogCategoryPage'));
+
+// Lazy load components
+const UnderConstructionPage = lazy(() => import("./components/UnderConstructionPage"));
+
 const queryClient = new QueryClient();
+
+// Loading component for Suspense
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 const App = () => {
   // Check environment variables for different modes
@@ -36,24 +47,20 @@ const App = () => {
     constructionMode: isConstructionMode,
   });
 
-  // Newsletter-only mode - show only newsletter signup
+  // Newsletter-only mode - completely isolated, no routing needed
   if (isNewsletterOnlyMode) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="*" element={<NewsletterOnlyPage />} />
-            </Routes>
-          </BrowserRouter>
+          <NewsletterOnlyPage />
         </TooltipProvider>
       </QueryClientProvider>
     );
   }
 
-  // Construction mode - show construction page
+  // Construction mode - minimal routing
   if (isConstructionMode) {
     return (
       <QueryClientProvider client={queryClient}>
@@ -61,54 +68,55 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="*" element={<UnderConstructionPage />} />
-            </Routes>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                <Route path="*" element={<UnderConstructionPage />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
     );
   }
 
-  // Normal application mode
+  // Normal application mode - full routing with lazy loading
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AuthProvider>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/search" element={<SearchResults />} />
-              <Route path="/unauthorized" element={<UnauthorizedPage />} />
-              <Route path="/upgrade" element={<UpgradePage />} />
-              <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
-              
-              {/* Blog Routes */}
-              <Route path="/blog" element={<BlogLandingPage />} />
-              <Route path="/blog/post/:slug" element={<BlogPostPage />} />
-              <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
+          <Suspense fallback={<LoadingSpinner />}>
+            <AuthProvider>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/search" element={<SearchResults />} />
+                <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                <Route path="/upgrade" element={<UpgradePage />} />
+                <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
+                
+                {/* Blog Routes */}
+                <Route path="/blog" element={<BlogLandingPage />} />
+                <Route path="/blog/post/:slug" element={<BlogPostPage />} />
+                <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
 
-              {/* Protected Routes - Requires Authentication */}
-              <Route
-                path="/browse"
-                element={
-                  <ProtectedRoute>
-                    <BrowsePage />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Protected Routes - Requires Authentication */}
+                <Route
+                  path="/browse"
+                  element={
+                    <ProtectedRoute>
+                      <BrowsePage />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Community Route */}
-              <Route path="/community" element={<CommunityPage />} />
-
-              {/* Catch all - 404 */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AuthProvider>
+                {/* Catch all - 404 */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AuthProvider>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
