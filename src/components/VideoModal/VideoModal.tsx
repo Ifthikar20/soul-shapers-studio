@@ -7,7 +7,6 @@ import { VideoModalTabs } from "./VideoModalTabs";
 import { OverviewTab } from "./tabs/OverviewTab";
 import { LessonsTab } from "./tabs/LessonsTab";
 import { PracticeTab } from "./tabs/PracticeTab";
-import { CommunityTab } from "./tabs/CommunityTab";
 import { VideoContent } from '@/types/video.types';
 import { X, Plus, ThumbsUp, Share2, User, Users, Clock } from "lucide-react";
 
@@ -49,8 +48,6 @@ const VideoModal = ({
         return <LessonsTab lessons={lessons} currentLesson={currentLesson} onLessonSelect={setCurrentLesson} />;
       case 'practice':
         return <PracticeTab questions={practiceQuestions} />;
-      case 'community':
-        return <CommunityTab posts={communityPosts} />;
       default:
         return <OverviewTab video={video} totalLessons={lessons.length || 7} />;
     }

@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
             ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
             router: ['react-router-dom'],
             auth: ['@/contexts/AuthContext', '@/services/auth.service'],
-            video: ['@/components/VideoModal', '@/components/VideoPlayer'],
+            // video: ['@/components/VideoModal', '@/components/VideoPlayer'],
           },
         },
       },
