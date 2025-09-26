@@ -1,4 +1,4 @@
-// vite.config.ts - Optimized for different modes
+// vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -23,10 +23,11 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
+      // Use esbuild instead of terser for faster builds
+      minify: 'esbuild',
       rollupOptions: {
         output: {
           manualChunks: isNewsletterOnly ? undefined : {
-            // Split vendor dependencies
             vendor: ['react', 'react-dom'],
             ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
             router: ['react-router-dom'],
@@ -35,26 +36,13 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
-      // Optimize for newsletter-only mode
-      ...(isNewsletterOnly && {
-        target: 'es2015',
-        minify: 'terser',
-        terserOptions: {
-          compress: {
-            drop_console: true,
-            drop_debugger: true,
-          },
-        },
-      }),
     },
-    // Tree shaking optimization
     optimizeDeps: {
       include: isNewsletterOnly 
         ? ['react', 'react-dom'] 
         : ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
     },
     define: {
-      // Remove unused features in newsletter-only mode
       __NEWSLETTER_ONLY__: JSON.stringify(isNewsletterOnly),
       __CONSTRUCTION_MODE__: JSON.stringify(isConstruction),
     },
