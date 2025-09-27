@@ -72,7 +72,7 @@ const NAVIGATION_CONFIG = {
     authenticated: [
       { label: 'Browse', href: '/browse' },
       { label: 'Blog', href: '/blog' },
-      { label: 'Community', href: '/community' }
+    
     ],
     guest: [
       { label: 'Browse', href: '/browse' },
