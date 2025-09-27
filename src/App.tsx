@@ -25,6 +25,7 @@ const BlogLandingPage = lazy(() => import('./pages/blog/BlogLandingPage'));
 const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
 const BlogCategoryPage = lazy(() => import('./pages/blog/BlogCategoryPage'));
 const AudioPage = lazy(() => import("./pages/AudioPage"));
+const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 
 // Lazy load components
 const UnderConstructionPage = lazy(() => import("./components/UnderConstructionPage"));
@@ -100,7 +101,7 @@ const App = () => {
 
                 {/* NEW - Add this audio route */}
                 <Route path="/audio" element={<AudioPage />} />
-
+                <Route path="/audio/:id" element={<SingleAudioPage />} />
 
                 {/* Blog Routes */}
                 <Route path="/blog" element={<BlogLandingPage />} />
