@@ -24,6 +24,7 @@ const UnauthorizedPage = lazy(() => import("./pages/UnauthorizedPage"));
 const BlogLandingPage = lazy(() => import('./pages/blog/BlogLandingPage'));
 const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
 const BlogCategoryPage = lazy(() => import('./pages/blog/BlogCategoryPage'));
+const AudioPage = lazy(() => import("./pages/AudioPage"));
 
 // Lazy load components
 const UnderConstructionPage = lazy(() => import("./components/UnderConstructionPage"));
@@ -96,7 +97,11 @@ const App = () => {
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
                 <Route path="/upgrade" element={<UpgradePage />} />
                 <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
-                
+
+                {/* NEW - Add this audio route */}
+                <Route path="/audio" element={<AudioPage />} />
+
+
                 {/* Blog Routes */}
                 <Route path="/blog" element={<BlogLandingPage />} />
                 <Route path="/blog/post/:slug" element={<BlogPostPage />} />

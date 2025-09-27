@@ -41,6 +41,9 @@ interface HeaderProps {
 }
 
 // Configuration Objects
+// src/components/Header.tsx - Changes to add Audio navigation
+
+// Find the NAVIGATION_CONFIG object (around line 45) and update it:
 const NAVIGATION_CONFIG = {
   categories: [
     { id: 'mental-health', name: 'Mental Health', icon: Brain },
@@ -68,14 +71,16 @@ const NAVIGATION_CONFIG = {
     "healthy habits"
   ],
   
+  // UPDATE THIS SECTION - Add 'Audio' to both authenticated and guest nav items
   mainNavItems: {
     authenticated: [
       { label: 'Browse', href: '/browse' },
+      { label: 'Audio', href: '/audio' }, // NEW - ADD THIS LINE
       { label: 'Blog', href: '/blog' },
-    
     ],
     guest: [
       { label: 'Browse', href: '/browse' },
+      { label: 'Audio', href: '/audio' }, // NEW - ADD THIS LINE
       { label: 'Blog', href: '/blog' }
     ]
   }

@@ -5,6 +5,7 @@ import Categories from "@/components/Categories";
 // import VideoGrid from "@/components/VideoGrid";
 import Footer from "@/components/Footer";
 import ServicesSection from "@/components/ServicesSection";
+import AudioComponent from "@/components/AudioComponent";
 
 const Index = () => {
   return (
@@ -14,6 +15,7 @@ const Index = () => {
       <Categories />
       <ServicesSection />
       {/* <VideoGrid /> */}
+      <AudioComponent />
       <Footer />
     </div>
   );
