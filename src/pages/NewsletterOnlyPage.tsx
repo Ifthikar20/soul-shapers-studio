@@ -29,21 +29,21 @@ const NewsletterOnlyPage: React.FC = () => {
                 Solving mental health by building community
               </h2>
               <p className="text-xl text-gray-600 leading-relaxed">
-                Join our community and get expert wellness tips delivered to your inbox.
+                Join our community and get wellness insights from real people on similar journeys.
               </p>
               
               <div className="space-y-3 text-gray-700">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                  <span>Weekly mental health insights from licensed professionals</span>
+                  <span>Weekly mental health stories and community wisdom</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                  <span>Practical exercises and guided meditations</span>
+                  <span>Peer-to-peer support exercises and shared experiences</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                  <span>Early access to our wellness platform</span>
+                  <span>Early access to our community wellness platform</span>
                 </div>
               </div>
             </div>
@@ -65,7 +65,7 @@ const NewsletterOnlyPage: React.FC = () => {
               <div className="aspect-[4/5] bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl overflow-hidden flex items-center justify-center">
                 <img
                   src={watercolorImage}
-                  alt="Wellness illustration"
+                  alt="Community wellness illustration"
                   className="w-full h-full object-contain p-8"
                 />
               </div>
@@ -74,11 +74,52 @@ const NewsletterOnlyPage: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center pt-16 border-t border-gray-100 mt-16">
-          <p className="text-sm text-gray-500">
-            Better & Bliss • Mental Health & Wellness Platform • Your journey starts here
-          </p>
-        </div>
+        <footer className="border-t border-gray-100 mt-16 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            
+            {/* Brand */}
+            <div className="text-center md:text-left">
+              <p className="text-sm text-gray-500">
+                Better & Bliss • Mental Health & Wellness Platform • Your journey starts here
+              </p>
+            </div>
+
+            {/* Footer Links */}
+            <div className="flex flex-wrap justify-center md:justify-end gap-6 text-sm">
+              <a 
+                href="/about" 
+                className="text-gray-600 hover:text-indigo-600 transition-colors duration-200"
+              >
+                About Us
+              </a>
+              <a 
+                href="/terms" 
+                className="text-gray-600 hover:text-indigo-600 transition-colors duration-200"
+              >
+                Terms & Conditions
+              </a>
+              <a 
+                href="/privacy" 
+                className="text-gray-600 hover:text-indigo-600 transition-colors duration-200"
+              >
+                Privacy Policy
+              </a>
+              <a 
+                href="/contact" 
+                className="text-gray-600 hover:text-indigo-600 transition-colors duration-200"
+              >
+                Contact
+              </a>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="text-center mt-6 pt-4 border-t border-gray-50">
+            <p className="text-xs text-gray-400">
+              © 2024 Better & Bliss. All rights reserved. Building community-driven mental wellness together.
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   );
