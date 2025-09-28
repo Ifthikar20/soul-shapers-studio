@@ -1,9 +1,10 @@
-// src/components/AudioComponent.tsx
-import React, { useState, useCallback } from 'react';
+// src/components/AudioComponent.tsx - Fixed version
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Slider } from '@/components/ui/slider';
 import { 
   Play, 
   Clock, 
@@ -17,32 +18,11 @@ import {
   ChevronRight,
   Pause,
   SkipBack,
-  SkipForward
+  SkipForward,
+  VolumeX,
+  Volume1
 } from 'lucide-react';
 import { AudioContent } from '@/types/audio.types';
-
-// // Audio content interface
-// interface AudioContent {
-//   id: number;
-//   title: string;
-//   expert: string;
-//   expertCredentials: string;
-//   expertAvatar: string;
-//   duration: string;
-//   category: string;
-//   rating: number;
-//   listens: string;
-//   thumbnail: string;
-//   isNew: boolean;
-//   isTrending: boolean;
-//   description: string;
-//   fullDescription: string;
-//   audioUrl: string;
-//   accessTier: 'free' | 'premium';
-//   isFirstEpisode?: boolean;
-//   seriesId?: string;
-//   episodeNumber?: number;
-// }
 
 // Mock audio data
 const audioContent: AudioContent[] = [
@@ -61,7 +41,7 @@ const audioContent: AudioContent[] = [
     isTrending: true,
     description: "Start your day with calm and clarity through this guided anxiety relief meditation.",
     fullDescription: "A gentle morning meditation designed to help you release anxiety and set positive intentions for the day ahead.",
-    audioUrl: "#",
+    audioUrl: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
     accessTier: 'free',
     isFirstEpisode: true
   },
@@ -80,7 +60,7 @@ const audioContent: AudioContent[] = [
     isTrending: true,
     description: "Calming bedtime stories designed to help adults drift into peaceful sleep.",
     fullDescription: "Professionally crafted sleep stories that guide your mind into relaxation and prepare you for restorative sleep.",
-    audioUrl: "#",
+    audioUrl: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
     accessTier: 'premium'
   },
   {
@@ -98,7 +78,7 @@ const audioContent: AudioContent[] = [
     isTrending: false,
     description: "Learn powerful breathing techniques to manage stress in real-time.",
     fullDescription: "Master evidence-based breathing methods that you can use anywhere to quickly reduce stress and anxiety.",
-    audioUrl: "#",
+    audioUrl: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
     accessTier: 'free'
   },
   {
@@ -116,7 +96,7 @@ const audioContent: AudioContent[] = [
     isTrending: false,
     description: "Cultivate kindness toward yourself with this guided self-compassion practice.",
     fullDescription: "Learn to treat yourself with the same kindness you would offer a good friend through this transformative practice.",
-    audioUrl: "#",
+    audioUrl: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
     accessTier: 'premium'
   }
 ];
@@ -238,15 +218,128 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: {
   );
 };
 
-// Simple Audio Player Modal (Preview of the single audio play screen)
+// Audio Player Modal
 const AudioPlayerModal = ({ audio, open, onOpenChange }: {
   audio: AudioContent | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState([80]);
+  const [isMuted, setIsMuted] = useState(false);
+  
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Parse duration string to seconds
+  const parseDuration = (durationStr: string): number => {
+    const [minutes, seconds] = durationStr.split(':').map(Number);
+    return minutes * 60 + seconds;
+  };
+
+  // Format time in MM:SS
+  const formatTime = (timeInSeconds: number): string => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  // Audio event handlers
+  useEffect(() => {
+    const audioElement = audioRef.current;
+    if (!audioElement || !audio) return;
+
+    const handleLoadedMetadata = () => {
+      setDuration(audioElement.duration || parseDuration(audio.duration));
+    };
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audioElement.currentTime);
+    };
+
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
+
+    audioElement.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audioElement.addEventListener('timeupdate', handleTimeUpdate);
+    audioElement.addEventListener('play', handlePlay);
+    audioElement.addEventListener('pause', handlePause);
+    audioElement.addEventListener('ended', handleEnded);
+
+    return () => {
+      audioElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audioElement.removeEventListener('timeupdate', handleTimeUpdate);
+      audioElement.removeEventListener('play', handlePlay);
+      audioElement.removeEventListener('pause', handlePause);
+      audioElement.removeEventListener('ended', handleEnded);
+    };
+  }, [audio]);
+
+  const togglePlayPause = () => {
+    const audioElement = audioRef.current;
+    if (!audioElement) return;
+
+    if (isPlaying) {
+      audioElement.pause();
+    } else {
+      audioElement.play().catch(console.error);
+    }
+  };
+
+  const handleSeek = (value: number[]) => {
+    const audioElement = audioRef.current;
+    if (!audioElement) return;
+    
+    audioElement.currentTime = value[0];
+    setCurrentTime(value[0]);
+  };
+
+  const handleVolumeChange = (value: number[]) => {
+    const audioElement = audioRef.current;
+    if (!audioElement) return;
+    
+    const volumeValue = value[0] / 100;
+    audioElement.volume = volumeValue;
+    setVolume(value);
+    setIsMuted(volumeValue === 0);
+  };
+
+  const toggleMute = () => {
+    const audioElement = audioRef.current;
+    if (!audioElement) return;
+    
+    if (isMuted) {
+      audioElement.volume = volume[0] / 100;
+      setIsMuted(false);
+    } else {
+      audioElement.volume = 0;
+      setIsMuted(true);
+    }
+  };
+
+  const skip = (seconds: number) => {
+    const audioElement = audioRef.current;
+    if (!audioElement) return;
+    
+    const newTime = Math.max(0, Math.min(duration, currentTime + seconds));
+    audioElement.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const getVolumeIcon = () => {
+    if (isMuted || volume[0] === 0) return VolumeX;
+    if (volume[0] < 50) return Volume1;
+    return Volume2;
+  };
 
   if (!audio) return null;
+
+  const VolumeIcon = getVolumeIcon();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -262,6 +355,13 @@ const AudioPlayerModal = ({ audio, open, onOpenChange }: {
           </Button>
 
           <div className="text-center space-y-6 p-6">
+            {/* Audio element */}
+            <audio
+              ref={audioRef}
+              src={audio.audioUrl}
+              preload="metadata"
+            />
+
             {/* Thumbnail */}
             <div className="relative mx-auto w-48 h-48 rounded-2xl overflow-hidden shadow-lg">
               <img
@@ -296,16 +396,22 @@ const AudioPlayerModal = ({ audio, open, onOpenChange }: {
               </div>
             </div>
 
-            {/* Simple Player Controls */}
+            {/* Player Controls */}
             <div className="space-y-4">
+              {/* Main Controls */}
               <div className="flex items-center justify-center gap-4">
-                <Button variant="outline" size="icon" className="rounded-full">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-full"
+                  onClick={() => skip(-10)}
+                >
                   <SkipBack className="w-4 h-4" />
                 </Button>
                 
                 <Button 
                   size="lg"
-                  onClick={() => setIsPlaying(!isPlaying)}
+                  onClick={togglePlayPause}
                   className="rounded-full w-16 h-16 bg-purple-600 hover:bg-purple-700"
                 >
                   {isPlaying ? (
@@ -315,19 +421,56 @@ const AudioPlayerModal = ({ audio, open, onOpenChange }: {
                   )}
                 </Button>
                 
-                <Button variant="outline" size="icon" className="rounded-full">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-full"
+                  onClick={() => skip(10)}
+                >
                   <SkipForward className="w-4 h-4" />
                 </Button>
               </div>
 
-              {/* Progress Bar Placeholder */}
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-purple-600 h-2 rounded-full w-1/3"></div>
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <Slider
+                  value={[currentTime]}
+                  max={duration || parseDuration(audio.duration)}
+                  step={1}
+                  onValueChange={handleSeek}
+                  className="w-full"
+                />
+                
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{audio.duration}</span>
+                </div>
               </div>
-              
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>2:30</span>
-                <span>{audio.duration}</span>
+
+              {/* Volume Control */}
+              <div className="flex items-center justify-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleMute}
+                  className="rounded-full"
+                >
+                  <VolumeIcon className="w-4 h-4" />
+                </Button>
+                
+                <div className="w-24">
+                  <Slider
+                    value={volume}
+                    max={100}
+                    step={1}
+                    onValueChange={handleVolumeChange}
+                    className="w-full"
+                  />
+                </div>
+                
+                <span className="text-xs text-gray-500 w-8 text-center">
+                  {Math.round(volume[0])}
+                </span>
               </div>
             </div>
 
@@ -335,7 +478,6 @@ const AudioPlayerModal = ({ audio, open, onOpenChange }: {
             <Button 
               className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
               onClick={() => {
-                // This would navigate to the full audio play screen
                 console.log('Navigate to full audio player for:', audio.id);
                 onOpenChange(false);
               }}
