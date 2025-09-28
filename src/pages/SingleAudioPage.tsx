@@ -7,7 +7,7 @@ import { AudioPlayer } from '@/components/AudioPlayer';
 import { AudioContent } from '@/components/AudioContent';
 
 // Plant images
-import plant4 from "@/assets/plant4.png";
+import plant4 from "@/assets/plant01.png";
 import plant5 from "@/assets/plant5.png";
 
 // Audio content data
@@ -73,7 +73,7 @@ const SingleAudioPage = () => {
 
   if (!audio) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen" style={{backgroundColor: 'rgb(252, 253, 253)'}}>
         <div className="container mx-auto px-6 py-20 text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Audio Not Found</h1>
           <p className="text-muted-foreground mb-8">The audio session you're looking for doesn't exist.</p>
@@ -87,7 +87,7 @@ const SingleAudioPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{backgroundColor: 'rgb(252, 253, 253)'}}>
       {/* Back Button */}
       <div className="container mx-auto px-6 pt-8">
         <Button 
@@ -101,7 +101,7 @@ const SingleAudioPage = () => {
       </div>
 
       <div className="container mx-auto px-6 pb-12">
-        <div className="max-w-6xl mx-auto space-y-12">
+        <div className="max-w-4xl mx-auto space-y-6">
           
           <AudioPlayer 
             audio={audio}

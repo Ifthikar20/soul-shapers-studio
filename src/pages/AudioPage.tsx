@@ -52,7 +52,6 @@ interface AudioContent {
 // Plant images for thumbnails
 import plant4 from "@/assets/plant4.png";
 import plant5 from "@/assets/plant5.png";
-import plant6 from "@/assets/plant6.png";
 import plant7 from "@/assets/plant7.png";
 import plant8 from "@/assets/plant8.png";
 import plant9 from "@/assets/plant9.png";
@@ -108,7 +107,7 @@ const audioContent: AudioContent[] = [
     category: "Breathwork",
     rating: 4.7,
     listens: "12.4k",
-    thumbnail: plant6,
+    thumbnail: plant5,
     isNew: true,
     isTrending: false,
     description: "Learn powerful breathing techniques to manage stress in real-time.",
@@ -224,14 +223,7 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: {
           alt={audio.title}
           className="w-full h-40 object-cover"
         />
-        
-        {/* Audio Icon Overlay */}
-        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-          <div className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
-            <Headphones className="w-8 h-8 text-purple-600" />
-          </div>
-        </div>
-        
+       
         {/* Play Overlay on Hover */}
         <div 
           onClick={() => onPlay(audio)}
