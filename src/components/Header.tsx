@@ -303,29 +303,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
           </>
         )}
 
-        {/* Newsletter Button */}
-        <Button
-          variant="ghost"
-          onClick={() => setShowNewsletter(true)}
-          className={`font-medium flex items-center gap-2 transition-all hover:scale-105 ${getTextClasses()}`}
-        >
-         
-          Community
-        </Button>
-
-        {/* Admin Link */}
-        {user?.role === 'admin' && (
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/admin')}
-            className={`font-medium transition-all hover:scale-105 ${
-              isScrolled ? 'text-purple-600 hover:text-purple-700' : 'text-purple-300 hover:text-purple-200'
-            }`}
-          >
-            <Shield className="w-4 h-4 mr-1" />
-            Admin
-          </Button>
-        )}
+      
       </nav>
     );
   };

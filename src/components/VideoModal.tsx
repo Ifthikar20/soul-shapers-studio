@@ -1173,43 +1173,7 @@ const VideoModal = ({ video, open, onOpenChange }: VideoModalProps) => {
                         </div>
                       </div>
                       
-                      {/* Community Posts */}
-                      {communityPosts.map((post) => (
-                        <div key={post.id} className="bg-zinc-900/50 rounded-lg p-6 border border-zinc-800">
-                          <div className="flex gap-4">
-                            <img 
-                              src={post.avatar} 
-                              alt={post.author}
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-2">
-                                <div>
-                                  <span className="text-white font-semibold">{post.author}</span>
-                                  <span className="text-zinc-500 text-sm ml-2">{post.timeAgo}</span>
-                                </div>
-                              </div>
-                              <p className="text-zinc-300 mb-4">{post.content}</p>
-                              <div className="flex items-center gap-6 text-sm">
-                                <button className="flex items-center gap-2 text-zinc-400 hover:text-purple-400 transition-colors">
-                                  <ThumbsUp className="w-4 h-4" />
-                                  <span>{post.likes}</span>
-                                </button>
-                                <button className="flex items-center gap-2 text-zinc-400 hover:text-purple-400 transition-colors">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                  </svg>
-                                  <span>{post.replies} replies</span>
-                                </button>
-                                <button className="flex items-center gap-2 text-zinc-400 hover:text-purple-400 transition-colors ml-auto">
-                                  <Share2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      
+                   
                       <div className="text-center">
                         <Button variant="outline" className="border-zinc-700 text-white hover:bg-zinc-800">
                           Load More Posts

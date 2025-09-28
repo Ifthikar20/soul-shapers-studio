@@ -281,10 +281,6 @@ export const OverviewTab = ({ video, totalLessons }: OverviewTabProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-green-400" />
-              <span className="text-zinc-300 text-sm">24/7 Community Access</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-green-400" />
               <span className="text-zinc-300 text-sm">Expert Q&A Sessions</span>
             </div>
             <div className="flex items-center gap-2">
