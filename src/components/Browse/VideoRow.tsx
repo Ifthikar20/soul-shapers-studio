@@ -108,9 +108,10 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
               </div>
             ))
           ) : (
-            // Actual content
-            videos.map((video) => (
-              <div key={video.id} className="flex-none w-72">
+            videos
+            .filter(video => video.id != null && !isNaN(video.id))
+            .map((video, index) => (
+              <div key={`video-${video.id}-${index}`} className="flex-none w-72">
                 <HybridVideoCard
                   video={video}
                   onPlay={onPlay}
