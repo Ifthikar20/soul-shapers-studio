@@ -11,7 +11,6 @@ import {
   Play, 
   Clock, 
   User, 
-  Star, 
   Crown, 
   TrendingUp, 
   Headphones,
@@ -35,7 +34,6 @@ interface AudioContent {
   expertAvatar: string;
   duration: string;
   category: string;
-  rating: number;
   listens: string;
   thumbnail: string;
   isNew: boolean;
@@ -68,7 +66,6 @@ const audioContent: AudioContent[] = [
     expertAvatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop&crop=face",
     duration: "12:30",
     category: "Meditation",
-    rating: 4.9,
     listens: "25.3k",
     thumbnail: plant4,
     isNew: true,
@@ -87,7 +84,6 @@ const audioContent: AudioContent[] = [
     expertAvatar: "https://images.unsplash.com/photo-1594824388853-d0b8ccbfbb3d?w=100&h=100&fit=crop&crop=face",
     duration: "25:45",
     category: "Sleep",
-    rating: 4.8,
     listens: "18.7k",
     thumbnail: plant5,
     isNew: false,
@@ -105,7 +101,6 @@ const audioContent: AudioContent[] = [
     expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     duration: "8:15",
     category: "Breathwork",
-    rating: 4.7,
     listens: "12.4k",
     thumbnail: plant5,
     isNew: true,
@@ -123,7 +118,6 @@ const audioContent: AudioContent[] = [
     expertAvatar: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&h=100&fit=crop&crop=face",
     duration: "15:20",
     category: "Self-Care",
-    rating: 4.9,
     listens: "22.1k",
     thumbnail: plant7,
     isNew: false,
@@ -141,7 +135,6 @@ const audioContent: AudioContent[] = [
     expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     duration: "18:45",
     category: "Focus",
-    rating: 4.6,
     listens: "15.2k",
     thumbnail: plant8,
     isNew: true,
@@ -159,7 +152,6 @@ const audioContent: AudioContent[] = [
     expertAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
     duration: "14:30",
     category: "Self-Esteem",
-    rating: 4.8,
     listens: "19.8k",
     thumbnail: plant9,
     isNew: false,
@@ -177,7 +169,6 @@ const audioContent: AudioContent[] = [
     expertAvatar: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=100&h=100&fit=crop&crop=face",
     duration: "22:15",
     category: "Healing",
-    rating: 4.9,
     listens: "14.2k",
     thumbnail: plant10,
     isNew: true,
@@ -195,7 +186,6 @@ const audioContent: AudioContent[] = [
     expertAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
     duration: "16:45",
     category: "Gratitude",
-    rating: 4.7,
     listens: "18.9k",
     thumbnail: plant11,
     isNew: false,
@@ -221,7 +211,7 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: {
         <img
           src={audio.thumbnail}
           alt={audio.title}
-          className="w-full h-40 object-cover"
+          className="w-full h-40 object-contain bg-white"
         />
        
         {/* Play Overlay on Hover */}
@@ -284,10 +274,7 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: {
         {/* Stats and Action */}
         <div className="flex items-center justify-between">
           <div className="flex items-center text-sm text-muted-foreground">
-            <Star className="w-4 h-4 mr-1 text-yellow-500 flex-shrink-0" />
-            <span>{audio.rating}</span>
-            <span className="mx-2">•</span>
-            <span>{audio.listens}</span>
+            <span>{audio.listens} listens</span>
           </div>
           
           {!canListen ? (
@@ -389,7 +376,7 @@ const AudioPlayerModal = ({ audio, open, onOpenChange }: {
               <img 
                 src={audio.thumbnail} 
                 alt={audio.title}
-                className="w-24 h-24 rounded-2xl mx-auto object-cover shadow-lg"
+                className="w-24 h-24 rounded-2xl mx-auto object-contain bg-white shadow-lg"
               />
             </div>
             
@@ -401,10 +388,6 @@ const AudioPlayerModal = ({ audio, open, onOpenChange }: {
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 {audio.duration}
-              </span>
-              <span className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-yellow-500" />
-                {audio.rating}
               </span>
               <span>{audio.listens} listens</span>
             </div>
