@@ -1,5 +1,5 @@
-// src/components/AudioPlayer.tsx
-import React, { useState } from 'react';
+// src/components/AudioPlayer.tsx - FIXED with actual audio playback
+import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -14,36 +14,86 @@ interface AudioPlayerProps {
 export const AudioPlayer = ({ audio, onPlay, onPause, onProgressChange }: AudioPlayerProps) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState([0]);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const audioRef = useRef<HTMLAudioElement>(null);
 
-    const durationParts = audio.duration.split(':');
-    const duration = parseInt(durationParts[0]) * 60 + parseInt(durationParts[1]);
+    // Get audio URL from API or fallback to local
+    const audioUrl = audio.audioUrl || '/assets/box-breathing.mp3';
+
+    useEffect(() => {
+        const audioElement = audioRef.current;
+        if (!audioElement) return;
+
+        const updateTime = () => {
+            setCurrentTime(audioElement.currentTime);
+            const progressPercent = (audioElement.currentTime / audioElement.duration) * 100;
+            setProgress([progressPercent]);
+        };
+
+        const updateDuration = () => {
+            setDuration(audioElement.duration);
+        };
+
+        const handleEnded = () => {
+            setIsPlaying(false);
+            setProgress([0]);
+            onPause?.();
+        };
+
+        audioElement.addEventListener('timeupdate', updateTime);
+        audioElement.addEventListener('loadedmetadata', updateDuration);
+        audioElement.addEventListener('ended', handleEnded);
+
+        return () => {
+            audioElement.removeEventListener('timeupdate', updateTime);
+            audioElement.removeEventListener('loadedmetadata', updateDuration);
+            audioElement.removeEventListener('ended', handleEnded);
+        };
+    }, [onPause]);
 
     const handleTogglePlay = () => {
+        const audioElement = audioRef.current;
+        if (!audioElement) return;
+
         if (isPlaying) {
+            audioElement.pause();
             setIsPlaying(false);
             onPause?.();
         } else {
+            audioElement.play();
             setIsPlaying(true);
             onPlay?.();
         }
     };
 
     const handleProgressChange = (value: number[]) => {
+        const audioElement = audioRef.current;
+        if (!audioElement) return;
+
         setProgress(value);
+        const newTime = (value[0] / 100) * audioElement.duration;
+        audioElement.currentTime = newTime;
         onProgressChange?.(value[0]);
     };
 
     const formatTime = (seconds: number) => {
+        if (isNaN(seconds)) return '0:00';
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
-    const currentTime = (progress[0] / 100) * duration;
-
     return (
         <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Plant Image with improved blending */}
+            {/* Hidden audio element */}
+            <audio 
+                ref={audioRef} 
+                src={audioUrl}
+                preload="metadata"
+            />
+
+            {/* Plant Image */}
             <div className="flex justify-center lg:justify-end">
                 <div className="relative">
                     <img
