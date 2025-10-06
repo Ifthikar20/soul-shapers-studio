@@ -3,6 +3,7 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.betterandbliss.com';
 // Rest of your code remains the same
 
 interface User {
@@ -128,25 +129,34 @@ this.api.interceptors.response.use(
     }
   }
   
-  async register(email: string, password: string, fullName: string): Promise<LoginResponse> {
-    try {
-      const response = await this.api.post('/auth/register', {
-        email,
-        password,
-        full_name: fullName
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(this.handleError(error as AxiosError<ApiError>));
-    }
-  }
   
-  async logout(): Promise<void> {
+  async register(email: string, password: string, full_name: string) {
     try {
-      await this.api.post('/auth/logout');
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password, full_name }),
+      });
+  
+      const data = await response.json();
+      
+      // Handle confirmation requirement (even if status is 200)
+      if (data.requires_confirmation || data.detail?.requires_confirmation) {
+        return {
+          success: true,
+          needsConfirmation: true,
+          message: data.message || data.detail?.message || 'Please confirm your email'
+        };
+      }
+      
+      if (!response.ok) {
+        throw new Error(data.detail || 'Registration failed');
+      }
+      
+      return data;
     } catch (error) {
-      console.error('Logout error:', error);
-      // Even if logout fails on server, clear local state
+      throw error;
     }
   }
   

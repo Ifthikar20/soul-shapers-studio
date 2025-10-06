@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import bbLogo from "@/assets/b-b-logo.png";
 
 interface HeaderProps {
   onShowAuth?: (mode: 'signin' | 'signup') => void;
@@ -155,23 +156,24 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   };
 
   // Component Sections
-  const LogoSection = () => (
-    <div 
-      className="flex items-center space-x-3 cursor-pointer group"
-      onClick={() => navigate(isAuthenticated ? '/browse' : '/')}
-    >
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-        <Sparkles className="w-4 h-4 text-white" />
-      </div>
-      <h1 className={`text-xl font-bold transition-all duration-300 ${
-        isScrolled
-          ? 'text-foreground'
-          : 'bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent'
-      }`}>
-        Better & Bliss
-      </h1>
-    </div>
-  );
+  const LogoSection = () => {
+    const navigate = useNavigate();
+    
+    return (
+      <div 
+  className="flex items-center space-x-4 cursor-pointer group"
+  onClick={() => navigate(isAuthenticated ? '/browse' : '/')}
+>
+  <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
+    <img 
+      src={bbLogo} 
+      alt="Better & Bliss Logo" 
+      className="w-full h-full object-contain"
+    />
+  </div>
+</div>
+    );
+  };
 
   const SearchSection = () => (
     <div className="relative max-w-md mx-auto">
