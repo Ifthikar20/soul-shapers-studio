@@ -43,10 +43,10 @@ const Hero = () => {
             <div className="space-y-4">
               <h1 className="text-5xl md:text-7xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-purple-900 via-purple-700 to-purple-600 bg-clip-text text-transparent">
-                  Better Mind,
+                  Better Tribe,
                 </span>
                 <br />
-                <span className="text-gray-900">Blissful Life</span>
+                <span className="text-gray-900">Better Mind</span>
               </h1>
               
               <p className="text-lg md:text-xl text-gray-700 leading-relaxed max-w-xl">
