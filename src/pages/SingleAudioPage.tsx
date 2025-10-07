@@ -1,260 +1,396 @@
-// src/pages/SingleAudioPage.tsx - Integrated with Backend API
-import React, { useState, useEffect } from 'react';
+// src/pages/SingleAudioPage.tsx - PRODUCTION VERSION (No Fallbacks)
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Moon, Sun, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { AudioContent } from '@/components/AudioContent';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { audioStreamingService, SecureAudioResponse } from '@/services/audio.service';
 
-// Plant images
-import plant4 from "@/assets/plant001.png";
-import plant4Night from "@/assets/1.png";
-import plant5 from "@/assets/plant5.png";
+// ============================================
+// TYPE DEFINITIONS
+// ============================================
 
-// API Response Interface
-interface AudioStreamData {
-  content_id: string;
-  content_type: string;
+interface DisplayAudio {
+  id: number;
   title: string;
-  duration_seconds: number;
-  audio_url: string;
-  audio_format: string;
-  thumbnail_url?: string;
-  session_id: string;
-  expires_at: string;
-  content_metadata: {
-    title: string;
-    description: string;
-    expert_name: string;
-    category_name: string;
-    access_tier: string;
-  };
-  user_info?: {
-    user_id: string;
-    subscription_tier: string;
-    access_granted: boolean;
-  };
+  expert: string;
+  expertCredentials: string;
+  duration: string;
+  durationSeconds: number;
+  category: string;
+  thumbnail: string;
+  description: string;
+  fullDescription: string;
+  accessTier: 'free' | 'premium';
+  audioUrl: string;
+  sessionId: string;
+  expiresAt: string;
+  isSecure: boolean;
+  cdnEnabled: boolean;
 }
 
-// Fallback static data for when API is unavailable
-const audioContentData = [
-  {
-    id: 1,
-    title: "Morning Meditation for Anxiety Relief",
-    expert: "Dr. Sarah Johnson",
-    expertCredentials: "Clinical Psychologist, PhD",
-    duration: "12:30",
-    category: "Meditation",
-    rating: 4.9,
-    listens: "25.3k",
-    thumbnail: plant4,
-    thumbnailNight: plant4Night,
-    description: "Start your day with calm and clarity through this guided anxiety relief meditation.",
-    fullDescription: "A gentle morning meditation designed to help you release anxiety and set positive intentions for the day ahead.",
-    accessTier: 'free' as const,
-    transcript: `Welcome to your morning meditation for anxiety relief...`,
-    benefits: [
-      'Reduces morning anxiety and stress',
-      'Improves focus and mental clarity',
-      'Promotes emotional balance throughout the day',
-      'Establishes a positive morning routine'
-    ],
-  },
-  {
-    id: 2,
-    title: "Deep Sleep Stories for Adults",
-    expert: "Dr. Emily Chen",
-    expertCredentials: "Sleep Specialist, MD",
-    duration: "25:45",
-    category: "Sleep",
-    rating: 4.8,
-    listens: "18.7k",
-    thumbnail: plant5,
-    thumbnailNight: plant5,
-    description: "Calming bedtime stories designed to help adults drift into peaceful sleep.",
-    fullDescription: "Professionally crafted sleep stories that guide your mind into relaxation and prepare you for restorative sleep.",
-    accessTier: 'premium' as const,
-    transcript: `Welcome to your sleep story...`,
-    benefits: [
-      'Promotes deep, restorative sleep',
-      'Reduces bedtime anxiety and racing thoughts',
-      'Creates a calming bedtime routine',
-      'Improves overall sleep quality'
-    ],
-  },
-];
+interface ErrorState {
+  type: 'AUTH_ERROR' | 'ACCESS_DENIED' | 'NOT_FOUND' | 'NETWORK_ERROR' | 'TOKEN_EXPIRED' | 'SERVER_ERROR';
+  message: string;
+  canRetry: boolean;
+}
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// ============================================
+// CONTENT SLUG MAPPING
+// ============================================
+
+const SLUG_MAP: Record<string, string> = {
+  '1': 'guided-meditation-anxiety-relief',
+  '2': 'self-compassion-practice',
+};
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
 
 const SingleAudioPage = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  
+  // UI State
   const [showTranscript, setShowTranscript] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   
-  // API state
-  const [audioStreamData, setAudioStreamData] = useState<AudioStreamData | null>(null);
+  // Data State
+  const [audioData, setAudioData] = useState<SecureAudioResponse | null>(null);
+  const [displayAudio, setDisplayAudio] = useState<DisplayAudio | null>(null);
+  
+  // Loading & Error State
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [useStaticData, setUseStaticData] = useState(false);
+  const [error, setError] = useState<ErrorState | null>(null);
+  const [retrying, setRetrying] = useState(false);
+  
+  // Playback tracking refs
+  const playbackStartTime = useRef<number>(0);
+  const lastPosition = useRef<number>(0);
+  const hasLoggedPlay = useRef<boolean>(false);
 
-  // Fetch audio stream data from backend
-  useEffect(() => {
-    const fetchAudioStream = async () => {
-      // For the real audio from backend, use the slug
-      const audioSlug = 'guided-meditation-anxiety-relief';
-      
-      try {
+  // Get content slug from page ID
+  const contentSlug = SLUG_MAP[id || '1'] || 'guided-meditation-anxiety-relief';
+
+  // ============================================
+  // FETCH AUDIO STREAM
+  // ============================================
+
+  const fetchAudioStream = async (isRetry = false) => {
+    try {
+      if (isRetry) {
+        setRetrying(true);
+      } else {
         setLoading(true);
-        setError(null);
-        
-        const response = await fetch(
-          `${API_BASE_URL}/content/${audioSlug}/stream`,
-          {
-            credentials: 'include', // Send auth cookies
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error('Please log in to access this content');
-          }
-          if (response.status === 403) {
-            throw new Error('Premium subscription required to access this content');
-          }
-          if (response.status === 404) {
-            throw new Error('Audio content not found');
-          }
-          throw new Error('Failed to load audio');
-        }
-
-        const data: AudioStreamData = await response.json();
-        setAudioStreamData(data);
-        setUseStaticData(false);
-        
-      } catch (err) {
-        console.error('Failed to fetch audio stream:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        // Fall back to static data for demo purposes
-        setUseStaticData(true);
-      } finally {
-        setLoading(false);
       }
-    };
+      
+      setError(null);
 
-    fetchAudioStream();
-  }, [id]);
+      console.log(`🎵 Fetching secure audio stream: ${contentSlug}`);
+
+      const streamData = await audioStreamingService.getSecureAudioStream(contentSlug);
+
+      console.log('✅ Stream received:', {
+        title: streamData.title,
+        duration: streamData.duration_seconds,
+        secure: streamData.is_secure,
+        cdn: streamData.cdn_enabled
+      });
+
+      setAudioData(streamData);
+      
+      const transformedAudio = transformToDisplay(streamData);
+      setDisplayAudio(transformedAudio);
+
+      checkUrlExpiration(streamData.expires_at);
+      
+    } catch (err: any) {
+      console.error('❌ Stream fetch failed:', err);
+      
+      const errorState = parseError(err);
+      setError(errorState);
+      
+    } finally {
+      setLoading(false);
+      setRetrying(false);
+    }
+  };
+
+  // ============================================
+  // DATA TRANSFORMATION
+  // ============================================
+
+  const transformToDisplay = (apiData: SecureAudioResponse): DisplayAudio => {
+    const minutes = Math.floor(apiData.duration_seconds / 60);
+    const seconds = apiData.duration_seconds % 60;
+    
+    return {
+      id: parseInt(id || '1'),
+      title: apiData.title,
+      expert: "Mental Health Professional",
+      expertCredentials: "Licensed Therapist",
+      duration: `${minutes}:${seconds.toString().padStart(2, '0')}`,
+      durationSeconds: apiData.duration_seconds,
+      category: "Mindfulness",
+      thumbnail: apiData.thumbnail_url || '',
+      description: "Evidence-based audio for mental wellness",
+      fullDescription: "Professional mental health content designed to support your wellness journey.",
+      accessTier: 'free',
+      audioUrl: apiData.audio_url,
+      sessionId: apiData.content_id.toString(),
+      expiresAt: apiData.expires_at,
+      isSecure: apiData.is_secure,
+      cdnEnabled: apiData.cdn_enabled,
+    };
+  };
+
+  // ============================================
+  // ERROR HANDLING
+  // ============================================
+
+  const parseError = (err: any): ErrorState => {
+    if (err.response) {
+      const status = err.response.status;
+      const detail = err.response.data?.detail || err.message;
+
+      switch (status) {
+        case 401:
+          return {
+            type: 'AUTH_ERROR',
+            message: 'Please log in to access this content',
+            canRetry: false
+          };
+        
+        case 403:
+          return {
+            type: 'ACCESS_DENIED',
+            message: detail || 'Premium subscription required',
+            canRetry: false
+          };
+        
+        case 404:
+          return {
+            type: 'NOT_FOUND',
+            message: 'Audio content not found',
+            canRetry: false
+          };
+        
+        case 410:
+          return {
+            type: 'TOKEN_EXPIRED',
+            message: 'Stream URL expired',
+            canRetry: true
+          };
+
+        case 500:
+        case 502:
+        case 503:
+          return {
+            type: 'SERVER_ERROR',
+            message: 'Server error. Please try again.',
+            canRetry: true
+          };
+        
+        default:
+          return {
+            type: 'NETWORK_ERROR',
+            message: 'Connection error. Check your internet.',
+            canRetry: true
+          };
+      }
+    }
+
+    if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+      return {
+        type: 'NETWORK_ERROR',
+        message: 'Request timeout. Please try again.',
+        canRetry: true
+      };
+    }
+
+    return {
+      type: 'NETWORK_ERROR',
+      message: err.message || 'An unexpected error occurred',
+      canRetry: true
+    };
+  };
+
+  const checkUrlExpiration = (expiresAt: string) => {
+    const expirationTime = new Date(expiresAt).getTime();
+    const currentTime = Date.now();
+    const timeRemaining = expirationTime - currentTime;
+    const fiveMinutes = 5 * 60 * 1000;
+
+    if (timeRemaining < fiveMinutes && timeRemaining > 0) {
+      console.warn('⚠️ URL expires soon (< 5 min)');
+    } else if (timeRemaining <= 0) {
+      console.error('❌ URL already expired');
+    }
+  };
+
+  // ============================================
+  // PLAYBACK HANDLERS
+  // ============================================
 
   const handlePlay = () => {
     setShowTranscript(true);
+    
+    if (!hasLoggedPlay.current) {
+      playbackStartTime.current = Date.now();
+      hasLoggedPlay.current = true;
+      console.log('📊 Play event at position 0');
+    }
   };
 
-  const handlePause = () => {
-    // Keep transcript visible even when paused
+  const handlePause = (currentTime: number) => {
+    lastPosition.current = currentTime;
+    console.log('📊 Pause event at position:', currentTime);
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
+  const handleSeek = (fromPosition: number, toPosition: number) => {
+    console.log('📊 Seek event from', fromPosition, 'to', toPosition);
   };
 
-  // Theme classes
+  const handleComplete = () => {
+    const durationWatched = Math.floor((Date.now() - playbackStartTime.current) / 1000);
+    console.log('📊 Complete event, duration watched:', durationWatched);
+  };
+
+  const handleError = (errorCode: string, errorMessage: string) => {
+    console.error('📊 Playback error:', errorCode, errorMessage);
+  };
+
+  // ============================================
+  // LIFECYCLE
+  // ============================================
+
+  useEffect(() => {
+    fetchAudioStream();
+
+    return () => {
+      if (hasLoggedPlay.current && audioData) {
+        const durationWatched = Math.floor((Date.now() - playbackStartTime.current) / 1000);
+        console.log('📊 Session end, total duration:', durationWatched);
+      }
+    };
+  }, [contentSlug]);
+
+  // ============================================
+  // UI HELPERS
+  // ============================================
+
+  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+  
+  const handleRetry = () => fetchAudioStream(true);
+  
+  const handleLogin = () => navigate('/login');
+  
+  const handleSubscribe = () => navigate('/subscribe');
+
   const themeClasses = {
     background: isDarkMode ? '' : 'bg-gray-50',
     text: isDarkMode ? 'text-white' : 'text-gray-900',
     mutedText: isDarkMode ? 'text-gray-300' : 'text-gray-600',
     buttonBg: isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100',
-    cardBg: isDarkMode ? 'bg-gray-800' : 'bg-white'
+    cardBg: isDarkMode ? 'bg-gray-800' : 'bg-white',
   };
 
-  // Loading state
+  // ============================================
+  // RENDER: LOADING STATE
+  // ============================================
+
   if (loading) {
     return (
-      <div 
+      <div
         className={`min-h-screen ${themeClasses.background} transition-colors duration-300 flex items-center justify-center`}
         style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
       >
         <div className="text-center space-y-4">
           <Loader2 className={`w-12 h-12 ${themeClasses.text} animate-spin mx-auto`} />
-          <p className={themeClasses.mutedText}>Loading audio content...</p>
+          <p className={themeClasses.text}>Loading secure audio stream...</p>
+          <p className="text-xs text-gray-500">Establishing encrypted connection...</p>
         </div>
       </div>
     );
   }
 
-  // If using static data (fallback), find the audio
-  let audioToDisplay;
-  
-  if (useStaticData) {
-    // Use static data as fallback
-    const staticAudio = audioContentData.find(item => item.id === parseInt(id || ''));
-    if (staticAudio) {
-      audioToDisplay = {
-        ...staticAudio,
-        thumbnail: isDarkMode ? staticAudio.thumbnailNight : staticAudio.thumbnail,
-        // Add a local audio file path for static data
-        audioUrl: '/assets/box-breathing.mp3' // This would be your local file
-      };
-    }
-  } else if (audioStreamData) {
-    // Use API data
-    audioToDisplay = {
-      id: parseInt(id || '1'),
-      title: audioStreamData.content_metadata.title,
-      expert: audioStreamData.content_metadata.expert_name,
-      expertCredentials: "Mental Health Professional",
-      duration: `${Math.floor(audioStreamData.duration_seconds / 60)}:${(audioStreamData.duration_seconds % 60).toString().padStart(2, '0')}`,
-      category: audioStreamData.content_metadata.category_name,
-      rating: 4.9,
-      listens: "0",
-      thumbnail: audioStreamData.thumbnail_url || plant4,
-      thumbnailNight: audioStreamData.thumbnail_url || plant4Night,
-      description: audioStreamData.content_metadata.description,
-      fullDescription: audioStreamData.content_metadata.description,
-      accessTier: audioStreamData.content_metadata.access_tier as 'free' | 'premium',
-      transcript: "Audio transcript will be available soon...",
-      benefits: [
-        'Reduces anxiety and stress',
-        'Improves mental clarity',
-        'Promotes relaxation',
-        'Evidence-based techniques'
-      ],
-      // The actual streaming URL from your backend
-      audioUrl: audioStreamData.audio_url,
-      sessionId: audioStreamData.session_id,
-      expiresAt: audioStreamData.expires_at
-    };
+  // ============================================
+  // RENDER: ERROR STATES
+  // ============================================
+
+  // Authentication Required
+  if (error?.type === 'AUTH_ERROR') {
+    return (
+      <div
+        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
+        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
+      >
+        <div className="max-w-md w-full mx-4">
+          <Alert variant="destructive">
+            <AlertCircle className="h-5 w-5" />
+            <AlertTitle className="text-lg font-semibold mb-2">Authentication Required</AlertTitle>
+            <AlertDescription>
+              <p className="mb-4">{error.message}</p>
+              <div className="flex gap-3">
+                <Button onClick={handleLogin} className="flex-1">
+                  Log In
+                </Button>
+                <Button onClick={() => navigate('/audio')} variant="outline" className="flex-1">
+                  Go Back
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
   }
 
-  // Not found state
-  if (!audioToDisplay) {
+  // Access Denied
+  if (error?.type === 'ACCESS_DENIED') {
     return (
-      <div 
-        className={`min-h-screen ${themeClasses.background} transition-colors duration-300`}
-        style={isDarkMode ? { backgroundColor: '#141413' } : {}}
+      <div
+        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
+        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
       >
-        <div className="absolute top-6 right-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleDarkMode}
-            className={`${themeClasses.buttonBg} ${themeClasses.text}`}
-          >
-            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </Button>
+        <div className="max-w-md w-full mx-4">
+          <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-900/20">
+            <AlertCircle className="h-5 w-5 text-amber-600" />
+            <AlertTitle className="text-lg font-semibold mb-2 text-amber-900 dark:text-amber-100">
+              Premium Content
+            </AlertTitle>
+            <AlertDescription className="text-amber-800 dark:text-amber-200">
+              <p className="mb-4">{error.message}</p>
+              <div className="flex gap-3">
+                <Button onClick={handleSubscribe} className="flex-1 bg-amber-600 hover:bg-amber-700">
+                  Upgrade to Premium
+                </Button>
+                <Button onClick={() => navigate('/audio')} variant="outline" className="flex-1">
+                  Browse Free Content
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
         </div>
+      </div>
+    );
+  }
 
-        <div className="container mx-auto px-6 py-20 text-center">
-          <h1 className={`text-2xl font-bold ${themeClasses.text} mb-4`}>Audio Not Found</h1>
-          <p className={`${themeClasses.mutedText} mb-8`}>The audio session you're looking for doesn't exist.</p>
-          <Button 
-            onClick={() => navigate('/audio')} 
-            variant="outline"
-            className={isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-800' : ''}
-          >
+  // Not Found
+  if (error?.type === 'NOT_FOUND') {
+    return (
+      <div
+        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
+        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
+      >
+        <div className="text-center">
+          <AlertCircle className={`w-16 h-16 ${themeClasses.mutedText} mx-auto mb-4`} />
+          <h1 className={`text-2xl font-bold ${themeClasses.text} mb-2`}>Audio Not Found</h1>
+          <p className={`${themeClasses.mutedText} mb-6`}>{error.message}</p>
+          <Button onClick={() => navigate('/audio')} variant="outline">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Audio Library
           </Button>
@@ -263,8 +399,80 @@ const SingleAudioPage = () => {
     );
   }
 
+  // Network/Retry Errors
+  if (error?.canRetry) {
+    return (
+      <div
+        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
+        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
+      >
+        <div className="max-w-md w-full mx-4">
+          <Alert>
+            <AlertCircle className="h-5 w-5" />
+            <AlertTitle className="text-lg font-semibold mb-2">Connection Error</AlertTitle>
+            <AlertDescription>
+              <p className="mb-4">{error.message}</p>
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handleRetry} 
+                  disabled={retrying}
+                  className="flex-1"
+                >
+                  {retrying ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Retrying...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Retry
+                    </>
+                  )}
+                </Button>
+                <Button onClick={() => navigate('/audio')} variant="outline" className="flex-1">
+                  Go Back
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
+
+  // No audio data loaded
+  if (!displayAudio) {
+    return (
+      <div
+        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
+        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
+      >
+        <div className="text-center">
+          <AlertCircle className={`w-16 h-16 ${themeClasses.mutedText} mx-auto mb-4`} />
+          <h1 className={`text-2xl font-bold ${themeClasses.text} mb-2`}>Unable to Load Audio</h1>
+          <p className={`${themeClasses.mutedText} mb-6`}>Something went wrong loading the audio content.</p>
+          <div className="flex gap-3 justify-center">
+            <Button onClick={handleRetry} variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Try Again
+            </Button>
+            <Button onClick={() => navigate('/audio')} variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================
+  // RENDER: MAIN CONTENT (SUCCESS STATE)
+  // ============================================
+
   return (
-    <div 
+    <div
       className={`min-h-screen ${themeClasses.background} transition-colors duration-300`}
       style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
     >
@@ -275,7 +483,7 @@ const SingleAudioPage = () => {
           size="icon"
           onClick={toggleDarkMode}
           className={`${themeClasses.buttonBg} ${themeClasses.text} rounded-full shadow-lg`}
-          title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          title={isDarkMode ? 'Light Mode' : 'Dark Mode'}
         >
           {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </Button>
@@ -283,8 +491,8 @@ const SingleAudioPage = () => {
 
       {/* Back Button */}
       <div className="container mx-auto px-6 pt-8">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => navigate('/audio')}
           className={`mb-6 ${themeClasses.buttonBg} ${themeClasses.text}`}
         >
@@ -293,32 +501,56 @@ const SingleAudioPage = () => {
         </Button>
       </div>
 
+      {/* Main Content */}
       <div className="container mx-auto px-6 pb-12">
         <div className="max-w-4xl mx-auto space-y-6">
           
-          {/* Warning if using fallback data */}
-          {useStaticData && error && (
-            <Alert variant="default" className={isDarkMode ? 'bg-gray-800 border-gray-700' : ''}>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className={themeClasses.mutedText}>
-                {error}. Showing demo content.
-              </AlertDescription>
-            </Alert>
+          {/* Security Info Badge (Optional) */}
+          {displayAudio.isSecure && (
+            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Secure encrypted stream</span>
+              {displayAudio.cdnEnabled && <span>• CDN enabled</span>}
+            </div>
           )}
 
-          {/* Pass dark mode state to child components */}
+          {/* Audio Player Component */}
           <div className={isDarkMode ? 'dark' : ''}>
-            <AudioPlayer 
-              audio={audioToDisplay}
+            <AudioPlayer
+              audio={displayAudio}
               onPlay={handlePlay}
               onPause={handlePause}
+              onSeek={handleSeek}
+              onComplete={handleComplete}
+              onError={handleError}
             />
 
-            <AudioContent 
-              audio={audioToDisplay}
+            {/* Audio Content/Transcript Component */}
+            <AudioContent
+              audio={displayAudio}
               showTranscript={showTranscript}
             />
           </div>
+
+          {/* Expiration Warning (if < 5 minutes remaining) */}
+          {(() => {
+            const expiresAt = new Date(displayAudio.expiresAt).getTime();
+            const now = Date.now();
+            const remaining = expiresAt - now;
+            const fiveMinutes = 5 * 60 * 1000;
+            
+            if (remaining < fiveMinutes && remaining > 0) {
+              return (
+                <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-900/20">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800 dark:text-amber-200">
+                    Stream URL expires soon. Refresh if playback stops.
+                  </AlertDescription>
+                </Alert>
+              );
+            }
+            return null;
+          })()}
 
         </div>
       </div>
