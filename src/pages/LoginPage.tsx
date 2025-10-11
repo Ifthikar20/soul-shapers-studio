@@ -1,5 +1,5 @@
 // src/pages/LoginPage.tsx - SIMPLIFIED PURPLE PROFESSIONAL MENTAL HEALTH DESIGN
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ import {
   Github,
   Chrome,
   Shield,
-  Zap,
   Heart,
   Brain
 } from "lucide-react";
@@ -43,7 +42,6 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [isVisible, setIsVisible] = useState(false);
 
   // Hooks
   const { login, register } = useAuth();
@@ -54,12 +52,6 @@ const LoginPage = () => {
   const from = location.state?.from?.pathname || "/browse";
 
   console.log('🔍 Login Page - Redirect destination:', from);
-
-  // Animation trigger on mount
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Form validation
   const validateForm = () => {
@@ -156,42 +148,25 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex flex-col xl:flex-row overflow-hidden">
       {/* Left Side - Login Form */}
-      <div className={`flex-1 flex items-center justify-center p-4 lg:p-6 bg-slate-50 dark:bg-slate-900 relative transition-all duration-700 ease-out ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'
-        }`}>
-        <div className="w-full max-w-md relative z-10">
-          {/* Back to Home Link - Hidden on mobile in landscape */}
+      <div className="flex-1 flex items-center justify-center p-4 lg:p-6 bg-slate-50 dark:bg-slate-900">
+        <div className="w-full max-w-md">
+          {/* Back to Home Link */}
           <Link
             to="/"
-            className={`inline-flex items-center text-slate-600 dark:text-slate-400 mb-4 lg:mb-8 transition-all duration-300 hover:translate-x-1 hover:text-purple-600 dark:hover:text-purple-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-              }`}
-            style={{ transitionDelay: '100ms' }}
+            className="inline-flex items-center text-slate-600 dark:text-slate-400 mb-4 lg:mb-8 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
           >
-            <div className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-300 hover:shadow-md hover:scale-105">
+            <div className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
               <ArrowLeft className="w-4 h-4" />
             </div>
             <span className="ml-3 text-sm font-semibold">Back to Home</span>
           </Link>
 
-          {/* Debug Info - Responsive padding */}
-          <div className={`mb-4 lg:mb-6 p-3 lg:p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 border border-purple-200/50 dark:border-purple-800/50 rounded-xl transition-all duration-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-            }`} style={{ transitionDelay: '200ms' }}>
-            <div className="flex items-center mb-1">
-              <Zap className="w-4 h-4 text-purple-600 mr-2" />
-              <span className="text-purple-700 dark:text-purple-300 text-sm font-semibold">Demo Mode</span>
-            </div>
-            <p className="text-purple-600 dark:text-purple-400 text-sm">
-              Will redirect to: <code className="px-2 py-1 bg-purple-100 dark:bg-purple-900/50 rounded text-sm font-mono">{from}</code>
-            </p>
-          </div>
-
           {/* Main Card */}
-          <Card className={`border border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-800 transition-all duration-600 ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-            }`} style={{ transitionDelay: '300ms' }}>
+          <Card className="border border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-800">
             <CardHeader className="text-center space-y-3 lg:space-y-4 pb-4 lg:pb-6">
               {/* Logo */}
-              <div className={`mx-auto relative transition-all duration-600 ${isVisible ? 'scale-100 rotate-0' : 'scale-0 rotate-45'
-                }`} style={{ transitionDelay: '400ms' }}>
-                <div className="relative bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-900/50 p-2 lg:p-3 rounded-2xl border border-purple-200/50 dark:border-purple-700/50 hover:scale-105 transition-transform duration-300">
+              <div className="mx-auto">
+                <div className="relative bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-900/50 p-2 lg:p-3 rounded-2xl border border-purple-200/50 dark:border-purple-700/50 hover:scale-105 transition-transform duration-200">
                   <img
                     src={betterBlissLogo}
                     alt="Better & Bliss"
@@ -203,8 +178,7 @@ const LoginPage = () => {
                 </div>
               </div>
 
-              <div className={`space-y-1 lg:space-y-2 transition-all duration-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                }`} style={{ transitionDelay: '500ms' }}>
+              <div className="space-y-1 lg:space-y-2">
                 <CardTitle className="text-xl lg:text-2xl font-bold">
                   <span className="bg-gradient-to-r from-purple-700 via-indigo-700 to-violet-700 bg-clip-text text-transparent">
                     {mode === 'signin' ? 'Welcome Back' : 'Begin Your Journey'}
@@ -229,14 +203,13 @@ const LoginPage = () => {
               )}
 
               {/* Social Login Buttons */}
-              <div className={`space-y-3 transition-all duration-600 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
-                }`} style={{ transitionDelay: '600ms' }}>
+              <div className="space-y-3">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleGoogleLogin}
                   disabled={isLoading}
-                  className="w-full h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:scale-105 hover:shadow-lg transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-950/20"
+                  className="w-full h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors"
                 >
                   <Chrome className="w-4 h-4 mr-2 text-blue-600" />
                   Continue with Google
@@ -246,7 +219,7 @@ const LoginPage = () => {
                   variant="outline"
                   onClick={handleGithubLogin}
                   disabled={isLoading}
-                  className="w-full h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:scale-105 hover:shadow-lg transition-all duration-300 hover:bg-gray-50 dark:hover:bg-gray-950/20"
+                  className="w-full h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:bg-gray-50 dark:hover:bg-gray-950/20 transition-colors"
                 >
                   <Github className="w-4 h-4 mr-2" />
                   Continue with GitHub
@@ -254,8 +227,7 @@ const LoginPage = () => {
               </div>
 
               {/* Divider */}
-              <div className={`relative transition-all duration-600 ${isVisible ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
-                }`} style={{ transitionDelay: '700ms' }}>
+              <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <Separator className="w-full bg-slate-300 dark:bg-slate-600" />
                 </div>
@@ -268,18 +240,17 @@ const LoginPage = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Full Name (Sign up only) */}
                 {mode === 'signup' && (
-                  <div className={`space-y-2 transition-all duration-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                    }`} style={{ transitionDelay: '800ms' }}>
+                  <div className="space-y-2">
                     <Label htmlFor="fullName" className="text-slate-700 dark:text-slate-300 font-semibold">Full Name</Label>
                     <div className="relative group">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-500" />
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-purple-500 transition-colors" />
                       <Input
                         id="fullName"
                         type="text"
                         placeholder="Enter your full name"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className={`pl-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300 hover:shadow-md focus:scale-[1.02] ${validationErrors.fullName ? 'border-red-400 focus:border-red-500' : ''}`}
+                        className={`pl-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 ${validationErrors.fullName ? 'border-red-400 focus:border-red-500' : ''}`}
                         disabled={isLoading}
                         required
                       />
@@ -294,18 +265,17 @@ const LoginPage = () => {
                 )}
 
                 {/* Email */}
-                <div className={`space-y-2 transition-all duration-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                  }`} style={{ transitionDelay: mode === 'signup' ? '900ms' : '800ms' }}>
+                <div className="space-y-2">
                   <Label htmlFor="email" className="text-slate-700 dark:text-slate-300 font-semibold">Email Address</Label>
                   <div className="relative group">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-500" />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-purple-500 transition-colors" />
                     <Input
                       id="email"
                       type="email"
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className={`pl-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300 hover:shadow-md focus:scale-[1.02] ${validationErrors.email ? 'border-red-400 focus:border-red-500' : ''}`}
+                      className={`pl-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 ${validationErrors.email ? 'border-red-400 focus:border-red-500' : ''}`}
                       disabled={isLoading}
                       required
                     />
@@ -319,35 +289,34 @@ const LoginPage = () => {
                 </div>
 
                 {/* Password */}
-                <div className={`space-y-2 transition-all duration-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                  }`} style={{ transitionDelay: mode === 'signup' ? '1000ms' : '900ms' }}>
+                <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <Label htmlFor="password" className="text-slate-700 dark:text-slate-300 font-semibold">Password</Label>
                     {mode === 'signin' && (
                       <Link
                         to="/forgot-password"
-                        className="text-sm text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors duration-300"
+                        className="text-sm text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors"
                       >
                         Forgot password?
                       </Link>
                     )}
                   </div>
                   <div className="relative group">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-500" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-purple-500 transition-colors" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder={mode === 'signin' ? "Enter your password" : "Create a strong password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className={`pl-10 pr-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300 hover:shadow-md focus:scale-[1.02] ${validationErrors.password ? 'border-red-400 focus:border-red-500' : ''}`}
+                      className={`pl-10 pr-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 ${validationErrors.password ? 'border-red-400 focus:border-red-500' : ''}`}
                       disabled={isLoading}
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 p-1 hover:text-purple-500 transition-all duration-300 hover:scale-110"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 p-1 hover:text-purple-500 transition-colors"
                       tabIndex={-1}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -369,25 +338,24 @@ const LoginPage = () => {
 
                 {/* Confirm Password (Sign up only) */}
                 {mode === 'signup' && (
-                  <div className={`space-y-2 transition-all duration-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                    }`} style={{ transitionDelay: '1100ms' }}>
+                  <div className="space-y-2">
                     <Label htmlFor="confirmPassword" className="text-slate-700 dark:text-slate-300 font-semibold">Confirm Password</Label>
                     <div className="relative group">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-500" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-purple-500 transition-colors" />
                       <Input
                         id="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm your password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`pl-10 pr-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300 hover:shadow-md focus:scale-[1.02] ${validationErrors.confirmPassword ? 'border-red-400 focus:border-red-500' : ''}`}
+                        className={`pl-10 pr-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 ${validationErrors.confirmPassword ? 'border-red-400 focus:border-red-500' : ''}`}
                         disabled={isLoading}
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 p-1 hover:text-purple-500 transition-all duration-300 hover:scale-110"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 p-1 hover:text-purple-500 transition-colors"
                         tabIndex={-1}
                       >
                         {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -404,17 +372,16 @@ const LoginPage = () => {
 
                 {/* Remember Me (Sign in only) */}
                 {mode === 'signin' && (
-                  <div className={`flex items-center space-x-2 pt-2 transition-all duration-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                    }`} style={{ transitionDelay: '1000ms' }}>
+                  <div className="flex items-center space-x-2 pt-2">
                     <Checkbox
                       id="remember"
                       checked={rememberMe}
                       onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                      className="border-slate-400 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600 transition-all duration-300 hover:scale-110"
+                      className="border-slate-400 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                     />
                     <Label
                       htmlFor="remember"
-                      className="text-sm text-slate-600 dark:text-slate-400 cursor-pointer hover:text-purple-600 transition-colors duration-300"
+                      className="text-sm text-slate-600 dark:text-slate-400 cursor-pointer hover:text-purple-600 transition-colors"
                     >
                       Remember me for 30 days
                     </Label>
@@ -424,9 +391,7 @@ const LoginPage = () => {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  className={`w-full h-10 lg:h-12 bg-gradient-to-r from-purple-700 to-indigo-700 text-white font-bold shadow-lg border-0 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:from-purple-800 hover:to-indigo-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-                    }`}
-                  style={{ transitionDelay: mode === 'signup' ? '1200ms' : '1100ms' }}
+                  className="w-full h-10 lg:h-12 bg-gradient-to-r from-purple-700 to-indigo-700 text-white font-bold shadow-lg border-0 hover:from-purple-800 hover:to-indigo-800 transition-colors"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -444,15 +409,14 @@ const LoginPage = () => {
               </form>
 
               {/* Switch Mode */}
-              <div className={`text-center pt-4 transition-all duration-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                }`} style={{ transitionDelay: mode === 'signup' ? '1300ms' : '1200ms' }}>
+              <div className="text-center pt-4">
                 <span className="text-slate-600 dark:text-slate-400">
                   {mode === 'signin' ? "Don't have an account? " : "Already have an account? "}
                 </span>
                 <button
                   type="button"
                   onClick={switchMode}
-                  className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-all duration-300 hover:scale-105"
+                  className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors"
                   disabled={isLoading}
                 >
                   {mode === 'signin' ? 'Create one now' : 'Sign in instead'}
@@ -461,25 +425,23 @@ const LoginPage = () => {
 
               {/* Terms and Privacy (Sign up only) */}
               {mode === 'signup' && (
-                <p className={`text-xs text-center text-slate-500 dark:text-slate-400 leading-relaxed pt-2 transition-all duration-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                  }`} style={{ transitionDelay: '1400ms' }}>
+                <p className="text-xs text-center text-slate-500 dark:text-slate-400 leading-relaxed pt-2">
                   By creating an account, you agree to our{' '}
-                  <Link to="/terms" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors duration-300">
+                  <Link to="/terms" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors">
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link to="/privacy" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors duration-300">
+                  <Link to="/privacy" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors">
                     Privacy Policy
                   </Link>
                 </p>
               )}
 
               {/* Additional Info */}
-              <div className={`text-center pt-2 transition-all duration-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                }`} style={{ transitionDelay: mode === 'signup' ? '1500ms' : '1300ms' }}>
+              <div className="text-center pt-2">
                 <p className="text-xs text-slate-600 dark:text-slate-400">
                   Need help?{' '}
-                  <Link to="/support" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors duration-300">
+                  <Link to="/support" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors">
                     Contact Support
                   </Link>
                 </p>
@@ -489,27 +451,29 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* Right Side - Simple Image */}
-      <div className={`flex-1 relative overflow-hidden transition-all duration-700 ease-out ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
-        }`} style={{ backgroundColor: '#F8F9F9' }}>
-        {/* Centered Content Container */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-          <div className={`transition-all duration-800 ease-out flex flex-col items-center ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-            }`} style={{ transitionDelay: '400ms' }}>
-            {/* Image */}
-            <img
-              src="/src/assets/pic-and-plant.png"
-              alt="Mental Health Illustration"
-             className="w-4/5 h-4/5 object-contain"
-            />
+      {/* Right Side - Background Image with Quotes Overlay */}
+      <div 
+        className="flex-1 relative overflow-hidden hidden xl:flex"
+        style={{
+          backgroundImage: 'url(/src/assets/login-page-canvas.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Dark Overlay for Better Text Readability */}
+        <div className="absolute inset-0 bg-black/20"></div>
 
+        {/* Centered Content Container */}
+        <div className="relative w-full h-full flex items-center justify-center p-8">
+          <div className="flex flex-col items-center justify-center max-w-2xl">
             {/* Quotes Section */}
-            <div className="text-center max-w-md">
-              <blockquote className="text-lg font-medium text-gray-700 italic mb-3">
+            <div className="text-center space-y-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
+              <blockquote className="text-xl font-medium text-gray-800 dark:text-gray-100 italic">
                 "Your mental health is just as important as your physical health."
               </blockquote>
 
-              <blockquote className="text-sm font-medium text-gray-600 italic">
+              <blockquote className="text-base font-medium text-gray-700 dark:text-gray-200 italic">
                 "It's okay to not be okay. What matters is that you're taking steps to heal."
               </blockquote>
             </div>
