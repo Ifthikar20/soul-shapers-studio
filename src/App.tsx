@@ -1,4 +1,4 @@
-// src/App.tsx - With protected search route
+// src/App.tsx - With protected search route and watch page
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +26,7 @@ const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
 const BlogCategoryPage = lazy(() => import('./pages/blog/BlogCategoryPage'));
 const AudioPage = lazy(() => import("./pages/AudioPage"));
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
+const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
 
 // Lazy load components
 const UnderConstructionPage = lazy(() => import("./components/UnderConstructionPage"));
@@ -106,6 +107,17 @@ const App = () => {
                 <Route path="/blog" element={<BlogLandingPage />} />
                 <Route path="/blog/post/:slug" element={<BlogPostPage />} />
                 <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
+
+                {/* ✅ NEW: Video Watch Page - Public (or make it protected if needed) */}
+
+                <Route
+                  path="/watch/:id"
+                  element={
+                    <ProtectedRoute>
+                      <WatchPage />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Protected Routes - Requires Authentication */}
                 <Route

@@ -1,5 +1,6 @@
-// src/components/VideoModal/VideoModal.tsx - Main container component
+// src/components/VideoModal/VideoModal.tsx
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Add this import
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
@@ -8,15 +9,18 @@ import { OverviewTab } from "./tabs/OverviewTab";
 import { LessonsTab } from "./tabs/LessonsTab";
 import { PracticeTab } from "./tabs/PracticeTab";
 import { VideoContent } from '@/types/video.types';
-import { X, Plus, ThumbsUp, Share2, User, Users, Clock } from "lucide-react";
+import { 
+  X, Plus, ThumbsUp, Share2, User, Users, Clock,
+  ExternalLink // ✅ Add this icon
+} from "lucide-react";
 
 interface VideoModalProps {
   video: VideoContent;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  lessons?: any[]; // API data
-  communityPosts?: any[]; // API data
-  practiceQuestions?: any[]; // API data
+  lessons?: any[];
+  communityPosts?: any[];
+  practiceQuestions?: any[];
 }
 
 const VideoModal = ({ 
@@ -27,6 +31,7 @@ const VideoModal = ({
   communityPosts = [], 
   practiceQuestions = [] 
 }: VideoModalProps) => {
+  const navigate = useNavigate(); // ✅ Add this hook
   const [activeTab, setActiveTab] = useState('overview');
   const [currentLesson, setCurrentLesson] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -36,9 +41,14 @@ const VideoModal = ({
   }, []);
 
   const toggleFullscreen = useCallback(async () => {
-    // Fullscreen logic here
     setIsFullscreen(!isFullscreen);
   }, [isFullscreen]);
+
+  // ✅ Add this handler
+  const handleWatchFullScreen = useCallback(() => {
+    onOpenChange(false); // Close the modal
+    navigate(`/watch/${video.id}`); // Navigate to full page
+  }, [video.id, onOpenChange, navigate]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -103,15 +113,41 @@ const VideoModal = ({
                     </span>
                   </div>
                   
+                  {/* ✅ UPDATE THIS SECTION - Add the Watch Full Screen button */}
                   <div className="flex flex-wrap items-center gap-3">
-                    <Button size="lg" variant="outline" className="bg-zinc-800/80 hover:bg-zinc-700 text-white border-zinc-700 rounded px-8">
+                    {/* Primary CTA - Watch Full Screen */}
+                    <Button 
+                      size="lg"
+                      onClick={handleWatchFullScreen}
+                      className="bg-white hover:bg-white/90 text-black font-bold rounded px-8"
+                    >
+                      <ExternalLink className="w-5 h-5 mr-2" />
+                      Watch Full Screen
+                    </Button>
+
+                    {/* Secondary Actions */}
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="bg-zinc-800/80 hover:bg-zinc-700 text-white border-zinc-700 rounded px-8"
+                    >
                       <Plus className="w-5 h-5 mr-2" />
                       My List
                     </Button>
-                    <Button size="icon" variant="outline" className="rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-white border-zinc-700 w-12 h-12">
+                    
+                    <Button 
+                      size="icon" 
+                      variant="outline" 
+                      className="rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-white border-zinc-700 w-12 h-12"
+                    >
                       <ThumbsUp className="w-5 h-5" />
                     </Button>
-                    <Button size="icon" variant="outline" className="rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-white border-zinc-700 w-12 h-12">
+                    
+                    <Button 
+                      size="icon" 
+                      variant="outline" 
+                      className="rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-white border-zinc-700 w-12 h-12"
+                    >
                       <Share2 className="w-5 h-5" />
                     </Button>
                   </div>
