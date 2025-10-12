@@ -1,3 +1,4 @@
+// src/components/VideoGrid.tsx - COMPLETE FIXED VERSION
 import { useState, useEffect, useCallback } from "react";
 import { useVideoAccess } from '@/hooks/useVideoAccess';
 import { useNavigationTracking } from '@/hooks/useNavigationTracking';
@@ -6,24 +7,41 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { contentService } from '@/services/content.service';
 import { 
-  Play, Clock, User, TrendingUp, 
-  ArrowRight, Crown, Star, Loader2,
-  AlertCircle
+  Play, User, TrendingUp, Crown, Star, Loader2, AlertCircle
 } from 'lucide-react';
-
+import { toast } from 'sonner';
 import VideoModal from './VideoModal/VideoModal';
+import { useNavigate } from 'react-router-dom';
+import { Video, hasShortId } from '@/types/video.types';
 
-// Fixed Size Video Card Component
+// ✅ FIXED: Fixed Size Video Card Component with proper typing
 const FixedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
-  video: any;
-  videos: any[];
-  onPlay: (video: any) => void;
-  onUpgrade: (video: any) => void;
+  video: Video; // ✅ Changed from 'any' to 'Video'
+  videos: Video[]; // ✅ Changed from 'any[]' to 'Video[]'
+  onPlay: (video: Video) => void;
+  onUpgrade: (video: Video) => void;
 }) => {
   const { canWatchVideo } = useVideoAccess();
   
   const canWatch = canWatchVideo(video, videos);
   const isLocked = !canWatch;
+
+  // ✅ Add debug logging
+  const handleCardClick = () => {
+    console.log('🎯 Card clicked:', {
+      id: video.id,
+      short_id: video.short_id,
+      title: video.title,
+      hasShortId: hasShortId(video)
+    });
+    onPlay(video);
+  };
+
+  const handleUpgradeClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    console.log('💳 Upgrade clicked for:', video.title);
+    onUpgrade(video);
+  };
 
   return (
     <Card className="cursor-pointer group overflow-hidden hover:shadow-md transition-all duration-200 w-72 h-80">
@@ -36,7 +54,7 @@ const FixedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
         
         {/* Play Overlay */}
         <div 
-          onClick={() => onPlay(video)}
+          onClick={handleCardClick} // ✅ Use handleCardClick
           className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer"
         >
           <div className="rounded-full p-2 bg-white/90 shadow-lg">
@@ -105,7 +123,7 @@ const FixedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => onUpgrade(video)}
+              onClick={handleUpgradeClick} // ✅ Use handleUpgradeClick
               className="text-orange-600 border-orange-200 hover:bg-orange-50 text-sm px-3 py-1.5 h-8 flex-shrink-0"
             >
               Upgrade
@@ -114,7 +132,10 @@ const FixedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => onPlay(video)}
+              onClick={(e) => {
+                e.stopPropagation(); // ✅ Prevent double click
+                handleCardClick();
+              }}
               className="text-primary hover:bg-primary/10 text-sm px-3 py-1.5 h-8 flex-shrink-0"
             >
               Watch
@@ -127,13 +148,14 @@ const FixedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
 };
 
 const VideoGrid = () => {
-  const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
-  const [videos, setVideos] = useState<any[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null); // ✅ Changed from 'any' to 'Video'
+  const [videos, setVideos] = useState<Video[]>([]); // ✅ Changed from 'any[]' to 'Video[]'
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
+  const navigate = useNavigate();
   
-  // Use the hooks
+  // ✅ Use the hooks
   const { canWatchVideo } = useVideoAccess();
   const { 
     navigateToUpgrade, 
@@ -152,10 +174,11 @@ const VideoGrid = () => {
       // Use your existing content service
       const videos = await contentService.getVideosForFrontend(category);
 
+      console.log('✅ Videos loaded:', videos.length);
+      console.log('📦 First video:', videos[0]);
+
       setVideos(videos);
       setIsLoading(false);
-
-      console.log('✅ Videos loaded:', videos.length);
     } catch (error: any) {
       console.error('❌ Failed to fetch videos:', error);
       setError(error.message || 'Failed to load videos');
@@ -185,37 +208,76 @@ const VideoGrid = () => {
     }
   }, [trackNavigationEvent, getNavigationContextFromUrl]);
 
-  // Memoized callback for handling video play
-  const handleVideoPlay = useCallback((video: any) => {
-    const canWatch = canWatchVideo(video, videos);
-    
-    if (canWatch) {
-      trackNavigationEvent('Video Opened', {
-        videoId: video.id.toString(),
-        source: 'video_grid',
-        feature: video.title,
-        section: video.category
-      });
-      setSelectedVideo(video);
-    } else {
-      navigateToUpgrade({
-        source: 'video_locked',
-        videoId: video.id,
-        videoTitle: video.title,
-        seriesId: video.seriesId,
-        episodeNumber: video.episodeNumber,
-      });
-    }
-  }, [canWatchVideo, trackNavigationEvent, navigateToUpgrade, videos]);
+  // ✅ Memoized callback for handling video play with debug logging
+// src/components/VideoGrid.tsx - Enhanced Debug Version
 
-  // Memoized callback for upgrade navigation
-  const handleUpgradeClick = useCallback((video: any) => {
+const handleVideoPlay = useCallback((video: Video) => {
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('🎬 handleVideoPlay CALLED');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📦 Video object:', video);
+  console.log('🔑 video.id:', video.id);
+  console.log('🔑 video.short_id:', video.short_id);
+  console.log('📝 video.title:', video.title);
+  console.log('✅ hasShortId result:', hasShortId(video));
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+  // ✅ Ensure video has short_id before navigation
+  if (!hasShortId(video)) {
+    console.error('❌ FAILED: Video missing short_id');
+    console.error('Video object:', JSON.stringify(video, null, 2));
+    toast.error('Unable to play video - missing short_id');
+    return;
+  }
+
+  console.log('✅ PASSED: Video has short_id');
+
+  const canWatch = canWatchVideo(video, videos);
+  console.log('🔐 Access check result:', canWatch);
+  
+  if (canWatch) {
+    const navigateUrl = `/watch/${video.short_id}`;
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🚀 NAVIGATING TO:', navigateUrl);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    trackNavigationEvent('Video Opened', {
+      videoId: video.id.toString(),
+      videoShortId: video.short_id,
+      source: 'video_grid',
+      feature: video.title,
+      section: video.category
+    });
+    
+    // ✅ Navigate using short_id
+    navigate(navigateUrl);
+    
+    console.log('✅ Navigation command sent');
+  } else {
+    console.log('🔒 Video locked, showing upgrade prompt');
+    navigateToUpgrade({
+      source: 'video_locked',
+      videoId: video.id,
+      videoShortId: video.short_id,
+      videoTitle: video.title,
+      seriesId: video.seriesId,
+      episode: video.episodeNumber?.toString(),
+    });
+  }
+}, [canWatchVideo, trackNavigationEvent, navigateToUpgrade, videos, navigate]);
+
+
+
+  // ✅ Memoized callback for upgrade navigation
+  const handleUpgradeClick = useCallback((video: Video) => {
+    console.log('💳 handleUpgradeClick called for:', video.title);
     navigateToUpgrade({
       source: 'upgrade_button',
       videoId: video.id,
+      videoShortId: video.short_id,
       videoTitle: video.title,
       seriesId: video.seriesId,
-      episodeNumber: video.episodeNumber,
+      episode: video.episodeNumber?.toString(),
     });
   }, [navigateToUpgrade]);
 
@@ -224,7 +286,7 @@ const VideoGrid = () => {
     setSelectedCategory(category);
     trackNavigationEvent('Category Filter Changed', {
       source: 'video_grid',
-    
+      category: category || 'all'
     });
   }, [trackNavigationEvent]);
 
@@ -302,14 +364,14 @@ const VideoGrid = () => {
               <Badge 
                 variant="outline" 
                 className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full"
-                onClick={() => handleCategoryFilter(undefined)} // You can add filter logic here
+                onClick={() => handleCategoryFilter(undefined)}
               >
                 Popular
               </Badge>
               <Badge 
                 variant="outline" 
                 className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full"
-                onClick={() => handleCategoryFilter(undefined)} // You can add filter logic here
+                onClick={() => handleCategoryFilter(undefined)}
               >
                 New
               </Badge>
@@ -369,7 +431,7 @@ const VideoGrid = () => {
           ))}
         </div>
 
-        {/* Video Modal - Simplified without lessons/community/practice */}
+        {/* Video Modal - Only open if selectedVideo exists */}
         {selectedVideo && (
           <VideoModal 
             video={selectedVideo}

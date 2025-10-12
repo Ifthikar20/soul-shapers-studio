@@ -1,17 +1,48 @@
-// src/hooks/useNavigationTracking.ts - Fixed with query property
+// src/hooks/useNavigationTracking.ts - COMPLETE FIXED VERSION
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useVideoAccess } from './useVideoAccess';
 
-interface NavigationContext {
-  from?: string;
-  to?: string;
+export interface NavigationContext {
   source?: string;
-  videoId?: string;
+  from?: string;
   feature?: string;
   section?: string;
+  category?: string;
+  videoId?: string;
+  videoShortId?: string;
+  videoTitle?: string;
+  seriesId?: string;
+  episode?: string;
+  episodeNumber?: number;
+  plan?: string;
   trackingId?: string;
-  query?: string; // ADD THIS LINE
-  resultCount?: number; // ADD THIS LINE (optional but useful)
+  timestamp?: string;
+  query?: string;
+  to?: string;
+  currentPage?: string;
+}
+
+export interface UpgradeContext {
+  source: string;
+  videoId?: number;
+  videoShortId?: string;
+  videoTitle?: string;
+  seriesId?: string;
+  episodeNumber?: number;
+  episode?: string;
+  plan?: string;
+}
+
+export interface TrackingNavigationContext {
+  source: string;
+  videoId?: number;
+  videoShortId?: string;
+  videoTitle?: string;
+  seriesId?: string;
+  feature?: string;
+  query?: string;
+  category?: string;
+  currentPage?: string;
 }
 
 export const useNavigationTracking = () => {
@@ -19,7 +50,10 @@ export const useNavigationTracking = () => {
   const location = useLocation();
   const { generateTrackingUrl } = useVideoAccess();
 
-  // Track navigation events
+  /**
+   * Track navigation events
+   * This is where you integrate your analytics service
+   */
   const trackNavigationEvent = (event: string, context: NavigationContext) => {
     console.log('🧭 Navigation Analytics:', event, context);
     
@@ -28,9 +62,26 @@ export const useNavigationTracking = () => {
     // - Google Analytics: gtag('event', event, context)
     // - Mixpanel: mixpanel.track(event, context)
     // - Custom API: fetch('/api/analytics', { method: 'POST', body: JSON.stringify({event, context}) })
+    
+    // Add timestamp if not present
+    const enrichedContext = {
+      ...context,
+      timestamp: context.timestamp || new Date().toISOString(),
+    };
+
+    // You can also store in localStorage for debugging
+    if (import.meta.env.DEV) {
+      console.log('📊 Analytics Event:', {
+        event,
+        ...enrichedContext,
+      });
+    }
   };
 
-  // Get tracking context from current URL
+  /**
+   * Get tracking context from current URL
+   * Extracts tracking parameters from URL search params
+   */
   const getNavigationContextFromUrl = (): NavigationContext => {
     const urlParams = new URLSearchParams(window.location.search);
     const pathname = window.location.pathname;
@@ -40,44 +91,59 @@ export const useNavigationTracking = () => {
       trackingId,
       source: urlParams.get('source') || undefined,
       videoId: urlParams.get('video_id') || undefined,
+      videoShortId: urlParams.get('video_short_id') || undefined,
       feature: urlParams.get('feature') || undefined,
       from: urlParams.get('from_page') || undefined,
-      query: urlParams.get('q') || undefined, // ADD THIS LINE
+      query: urlParams.get('q') || undefined,
+      category: urlParams.get('category') || undefined,
+      episode: urlParams.get('episode') || undefined,
     };
   };
 
-  // 🎯 SECURE: Track navigation without affecting access control
+  /**
+   * Navigate with tracking context
+   * Adds tracking parameters to the URL and logs the event
+   */
   const navigateWithTracking = (
     path: string,
-    context: {
-      source: string;
-      videoId?: number;
-      videoTitle?: string;
-      seriesId?: string;
-      feature?: string;
-      query?: string; // ADD THIS LINE
-    }
+    context: TrackingNavigationContext
   ) => {
+    // ✅ FIX: Only pass properties that exist in TrackingContext
     const trackingUrl = generateTrackingUrl(path, {
-      ...context,
+      source: context.source,
+      videoId: context.videoId,
+      videoTitle: context.videoTitle,
+      seriesId: context.seriesId,
+      feature: context.feature,
+      query: context.query,
       currentPage: location.pathname,
     });
 
-    // Track the navigation event
+    // Track the navigation event with full context
     trackNavigationEvent('Page Navigation', {
       from: location.pathname,
       to: path,
       source: context.source,
       videoId: context.videoId?.toString(),
+      videoShortId: context.videoShortId,
       feature: context.feature,
-      query: context.query, // ADD THIS LINE
+      query: context.query,
+      category: context.category,
     });
 
     navigate(trackingUrl);
   };
 
-  // 🔒 SECURE: Navigate to video with access control + tracking
-  const navigateToVideo = (videoId: number, source: string = 'browse_click') => {
+  /**
+   * Navigate to video with access control + tracking
+   * Used for clicking on video cards
+   */
+  const navigateToVideo = (
+    videoId: number, 
+    videoShortId: string, 
+    source: string = 'browse_click'
+  ) => {
+    // ✅ FIX: Only pass properties that exist in TrackingContext
     const trackingUrl = generateTrackingUrl('/browse', {
       source,
       videoId,
@@ -86,6 +152,7 @@ export const useNavigationTracking = () => {
 
     trackNavigationEvent('Video Click', {
       videoId: videoId.toString(),
+      videoShortId: videoShortId,
       source,
       from: location.pathname,
     });
@@ -93,7 +160,9 @@ export const useNavigationTracking = () => {
     navigate(trackingUrl);
   };
 
-  // 🎯 SECURE: Navigate to profile/settings with tracking
+  /**
+   * Navigate to profile/settings with tracking
+   */
   const navigateToProfile = (section?: string) => {
     const trackingUrl = generateTrackingUrl('/profile', {
       source: 'navigation',
@@ -110,53 +179,99 @@ export const useNavigationTracking = () => {
     navigate(trackingUrl);
   };
 
-  // 🎯 Navigate to upgrade with tracking
-  const navigateToUpgrade = (context: {
-    source: string;
-    videoId?: number;
-    videoTitle?: string;
-    seriesId?: string;
-    episodeNumber?: number;
-  }) => {
+  /**
+   * Navigate to upgrade page with context
+   * Used when user clicks upgrade button or tries to access locked content
+   */
+  const navigateToUpgrade = (context: UpgradeContext) => {
+    // ✅ FIX: Only pass properties that exist in TrackingContext
     const upgradeUrl = generateTrackingUrl('/upgrade', {
-      ...context,
+      source: context.source,
+      videoId: context.videoId,
+      videoTitle: context.videoTitle,
+      seriesId: context.seriesId,
       currentPage: location.pathname,
     });
 
+    // Track with full context including short_id
     trackNavigationEvent('Upgrade Navigation', {
       from: location.pathname,
       source: context.source,
       videoId: context.videoId?.toString(),
+      videoShortId: context.videoShortId,
+      videoTitle: context.videoTitle,
+      seriesId: context.seriesId,
+      episodeNumber: context.episodeNumber,
+      episode: context.episode,
+      plan: context.plan,
     });
 
     navigate(upgradeUrl);
   };
 
-  // 🎯 Navigate to search with tracking
-  const navigateToSearch = (query: string) => {
+  /**
+   * Navigate to search with tracking
+   */
+  const navigateToSearch = (query: string, category?: string) => {
     const searchUrl = generateTrackingUrl('/search', {
       source: 'search_action',
       feature: query,
+      query: query,
       currentPage: location.pathname,
-      query: query, // ADD THIS LINE
     });
 
     trackNavigationEvent('Search Navigation', {
       from: location.pathname,
       feature: query,
-      query: query, // ADD THIS LINE
+      query: query,
+      category: category,
     });
 
     navigate(searchUrl);
   };
 
+  /**
+   * Navigate to category filter
+   */
+  const navigateToCategory = (category: string, source: string = 'category_filter') => {
+    const categoryUrl = generateTrackingUrl('/browse', {
+      source: source,
+      currentPage: location.pathname,
+    });
+
+    trackNavigationEvent('Category Filter', {
+      from: location.pathname,
+      category: category,
+      source: source,
+    });
+
+    navigate(categoryUrl);
+  };
+
+  /**
+   * Navigate back with tracking
+   */
+  const navigateBack = (source: string = 'back_button') => {
+    trackNavigationEvent('Navigate Back', {
+      from: location.pathname,
+      source: source,
+    });
+
+    navigate(-1);
+  };
+
   return {
+    // Core tracking
     trackNavigationEvent,
     getNavigationContextFromUrl,
+    
+    // Navigation with tracking
     navigateWithTracking,
     navigateToVideo,
     navigateToProfile,
     navigateToUpgrade,
     navigateToSearch,
+    navigateToCategory,
+    navigateBack,
   };
 };

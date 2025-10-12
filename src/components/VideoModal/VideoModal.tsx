@@ -1,4 +1,4 @@
-// src/components/VideoModal/VideoModal.tsx - SIMPLIFIED FOR EXISTING BACKEND
+// src/components/VideoModal/VideoModal.tsx - FIXED FOR SHORT_ID
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -7,13 +7,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import HLSVideoPlayer, { HLSVideoPlayerRef } from './HLSVideoPlayer';
 import { videoService } from '@/services/video.service';
 import { toVideoId } from '@/utils/video.utils';
+import { Video } from '@/types/video.types'; // ✅ Import Video type
 import { 
   X, Plus, ThumbsUp, Share2, User, Users, Clock,
   ExternalLink, AlertCircle, Loader2
 } from "lucide-react";
 
 interface VideoModalProps {
-  video: any; // Using any since your backend format differs from VideoContent
+  video: Video; // ✅ Changed from 'any' to 'Video'
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -38,7 +39,7 @@ const VideoModal = ({
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTrackedPositionRef = useRef<number>(0);
 
-  // Convert video.id to number
+  // ✅ Use video.id (numeric) for backend calls
   const videoId = toVideoId(video.id);
 
   // 🔒 Verify access and load secure stream URL
@@ -50,8 +51,13 @@ const VideoModal = ({
         setIsLoadingStream(true);
         setStreamError(null);
 
+        console.log('🔍 Verifying video access for:', {
+          id: video.id,
+          short_id: video.short_id,
+          title: video.title
+        });
+
         // Step 1: Verify access
-        console.log('🔍 Verifying video access...');
         const accessCheck = await videoService.verifyVideoAccess(videoId);
 
         if (!accessCheck.hasAccess) {
@@ -99,7 +105,7 @@ const VideoModal = ({
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [open, videoId]);
+  }, [open, videoId, video.id, video.short_id, video.title]);
 
   // 🔄 Auto-refresh token before expiration
   useEffect(() => {
@@ -190,10 +196,15 @@ const VideoModal = ({
     });
   }, [videoId]);
 
+  // ✅ FIXED: Navigate using short_id instead of numeric id
   const handleWatchFullScreen = useCallback(() => {
+    console.log('🎬 Opening full screen for:', {
+      short_id: video.short_id,
+      title: video.title
+    });
     onOpenChange(false);
-    navigate(`/watch/${video.id}`);
-  }, [video.id, onOpenChange, navigate]);
+    navigate(`/watch/${video.short_id}`); // ✅ Use short_id
+  }, [video.short_id, video.title, onOpenChange, navigate]);
 
   const handleUpgrade = useCallback(() => {
     navigate('/pricing');
@@ -318,7 +329,7 @@ const VideoModal = ({
                 </h1>
                 
                 <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400 mb-6">
-                  <span className="text-green-500 font-semibold">95% Match</span>
+                  <span className="text-green-500 font-semibold">{video.rating} ⭐</span>
                   <span>{new Date().getFullYear()}</span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
@@ -389,17 +400,19 @@ const VideoModal = ({
                 </p>
               </div>
 
-              {/* Hashtags */}
-              {video.hashtags && video.hashtags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {video.hashtags.map((tag: string, index: number) => (
-                    <span 
-                      key={index}
-                      className="text-sm text-purple-400 hover:text-purple-300 cursor-pointer"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+              {/* Category Badge */}
+              <div className="mb-4">
+                <span className="inline-block px-3 py-1 bg-purple-600/20 text-purple-300 rounded-full text-sm">
+                  {video.category}
+                </span>
+              </div>
+
+              {/* Video ID for debugging */}
+              {import.meta.env.DEV && (
+                <div className="mt-4 p-3 bg-zinc-900/50 rounded text-xs text-zinc-500 font-mono">
+                  <div>ID: {video.id}</div>
+                  <div>Short ID: {video.short_id}</div>
+                  <div>Slug: {video.slug}</div>
                 </div>
               )}
             </div>

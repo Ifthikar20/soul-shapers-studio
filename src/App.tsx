@@ -109,9 +109,8 @@ const App = () => {
                 <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
 
                 {/* ✅ NEW: Video Watch Page - Public (or make it protected if needed) */}
-
                 <Route
-                  path="/watch/:id"
+                  path="/watch/:shortId"
                   element={
                     <ProtectedRoute>
                       <WatchPage />
