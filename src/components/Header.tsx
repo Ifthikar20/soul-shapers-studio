@@ -1,4 +1,4 @@
-// src/components/Header.tsx - Reorganized and Structured
+// src/components/Header.tsx - Updated with auth-only search
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -41,10 +41,6 @@ interface HeaderProps {
   onShowAuth?: (mode: 'signin' | 'signup') => void;
 }
 
-// Configuration Objects
-// src/components/Header.tsx - Changes to add Audio navigation
-
-// Find the NAVIGATION_CONFIG object (around line 45) and update it:
 const NAVIGATION_CONFIG = {
   categories: [
     { id: 'mental-health', name: 'Mental Health', icon: Brain },
@@ -72,16 +68,15 @@ const NAVIGATION_CONFIG = {
     "healthy habits"
   ],
   
-  // UPDATE THIS SECTION - Add 'Audio' to both authenticated and guest nav items
   mainNavItems: {
     authenticated: [
       { label: 'Browse', href: '/browse' },
-      { label: 'Audio', href: '/audio' }, // NEW - ADD THIS LINE
+      { label: 'Audio', href: '/audio' },
       { label: 'Blog', href: '/blog' },
     ],
     guest: [
       { label: 'Browse', href: '/browse' },
-      { label: 'Audio', href: '/audio' }, // NEW - ADD THIS LINE
+      { label: 'Audio', href: '/audio' },
       { label: 'Blog', href: '/blog' }
     ]
   }
@@ -90,12 +85,9 @@ const NAVIGATION_CONFIG = {
 const Header = ({ onShowAuth }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showNewsletter, setShowNewsletter] = useState(false);
-  const [newsletterEmail, setNewsletterEmail] = useState("");
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, loading } = useAuth();
 
-  // Effects
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -112,10 +104,21 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Event Handlers
   const handleSearch = (query: string) => {
+    if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      navigate('/login', { 
+        state: { 
+          from: { pathname: `/browse?q=${encodeURIComponent(query.trim())}` },
+          message: 'Please sign in to search content'
+        } 
+      });
+      return;
+    }
+
     if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+      // Navigate to browse page with search query
+      navigate(`/browse?q=${encodeURIComponent(query.trim())}`);
     }
   };
 
@@ -129,8 +132,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     navigate('/');
   };
 
-
-  // Utility Functions
   const getUserInitials = (name: string) => {
     return name
       .split(' ')
@@ -155,64 +156,67 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     return isScrolled ? 'text-foreground hover:text-primary' : 'text-black hover:text-black/80';
   };
 
-  // Component Sections
   const LogoSection = () => {
-    const navigate = useNavigate();
-    
     return (
       <div 
-  className="flex items-center space-x-4 cursor-pointer group"
-  onClick={() => navigate(isAuthenticated ? '/browse' : '/')}
->
-  <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
-    <img 
-      src={bbLogo} 
-      alt="Better & Bliss Logo" 
-      className="w-full h-full object-contain"
-    />
-  </div>
-</div>
+        className="flex items-center space-x-4 cursor-pointer group"
+        onClick={() => navigate(isAuthenticated ? '/browse' : '/')}
+      >
+        <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
+          <img 
+            src={bbLogo} 
+            alt="Better & Bliss Logo" 
+            className="w-full h-full object-contain"
+          />
+        </div>
+      </div>
     );
   };
 
-  const SearchSection = () => (
-    <div className="relative max-w-md mx-auto">
-      <form onSubmit={handleSearchSubmit} className="relative group">
-        <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors ${
-          getTextClasses('secondary')
-        }`} />
-        <Input
-          placeholder="Search wellness topics, experts..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className={`pl-12 pr-4 h-11 rounded-full transition-all duration-300 focus:ring-2 focus:ring-primary/20 ${
-            isScrolled
-              ? 'bg-background/80 border-border/40 text-foreground placeholder:text-muted-foreground/70'
-              : 'bg-white/10 border-white/20 text-black placeholder:text-black/50'
-          }`}
-        />
-        
-        {/* Search Suggestions Dropdown */}
-        {searchQuery && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border/20 rounded-xl shadow-lg p-3 z-50 animate-in slide-in-from-top-2">
-            <p className="text-xs text-muted-foreground mb-2">Popular searches:</p>
-            <div className="flex flex-wrap gap-2">
-              {NAVIGATION_CONFIG.searchSuggestions.map((suggestion, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="cursor-pointer hover:bg-primary hover:text-balck text-s rounded-full transition-colors"
-                  onClick={() => handleSearch(suggestion)}
-                >
-                  {suggestion}
-                </Badge>
-              ))}
+  const SearchSection = () => {
+    // Show search only when authenticated
+    if (!isAuthenticated) {
+      return null;
+    }
+
+    return (
+      <div className="relative max-w-md mx-auto">
+        <form onSubmit={handleSearchSubmit} className="relative group">
+          <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors ${
+            getTextClasses('secondary')
+          }`} />
+          <Input
+            placeholder="Search wellness topics, experts..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={`pl-12 pr-4 h-11 rounded-full transition-all duration-300 focus:ring-2 focus:ring-primary/20 ${
+              isScrolled
+                ? 'bg-background/80 border-border/40 text-foreground placeholder:text-muted-foreground/70'
+                : 'bg-white/10 border-white/20 text-black placeholder:text-black/50'
+            }`}
+          />
+          
+          {searchQuery && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border/20 rounded-xl shadow-lg p-3 z-50 animate-in slide-in-from-top-2">
+              <p className="text-xs text-muted-foreground mb-2">Popular searches:</p>
+              <div className="flex flex-wrap gap-2">
+                {NAVIGATION_CONFIG.searchSuggestions.map((suggestion, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-primary hover:text-white text-s rounded-full transition-colors"
+                    onClick={() => handleSearch(suggestion)}
+                  >
+                    {suggestion}
+                  </Badge>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </form>
-    </div>
-  );
+          )}
+        </form>
+      </div>
+    );
+  };
 
   const CategoriesDropdown = () => (
     <DropdownMenu>
@@ -304,8 +308,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             <ExpertsDropdown />
           </>
         )}
-
-      
       </nav>
     );
   };
@@ -318,7 +320,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     if (isAuthenticated && user) {
       return (
         <div className="flex items-center gap-3">
-          {/* Upgrade Button for Free Users */}
           {user.subscription_tier === 'free' && (
             <Button
               variant="outline"
@@ -331,7 +332,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             </Button>
           )}
 
-          {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:scale-105 transition-transform">
@@ -386,7 +386,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
       );
     }
 
-    // Guest Actions
     return (
       <div className="flex items-center gap-3">
         <Button 
@@ -410,22 +409,19 @@ const Header = ({ onShowAuth }: HeaderProps) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             
-            {/* Logo Section */}
             <div className="flex-shrink-0">
               <LogoSection />
             </div>
 
-            {/* Search Section - Hidden on mobile */}
+            {/* Search Section - Only shown when authenticated */}
             <div className="hidden lg:block flex-1 max-w-2xl mx-8">
               <SearchSection />
             </div>
 
-            {/* Navigation & Actions */}
             <div className="flex items-center gap-4">
               <MainNavigation />
               <UserActions />
               
-              {/* Mobile Menu Button */}
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -436,17 +432,16 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             </div>
           </div>
 
-          {/* Mobile Search - Shows below header on mobile */}
-          <div className="lg:hidden pb-4">
-            <SearchSection />
-          </div>
+          {/* Mobile Search - Only shown when authenticated */}
+          {isAuthenticated && (
+            <div className="lg:hidden pb-4">
+              <SearchSection />
+            </div>
+          )}
         </div>
       </header>
 
-      {/* Header Spacer */}
       <div className="h-16 lg:h-20"></div>
-
-    
     </>
   );
 };

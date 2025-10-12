@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { Search, Play, Clock, User, Star, Filter, Grid, List, ArrowLeft } from "lucide-react";
+// src/pages/SearchResults.tsx - Updated with auth protection
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate, Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Search, Play, Clock, User, Star, Filter, Grid, List, ArrowLeft, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import betterBlissLogo from "@/assets/betterandblisslogo.png";
 
 const mockVideos = [
@@ -82,13 +85,35 @@ const mockExperts = [
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { isAuthenticated, loading } = useAuth();
+  
   const query = searchParams.get('q') || '';
   const [currentQuery, setCurrentQuery] = useState(query);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeTab, setActiveTab] = useState<'all' | 'videos' | 'experts'>('all');
 
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-secondary flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ 
+      from: { pathname: `/search?q=${query}` },
+      message: 'Please sign in to search content'
+    }} replace />;
+  }
+
   const handleBack = () => {
-    navigate('/');
+    navigate('/browse');
   };
 
   const filteredVideos = mockVideos.filter(video => 
@@ -347,7 +372,7 @@ const SearchResults = () => {
               <p className="text-muted-foreground mb-6">
                 Try adjusting your search terms or browse our featured content
               </p>
-              <Button variant="outline" className="rounded-full">
+              <Button variant="outline" className="rounded-full" onClick={() => navigate('/browse')}>
                 Browse All Content
               </Button>
             </div>

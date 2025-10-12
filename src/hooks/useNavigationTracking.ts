@@ -1,3 +1,4 @@
+// src/hooks/useNavigationTracking.ts - Fixed with query property
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useVideoAccess } from './useVideoAccess';
 
@@ -9,6 +10,8 @@ interface NavigationContext {
   feature?: string;
   section?: string;
   trackingId?: string;
+  query?: string; // ADD THIS LINE
+  resultCount?: number; // ADD THIS LINE (optional but useful)
 }
 
 export const useNavigationTracking = () => {
@@ -39,6 +42,7 @@ export const useNavigationTracking = () => {
       videoId: urlParams.get('video_id') || undefined,
       feature: urlParams.get('feature') || undefined,
       from: urlParams.get('from_page') || undefined,
+      query: urlParams.get('q') || undefined, // ADD THIS LINE
     };
   };
 
@@ -51,6 +55,7 @@ export const useNavigationTracking = () => {
       videoTitle?: string;
       seriesId?: string;
       feature?: string;
+      query?: string; // ADD THIS LINE
     }
   ) => {
     const trackingUrl = generateTrackingUrl(path, {
@@ -65,6 +70,7 @@ export const useNavigationTracking = () => {
       source: context.source,
       videoId: context.videoId?.toString(),
       feature: context.feature,
+      query: context.query, // ADD THIS LINE
     });
 
     navigate(trackingUrl);
@@ -132,11 +138,13 @@ export const useNavigationTracking = () => {
       source: 'search_action',
       feature: query,
       currentPage: location.pathname,
+      query: query, // ADD THIS LINE
     });
 
     trackNavigationEvent('Search Navigation', {
       from: location.pathname,
       feature: query,
+      query: query, // ADD THIS LINE
     });
 
     navigate(searchUrl);

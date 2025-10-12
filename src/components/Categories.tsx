@@ -1,137 +1,175 @@
-"use client";
-
-import React from "react";
-import { Users, Star, TrendingUp, Zap } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Import custom logo images
-import logoBrain from "@/assets/logo-brain.png";
-import logoHeart from "@/assets/logo-heart.png";
-import logoLeaf from "@/assets/logo-leaf.png";
-import logoTarget from "@/assets/logo-target.png";
+import logoBrain from '/src/assets/logo-brain.png';
+import logoHeart from '/src/assets/logo-heart.png';
+import logoLeaf from '/src/assets/logo-leaf.png';
+import logoTarget from '/src/assets/logo-target.png';
 
-const fadeInUp = "opacity-0 translate-y-6 animate-fadeInUp";
-
-const categories = [
-  { id: 1, title: "Mental Health", description: "Anxiety, depression, stress management", icon: logoBrain, videoCount: 150, color: "text-purple-500", trending: true, isImage: true },
-  { id: 2, title: "Mindfulness & Meditation", description: "Meditation techniques, mindful living", icon: logoLeaf, videoCount: 120, color: "text-green-500", trending: false, isImage: true },
-  { id: 3, title: "Emotional Wellness", description: "Emotional intelligence, relationships", icon: logoHeart, videoCount: 95, color: "text-pink-500", trending: true, isImage: true },
-  { id: 4, title: "Breaking Habits", description: "Addiction recovery, habit formation", icon: logoTarget, videoCount: 80, color: "text-orange-500", trending: false, isImage: true },
-  { id: 5, title: "Social Wellness", description: "Communication, boundaries, relationships", icon: Users, videoCount: 75, color: "text-blue-500", trending: false, isImage: false },
-  { id: 6, title: "Personal Growth", description: "Self-improvement, goal setting", icon: Star, videoCount: 110, color: "text-yellow-500", trending: true, isImage: false }
-];
+// Import watercolor images
+import watercolor1 from '/src/assets/watercolor-1.png';
+import watercolor2 from '/src/assets/watercolor-2.png';
 
 const Categories = () => {
-  return (
-    <section className="py-20 bg-gradient-secondary relative overflow-hidden">
-      {/* Floating Background Glow */}
-      <div className="absolute top-10 right-20 w-48 h-48 bg-primary/10 rounded-full blur-3xl animate-float-slow" />
-      <div className="absolute bottom-20 left-20 w-64 h-64 bg-purple-400/10 rounded-full blur-3xl animate-float-slower" />
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <Badge className="mb-4 px-6 py-2 bg-gradient-card border border-primary/20 text-primary rounded-full shadow-sm">
-            <Zap className="w-3 h-4 mr-2" />
-            Curated Categories
-          </Badge>
-          <h2 className="text-4xl md:text-4xl font-bold text-foreground mb-4">
-            Explore Wellness{" "}
-            <span className="bg-gradient-primary bg-clip-text text-transparent">
-              Categories
-            </span>
+  const categories = [
+    { 
+      id: 1, 
+      title: "Mental Health", 
+      description: "Expert guidance on anxiety, depression, stress management, and emotional well-being from licensed therapists.", 
+      icon: logoBrain,
+      image: watercolor1,
+      author: "Dr. Sarah Johnson",
+      role: "Clinical Psychologist"
+    },
+    { 
+      id: 2, 
+      title: "Mindfulness & Meditation", 
+      description: "Learn meditation techniques, breathing exercises, and mindful living practices to cultivate inner peace.", 
+      icon: logoLeaf,
+      image: watercolor2,
+      author: "James Chen",
+      role: "Meditation Instructor"
+    },
+    { 
+      id: 3, 
+      title: "Emotional Wellness", 
+      description: "Develop emotional intelligence, build healthy relationships, and master the art of self-compassion.", 
+      icon: logoHeart,
+      image: watercolor1,
+      author: "Dr. Emily Rodriguez",
+      role: "Relationship Therapist"
+    },
+    { 
+      id: 4, 
+      title: "Breaking Habits", 
+      description: "Evidence-based strategies for addiction recovery, habit formation, and sustainable behavioral change.", 
+      icon: logoTarget,
+      image: watercolor2,
+      author: "Dr. Michael Park",
+      role: "Addiction Specialist"
+    }
+  ];
+
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev === 0 ? categories.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === categories.length - 1 ? 0 : prev + 1));
+  };
+
+  const currentCategory = categories[currentIndex];
+
+  return (
+    <section className="py-24 bg-white">
+      <div className="container mx-auto px-6">
+        
+        {/* Header */}
+        <div className="mb-16">
+          <p className="text-sm text-gray-500 mb-2">Curated Categories</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Explore Wellness Categories
           </h2>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl">
             Discover expert content across different mental health and wellness topics.
           </p>
         </div>
 
-        {/* Category Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categories.map((category, i) => (
-            <Card
-              key={category.id}
-              className={`relative overflow-hidden cursor-pointer transform transition duration-500 ease-out hover:scale-[1.02] hover:shadow-lg ${fadeInUp}`}
-              style={{ animationDelay: `${i * 150}ms` }} // stagger effect
-            >
-              {category.trending && (
-                <div className="absolute top-4 right-4">
-                  <Badge className="bg-gradient-primary text-white border-0 rounded-full px-3 py-1 text-xs">
-                    <TrendingUp className="w-3 h-3 mr-1" />
-                    Trending
-                  </Badge>
-                </div>
-              )}
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Left Side - Testimonial Card */}
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-12 rounded-lg relative">
+            {/* Category Icon */}
+            <div className="mb-8">
+              <img 
+                src={currentCategory.icon} 
+                alt={currentCategory.title}
+                className="w-16 h-16 object-contain"
+              />
+            </div>
 
-              <CardContent className="p-6 group">
-                <div className="flex gap-4 items-start">
-                  {/* Icon */}
-                  <div className="flex-shrink-0">
-                    {category.isImage ? (
-                      <img 
-                        src={category.icon as string} 
-                        alt={`${category.title} icon`}
-                        className="w-14 h-14"
-                      />
-                    ) : (
-                      <category.icon className={`w-14 h-14 ${category.color}`} />
-                    )}
-                  </div>
+            {/* Quote/Description */}
+            <blockquote className="mb-12">
+              <p className="text-2xl md:text-3xl font-serif leading-relaxed text-gray-900 mb-8">
+                "{currentCategory.description}"
+              </p>
+            </blockquote>
 
-                  {/* Text */}
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-foreground mb-2 transition-colors group-hover:text-primary">
-                      {category.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-3">{category.description}</p>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="secondary" className="rounded-full text-xs px-3 py-1">
-                        {category.videoCount} videos
-                      </Badge>
-                      <span className="text-sm text-primary font-medium flex items-center transform transition duration-300 group-hover:translate-x-1">
-                        Explore →
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+            {/* Author Info */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-lg font-semibold text-gray-900">
+                  {currentCategory.author}
+                </p>
+                <p className="text-gray-500">
+                  {currentCategory.role}
+                </p>
+              </div>
+
+              {/* Navigation Arrows */}
+              <div className="flex gap-2">
+                <button
+                  onClick={handlePrevious}
+                  className="w-10 h-10 rounded-full bg-white hover:bg-gray-100 transition-colors flex items-center justify-center shadow-sm"
+                  aria-label="Previous category"
+                >
+                  <ChevronLeft className="w-5 h-5 text-gray-700" />
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="w-10 h-10 rounded-full bg-white hover:bg-gray-100 transition-colors flex items-center justify-center shadow-sm"
+                  aria-label="Next category"
+                >
+                  <ChevronRight className="w-5 h-5 text-gray-700" />
+                </button>
+              </div>
+            </div>
+
+            {/* Progress Dots */}
+            <div className="flex gap-2 mt-8">
+              {categories.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    index === currentIndex 
+                      ? 'w-8 bg-gray-900' 
+                      : 'w-1.5 bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  aria-label={`Go to category ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Right Side - Image */}
+          <div className="relative h-[600px] rounded-lg overflow-hidden shadow-2xl">
+            {categories.map((category, index) => (
+              <img
+                key={category.id}
+                src={category.image}
+                alt={category.title}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                  index === currentIndex ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ))}
+          </div>
+
         </div>
+
+        {/* Category Title Below */}
+        <div className="mt-8 text-center lg:text-left">
+          <h3 className="text-3xl font-bold text-gray-900 transition-opacity duration-300">
+            {currentCategory.title}
+          </h3>
+        </div>
+
       </div>
-
-      {/* Inline animations to mimic Framer Motion */}
-      <style>{`
-        @keyframes fadeInUp {
-          0% {
-            opacity: 0;
-            transform: translateY(24px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeInUp {
-          animation: fadeInUp 0.6s ease-out forwards;
-        }
-
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-        }
-        .animate-float-slow {
-          animation: float 8s ease-in-out infinite;
-        }
-        .animate-float-slower {
-          animation: float 12s ease-in-out infinite;
-        }
-      `}</style>
     </section>
   );
 };

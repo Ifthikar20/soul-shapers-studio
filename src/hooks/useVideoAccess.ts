@@ -1,3 +1,4 @@
+// src/hooks/useVideoAccess.ts - Updated with query support
 import { useAuth } from '@/contexts/AuthContext';
 import { VideoContent } from '@/types/video.types';
 
@@ -11,7 +12,7 @@ interface TrackingContext {
   currentPage?: string;
   feature?: string;
   section?: string;
-  query?: string;
+  query?: string; // ADD THIS LINE
 }
 
 export const useVideoAccess = () => {
@@ -74,7 +75,7 @@ export const useVideoAccess = () => {
       ...(context.currentPage && { from_page: context.currentPage }),
       ...(context.feature && { feature: context.feature }),
       ...(context.section && { section: context.section }),
-      ...(context.query && { query: context.query }),
+      ...(context.query && { query: context.query }), // ADD THIS LINE
     });
     
     return `${basePath}/${trackingId}?${params.toString()}`;

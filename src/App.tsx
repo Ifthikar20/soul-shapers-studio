@@ -1,4 +1,4 @@
-// src/App.tsx - Optimized with Code Splitting
+// src/App.tsx - With protected search route
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -94,16 +94,15 @@ const App = () => {
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/search" element={<SearchResults />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
                 <Route path="/upgrade" element={<UpgradePage />} />
                 <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
 
-                {/* NEW - Add this audio route */}
+                {/* Audio Routes - Public */}
                 <Route path="/audio" element={<AudioPage />} />
                 <Route path="/audio/:id" element={<SingleAudioPage />} />
 
-                {/* Blog Routes */}
+                {/* Blog Routes - Public */}
                 <Route path="/blog" element={<BlogLandingPage />} />
                 <Route path="/blog/post/:slug" element={<BlogPostPage />} />
                 <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
@@ -114,6 +113,16 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <BrowsePage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* PROTECTED: Search Route - Requires Authentication */}
+                <Route
+                  path="/search"
+                  element={
+                    <ProtectedRoute>
+                      <SearchResults />
                     </ProtectedRoute>
                   }
                 />
