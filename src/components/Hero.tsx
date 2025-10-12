@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
+
+// Import watercolor backdrop image
+import watercolor1 from '@/assets/watercolor-1.png';
 
 const Hero = () => {
   const [newsletterStep, setNewsletterStep] = useState<'form' | 'success'>('form');
@@ -14,145 +17,99 @@ const Hero = () => {
     setIsSubmitting(false);
   };
 
-  // Plant images in a grid/tile layout
-  const plantImages = [
-    "https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=400&q=80", // Monstera
-    "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400&q=80", // Ferns
-    "https://images.unsplash.com/photo-1463320726281-696a485928c7?w=400&q=80", // Palm
-    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=400&q=80", // Snake plant
-    "https://images.unsplash.com/photo-1509937528035-ad76254b0356?w=400&q=80", // Indoor plants
-    "https://images.unsplash.com/photo-1466781783364-36c955e42a7f?w=400&q=80", // Botanical
-  ];
-
   return (
     <section className="relative min-h-screen bg-white overflow-hidden">
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 via-white to-purple-50/20"></div>
-
-      <div className="relative max-w-7xl mx-auto px-6 py-20 md:py-32">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left Column - Content */}
-          <div className="space-y-8 order-2 lg:order-1">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-full border border-purple-100">
-              <Sparkles className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-900">Curated Wellness Journey</span>
-            </div>
-
-            {/* Main Heading */}
-            <div className="space-y-4">
-              <h1 className="text-5xl md:text-7xl font-bold leading-tight">
-                <span className="bg-gradient-to-r from-purple-900 via-purple-700 to-purple-600 bg-clip-text text-transparent">
-                  Better Tribe,
-                </span>
-                <br />
-                <span className="text-gray-900">Better Mind</span>
-              </h1>
-              
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed max-w-xl">
-                Discover expert-curated content on mental health, wellness, and personal transformation. 
-                Break limiting patterns and unlock your infinite potential.
-              </p>
-            </div>
-
-            {/* Newsletter Form */}
+      
+      <div className="max-w-7xl mx-auto px-6 py-20 md:py-32">
+        
+        {/* Curved Image Backdrop with Content */}
+        <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <img 
+            src={watercolor1}
+            alt="Wellness journey backdrop"
+            className="w-full h-[600px] object-cover"
+          />
+          
+          {/* Dark overlay for better text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60"></div>
+          
+          {/* Content Centered Inside the Backdrop */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+            
             {newsletterStep === 'form' ? (
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="relative flex-1">
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
-                      className="w-full h-14 px-5 rounded-2xl bg-white border-2 border-gray-200 focus:border-purple-400 focus:outline-none transition-all shadow-sm text-gray-900 placeholder:text-gray-500"
-                    />
-                  </div>
+              <div className="space-y-8 w-full max-w-2xl">
+                <div className="space-y-4">
+                  <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
+                    Explore Content
+                  </h1>
+                  <p className="text-xl md:text-2xl text-white/90">
+                    Join our wellness community and start your transformation journey
+                  </p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="flex-1 h-16 px-6 rounded-full bg-white/95 backdrop-blur-sm border-2 border-white/20 focus:border-white focus:outline-none transition-all text-gray-900 placeholder:text-gray-500 text-lg"
+                  />
                   <button 
                     onClick={handleSubmit}
                     disabled={isSubmitting || !email}
-                    className="h-14 px-8 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50"
+                    className="h-16 px-10 rounded-full bg-white hover:bg-gray-100 text-gray-900 font-semibold transition-all flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-lg"
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
                         Joining...
                       </>
                     ) : (
                       <>
-                        Subscribe
-                        <ArrowRight className="w-5 h-5" />
+                        Get Started
+                        <ArrowRight className="w-6 h-6" />
                       </>
                     )}
                   </button>
                 </div>
-                <p className="text-sm text-gray-600">
-                  Join <strong>10,000+</strong> transforming their mental health. 
-                  <span className="text-purple-700 font-medium ml-1">Free resources, no spam.</span>
+                
+                <p className="text-base text-white/80">
+                  Join <strong className="text-white font-semibold">10,000+</strong> members transforming their mental health
                 </p>
               </div>
             ) : (
-              <div className="space-y-4 p-6 bg-green-50 rounded-2xl border border-green-200">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full">
-                  <Check className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Welcome to the community!</h3>
-                  <p className="text-gray-700">
-                    Check your inbox for exclusive wellness resources and expert tips.
-                  </p>
+              <div className="bg-white/95 backdrop-blur-sm p-10 rounded-3xl shadow-2xl max-w-lg">
+                <div className="flex flex-col items-center gap-6">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                    <Check className="w-10 h-10 text-green-600" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-3xl font-bold text-gray-900 mb-3">Welcome to Better & Bliss!</h3>
+                    <p className="text-gray-600 text-lg">
+                      Check your inbox for exclusive wellness resources and expert tips to start your journey.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
-
-            {/* Social Proof */}
-            <div className="flex items-center gap-6 pt-4">
-              <div className="flex -space-x-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white"></div>
-                ))}
-              </div>
-              <div className="text-sm">
-                <p className="font-semibold text-gray-900">10,000+ Members</p>
-                <p className="text-gray-600">Growing daily</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Plant Image Grid with Fade */}
-          <div className="relative order-1 lg:order-2 h-[600px]">
-            {/* Grid of plant images with staggered layout */}
-            <div className="grid grid-cols-3 gap-3 h-full">
-              {plantImages.map((image, index) => {
-                // Calculate vertical offset: right tiles are higher than left tiles
-                const col = index % 3;
-                const offsetY = col * 40; // Each column to the right is 40px higher
-                
-                return (
-                  <div 
-                    key={index}
-                    className="relative rounded-2xl overflow-hidden bg-gray-100"
-                    style={{
-                      transform: `translateY(-${offsetY}px)`
-                    }}
-                  >
-                    <img 
-                      src={image}
-                      alt={`Plant ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Purple gradient fade overlay on the right side */}
-            <div className="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-purple-100/80 via-purple-50/40 to-transparent pointer-events-none"></div>
             
-            {/* Bottom fade for smooth transition */}
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/60 to-transparent pointer-events-none"></div>
           </div>
         </div>
+
+        {/* Social Proof Below */}
+        <div className="flex items-center justify-center gap-6 pt-12">
+          <div className="flex -space-x-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 border-2 border-white"></div>
+            ))}
+          </div>
+          <div className="text-sm">
+            <p className="font-semibold text-gray-900">10,000+ Members</p>
+            <p className="text-gray-600">Growing daily</p>
+          </div>
+        </div>
+
       </div>
     </section>
   );
