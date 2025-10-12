@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Moon, Sun, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioPlayer } from '@/components/AudioPlayer';
-import { AudioContent } from '@/components/AudioContent';
+import { AudioDetails } from '@/components/AudioDetails';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { audioStreamingService, SecureAudioResponse } from '@/services/audio.service';
 
@@ -53,20 +53,20 @@ const SLUG_MAP: Record<string, string> = {
 const SingleAudioPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+
   // UI State
   const [showTranscript, setShowTranscript] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  
+
   // Data State
   const [audioData, setAudioData] = useState<SecureAudioResponse | null>(null);
   const [displayAudio, setDisplayAudio] = useState<DisplayAudio | null>(null);
-  
+
   // Loading & Error State
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ErrorState | null>(null);
   const [retrying, setRetrying] = useState(false);
-  
+
   // Playback tracking refs
   const playbackStartTime = useRef<number>(0);
   const lastPosition = useRef<number>(0);
@@ -86,7 +86,7 @@ const SingleAudioPage = () => {
       } else {
         setLoading(true);
       }
-      
+
       setError(null);
 
       console.log(`🎵 Fetching secure audio stream: ${contentSlug}`);
@@ -101,18 +101,18 @@ const SingleAudioPage = () => {
       });
 
       setAudioData(streamData);
-      
+
       const transformedAudio = transformToDisplay(streamData);
       setDisplayAudio(transformedAudio);
 
       checkUrlExpiration(streamData.expires_at);
-      
+
     } catch (err: any) {
       console.error('❌ Stream fetch failed:', err);
-      
+
       const errorState = parseError(err);
       setError(errorState);
-      
+
     } finally {
       setLoading(false);
       setRetrying(false);
@@ -126,7 +126,7 @@ const SingleAudioPage = () => {
   const transformToDisplay = (apiData: SecureAudioResponse): DisplayAudio => {
     const minutes = Math.floor(apiData.duration_seconds / 60);
     const seconds = apiData.duration_seconds % 60;
-    
+
     return {
       id: parseInt(id || '1'),
       title: apiData.title,
@@ -163,21 +163,21 @@ const SingleAudioPage = () => {
             message: 'Please log in to access this content',
             canRetry: false
           };
-        
+
         case 403:
           return {
             type: 'ACCESS_DENIED',
             message: detail || 'Premium subscription required',
             canRetry: false
           };
-        
+
         case 404:
           return {
             type: 'NOT_FOUND',
             message: 'Audio content not found',
             canRetry: false
           };
-        
+
         case 410:
           return {
             type: 'TOKEN_EXPIRED',
@@ -193,7 +193,7 @@ const SingleAudioPage = () => {
             message: 'Server error. Please try again.',
             canRetry: true
           };
-        
+
         default:
           return {
             type: 'NETWORK_ERROR',
@@ -237,7 +237,7 @@ const SingleAudioPage = () => {
 
   const handlePlay = () => {
     setShowTranscript(true);
-    
+
     if (!hasLoggedPlay.current) {
       playbackStartTime.current = Date.now();
       hasLoggedPlay.current = true;
@@ -283,11 +283,11 @@ const SingleAudioPage = () => {
   // ============================================
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-  
+
   const handleRetry = () => fetchAudioStream(true);
-  
+
   const handleLogin = () => navigate('/login');
-  
+
   const handleSubscribe = () => navigate('/subscribe');
 
   const themeClasses = {
@@ -413,8 +413,8 @@ const SingleAudioPage = () => {
             <AlertDescription>
               <p className="mb-4">{error.message}</p>
               <div className="flex gap-3">
-                <Button 
-                  onClick={handleRetry} 
+                <Button
+                  onClick={handleRetry}
                   disabled={retrying}
                   className="flex-1"
                 >
@@ -504,7 +504,7 @@ const SingleAudioPage = () => {
       {/* Main Content */}
       <div className="container mx-auto px-6 pb-12">
         <div className="max-w-4xl mx-auto space-y-6">
-          
+
           {/* Security Info Badge (Optional) */}
           {displayAudio.isSecure && (
             <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
@@ -526,7 +526,7 @@ const SingleAudioPage = () => {
             />
 
             {/* Audio Content/Transcript Component */}
-            <AudioContent
+            <AudioDetails
               audio={displayAudio}
               showTranscript={showTranscript}
             />
@@ -538,7 +538,7 @@ const SingleAudioPage = () => {
             const now = Date.now();
             const remaining = expiresAt - now;
             const fiveMinutes = 5 * 60 * 1000;
-            
+
             if (remaining < fiveMinutes && remaining > 0) {
               return (
                 <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-900/20">
