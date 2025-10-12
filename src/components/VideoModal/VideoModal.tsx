@@ -1,64 +1,225 @@
-// src/components/VideoModal/VideoModal.tsx - CLEANED UP VERSION
-import { useState, useCallback } from "react";
+// src/components/VideoModal/VideoModal.tsx - SIMPLIFIED FOR EXISTING BACKEND
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import HLSVideoPlayer, { HLSVideoPlayerRef } from './HLSVideoPlayer';
-import { VideoModalTabs } from "./VideoModalTabs";
-import { OverviewTab } from "./tabs/OverviewTab";
-import { LessonsTab } from "./tabs/LessonsTab";
-import { PracticeTab } from "./tabs/PracticeTab";
-import { VideoContent } from '@/types/video.types';
+import { videoService } from '@/services/video.service';
+import { toVideoId } from '@/utils/video.utils';
 import { 
   X, Plus, ThumbsUp, Share2, User, Users, Clock,
-  ExternalLink
+  ExternalLink, AlertCircle, Loader2
 } from "lucide-react";
-import { useRef } from 'react';
 
 interface VideoModalProps {
-  video: VideoContent;
+  video: any; // Using any since your backend format differs from VideoContent
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  lessons?: any[];
-  communityPosts?: any[];
-  practiceQuestions?: any[];
 }
 
 const VideoModal = ({ 
   video, 
   open, 
-  onOpenChange, 
-  lessons = [], 
-  communityPosts = [], 
-  practiceQuestions = [] 
+  onOpenChange
 }: VideoModalProps) => {
   const navigate = useNavigate();
   const videoRef = useRef<HLSVideoPlayerRef>(null);
   
-  const [activeTab, setActiveTab] = useState('overview');
-  const [currentLesson, setCurrentLesson] = useState(1);
+  // Secure streaming states
+  const [secureStreamUrl, setSecureStreamUrl] = useState<string | null>(null);
+  const [isLoadingStream, setIsLoadingStream] = useState(true);
+  const [streamError, setStreamError] = useState<string | null>(null);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [upgradeRequired, setUpgradeRequired] = useState(false);
+  const [tokenExpiresAt, setTokenExpiresAt] = useState<string | null>(null);
+  
+  // Track video progress for analytics
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTrackedPositionRef = useRef<number>(0);
 
-  const handleTabChange = useCallback((tab: string) => {
-    setActiveTab(tab);
-  }, []);
+  // Convert video.id to number
+  const videoId = toVideoId(video.id);
+
+  // 🔒 Verify access and load secure stream URL
+  useEffect(() => {
+    if (!open || !video.id) return;
+
+    const initializeStream = async () => {
+      try {
+        setIsLoadingStream(true);
+        setStreamError(null);
+
+        // Step 1: Verify access
+        console.log('🔍 Verifying video access...');
+        const accessCheck = await videoService.verifyVideoAccess(videoId);
+
+        if (!accessCheck.hasAccess) {
+          setHasAccess(false);
+          setUpgradeRequired(accessCheck.upgradeRequired || false);
+          setStreamError(accessCheck.reason || 'Access denied');
+          setIsLoadingStream(false);
+          return;
+        }
+
+        setHasAccess(true);
+
+        // Step 2: Get secure stream URL
+        console.log('🔒 Requesting secure stream URL...');
+        const streamData = await videoService.getSecureStreamUrl({
+          videoId: videoId,
+          quality: 'auto',
+        });
+
+        setSecureStreamUrl(streamData.streamUrl);
+        setTokenExpiresAt(streamData.expiresAt);
+        setIsLoadingStream(false);
+
+        // Step 3: Track initial view
+        await videoService.trackVideoEvent({
+          videoId: videoId,
+          event: 'view',
+          position: 0,
+        });
+
+        console.log('✅ Stream initialized successfully');
+
+      } catch (error: any) {
+        console.error('❌ Failed to initialize stream:', error);
+        setStreamError(error.message || 'Failed to load video');
+        setIsLoadingStream(false);
+      }
+    };
+
+    initializeStream();
+
+    // Cleanup on modal close
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, [open, videoId]);
+
+  // 🔄 Auto-refresh token before expiration
+  useEffect(() => {
+    if (!tokenExpiresAt || !hasAccess || !open) return;
+
+    const expiresAt = new Date(tokenExpiresAt);
+    const now = new Date();
+    const timeUntilExpiry = expiresAt.getTime() - now.getTime();
+    
+    // Refresh token 2 minutes before expiration
+    const refreshTime = Math.max(timeUntilExpiry - 120000, 30000);
+
+    const refreshTimeout = setTimeout(async () => {
+      try {
+        console.log('🔄 Refreshing stream token...');
+        const streamData = await videoService.refreshStreamToken(videoId);
+        setSecureStreamUrl(streamData.streamUrl);
+        setTokenExpiresAt(streamData.expiresAt);
+        console.log('✅ Token refreshed successfully');
+      } catch (error) {
+        console.error('❌ Failed to refresh token:', error);
+        setStreamError('Session expired. Please reload the video.');
+      }
+    }, refreshTime);
+
+    return () => clearTimeout(refreshTimeout);
+  }, [tokenExpiresAt, hasAccess, open, videoId]);
+
+  // 📊 Track video progress
+  const handleTimeUpdate = useCallback((currentTime: number) => {
+    // Track progress every 10 seconds
+    const timeDiff = Math.abs(currentTime - lastTrackedPositionRef.current);
+    
+    if (timeDiff >= 10) {
+      videoService.trackVideoEvent({
+        videoId: videoId,
+        event: 'progress',
+        position: currentTime,
+      });
+      lastTrackedPositionRef.current = currentTime;
+    }
+  }, [videoId]);
+
+  // 📊 Track video completion
+  const handleDurationChange = useCallback((duration: number) => {
+    const videoElement = videoRef.current?.video;
+    if (!videoElement) return;
+
+    const checkCompletion = () => {
+      const progress = (videoElement.currentTime / duration) * 100;
+      
+      // Track completion at 90%
+      if (progress >= 90 && lastTrackedPositionRef.current < duration * 0.9) {
+        videoService.trackVideoEvent({
+          videoId: videoId,
+          event: 'complete',
+          position: videoElement.currentTime,
+        });
+      }
+    };
+
+    videoElement.addEventListener('timeupdate', checkCompletion);
+    
+    return () => {
+      videoElement.removeEventListener('timeupdate', checkCompletion);
+    };
+  }, [videoId]);
+
+  // 📊 Track video pause
+  const handlePause = useCallback(() => {
+    const currentTime = videoRef.current?.video?.currentTime || 0;
+    
+    videoService.trackVideoEvent({
+      videoId: videoId,
+      event: 'pause',
+      position: currentTime,
+    });
+  }, [videoId]);
+
+  // 📊 Track video errors
+  const handleVideoError = useCallback((error: any) => {
+    videoService.trackVideoEvent({
+      videoId: videoId,
+      event: 'error',
+      position: videoRef.current?.video?.currentTime || 0,
+      errorCode: error.code?.toString(),
+      errorMessage: error.message || 'Unknown error',
+    });
+  }, [videoId]);
 
   const handleWatchFullScreen = useCallback(() => {
     onOpenChange(false);
     navigate(`/watch/${video.id}`);
   }, [video.id, onOpenChange, navigate]);
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return <OverviewTab video={video} totalLessons={lessons.length || 7} />;
-      case 'lessons':
-        return <LessonsTab lessons={lessons} currentLesson={currentLesson} onLessonSelect={setCurrentLesson} />;
-      case 'practice':
-        return <PracticeTab questions={practiceQuestions} />;
-      default:
-        return <OverviewTab video={video} totalLessons={lessons.length || 7} />;
-    }
-  };
+  const handleUpgrade = useCallback(() => {
+    navigate('/pricing');
+    onOpenChange(false);
+  }, [navigate, onOpenChange]);
+
+  const handleRetry = useCallback(() => {
+    setStreamError(null);
+    setIsLoadingStream(true);
+    
+    // Re-trigger stream initialization
+    videoService.getSecureStreamUrl({
+      videoId: videoId,
+      quality: 'auto',
+    })
+      .then(streamData => {
+        setSecureStreamUrl(streamData.streamUrl);
+        setTokenExpiresAt(streamData.expiresAt);
+        setHasAccess(true);
+        setIsLoadingStream(false);
+      })
+      .catch(error => {
+        setStreamError(error.message);
+        setIsLoadingStream(false);
+      });
+  }, [videoId]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -75,17 +236,63 @@ const VideoModal = ({
             <X className="h-5 w-5" />
           </Button>
           
-          {/* HLS Video Player */}
+          {/* Video Player Section */}
           <div className="relative w-full bg-black">
             <div className="relative mx-auto max-w-[1400px]">
               <div className="relative aspect-video w-full">
-                <HLSVideoPlayer
-                  ref={videoRef}
-                  src={video.videoUrl}
-                  poster={video.thumbnail}
-                  className="w-full h-full object-cover"
-                  autoPlay={false}
-                />
+                
+                {/* Loading State */}
+                {isLoadingStream && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
+                    <Loader2 className="w-12 h-12 text-white animate-spin mb-4" />
+                    <p className="text-white text-sm">Loading secure stream...</p>
+                  </div>
+                )}
+
+                {/* Error State */}
+                {streamError && !isLoadingStream && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black p-8">
+                    <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+                    <h3 className="text-white text-xl font-semibold mb-2">
+                      {upgradeRequired ? 'Upgrade Required' : 'Playback Error'}
+                    </h3>
+                    <p className="text-zinc-400 text-center mb-6 max-w-md">
+                      {streamError}
+                    </p>
+                    
+                    {upgradeRequired ? (
+                      <Button 
+                        onClick={handleUpgrade}
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                      >
+                        Upgrade Now
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={handleRetry}
+                        variant="outline"
+                        className="bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700"
+                      >
+                        Try Again
+                      </Button>
+                    )}
+                  </div>
+                )}
+
+                {/* HLS Video Player - Only render when we have secure URL */}
+                {secureStreamUrl && hasAccess && !streamError && (
+                  <HLSVideoPlayer
+                    ref={videoRef}
+                    src={secureStreamUrl}
+                    poster={video.thumbnail}
+                    className="w-full h-full object-cover"
+                    autoPlay={false}
+                    onTimeUpdate={handleTimeUpdate}
+                    onDurationChange={handleDurationChange}
+                    onPause={handlePause}
+                    onError={handleVideoError}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -94,6 +301,16 @@ const VideoModal = ({
           <div className="relative px-8 lg:px-12 pb-20">
             <div className="max-w-[1400px] mx-auto">
               
+              {/* Access Warning */}
+              {upgradeRequired && (
+                <Alert className="mb-6 bg-purple-900/20 border-purple-500/50">
+                  <AlertCircle className="h-4 w-4 text-purple-400" />
+                  <AlertDescription className="text-purple-200">
+                    This is premium content. Upgrade your plan to watch this video.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               {/* Title and Actions */}
               <div className="mb-8">
                 <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
@@ -119,7 +336,8 @@ const VideoModal = ({
                   <Button 
                     size="lg"
                     onClick={handleWatchFullScreen}
-                    className="bg-white hover:bg-white/90 text-black font-bold rounded px-8"
+                    disabled={!hasAccess || !!streamError}
+                    className="bg-white hover:bg-white/90 text-black font-bold rounded px-8 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ExternalLink className="w-5 h-5 mr-2" />
                     Watch Full Screen
@@ -159,14 +377,31 @@ const VideoModal = ({
                 </div>
                 <div>
                   <p className="text-white font-semibold">{video.expert}</p>
-                  <p className="text-zinc-400 text-sm">Wellness Expert</p>
+                  <p className="text-zinc-400 text-sm">{video.expertCredentials || 'Wellness Expert'}</p>
                 </div>
               </div>
               
-              {/* Tabs */}
-              <VideoModalTabs activeTab={activeTab} onTabChange={handleTabChange}>
-                {renderTabContent()}
-              </VideoModalTabs>
+              {/* Description */}
+              <div className="mb-8">
+                <h3 className="text-white text-lg font-semibold mb-3">About this video</h3>
+                <p className="text-zinc-300 leading-relaxed">
+                  {video.fullDescription || video.description}
+                </p>
+              </div>
+
+              {/* Hashtags */}
+              {video.hashtags && video.hashtags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {video.hashtags.map((tag: string, index: number) => (
+                    <span 
+                      key={index}
+                      className="text-sm text-purple-400 hover:text-purple-300 cursor-pointer"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

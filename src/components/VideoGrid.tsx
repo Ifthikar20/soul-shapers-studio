@@ -1,183 +1,24 @@
 import { useState, useEffect, useCallback } from "react";
-import { useAuth } from '@/contexts/AuthContext';
 import { useVideoAccess } from '@/hooks/useVideoAccess';
 import { useNavigationTracking } from '@/hooks/useNavigationTracking';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { VideoContent } from '@/types/video.types';
+import { contentService } from '@/services/content.service';
 import { 
   Play, Clock, User, TrendingUp, 
-  ArrowRight, Crown, Star 
+  ArrowRight, Crown, Star, Loader2,
+  AlertCircle
 } from 'lucide-react';
 
 import VideoModal from './VideoModal/VideoModal';
 
-const videos: VideoContent[] = [
-  {
-    id: 1,
-    title: "Understanding Anxiety: A Complete Guide - Episode 1",
-    expert: "Dr. Sarah Johnson",
-    expertCredentials: "Clinical Psychologist, PhD in Mental Health",
-    expertAvatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop&crop=face",
-    duration: "18:30",
-    category: "Mental Health",
-    rating: 4.9,
-    views: "12.5k",
-    thumbnail: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop",
-    isNew: true,
-    isTrending: true,
-    description: "A comprehensive guide to understanding anxiety disorders.",
-    fullDescription: "Dive deep into the complexities of anxiety, exploring its psychological and physiological impacts. Learn evidence-based strategies for managing and overcoming anxiety in your daily life.",
-    videoUrl: "https://www.youtube.com/watch?v=pcxuXfq118I",
-    relatedTopics: ["Stress Management", "Cognitive Behavioral Techniques", "Mindfulness"],
-    learningObjectives: [
-      "Understand the different types of anxiety disorders",
-      "Identify personal anxiety triggers",
-      "Learn practical coping mechanisms"
-    ],
-    accessTier: 'free',
-    isFirstEpisode: true,
-    seriesId: "anxiety-series-1",
-    episodeNumber: 1
-  },
-  {
-    id: 2,
-    title: "Advanced Anxiety Management - Episode 2",
-    expert: "Dr. Sarah Johnson",
-    expertCredentials: "Clinical Psychologist, PhD in Mental Health",
-    expertAvatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop&crop=face",
-    duration: "22:15",
-    category: "Mental Health",
-    rating: 4.8,
-    views: "8.3k",
-    thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
-    isNew: false,
-    isTrending: true,
-    description: "Learn advanced techniques for managing anxiety.",
-    fullDescription: "Discover proven methods to reduce anxiety and improve your overall well-being through advanced techniques.",
-    videoUrl: "https://www.youtube.com/watch?v=d9YM_9CVmtc",
-    relatedTopics: ["Advanced CBT", "Exposure Therapy", "Mindfulness"],
-    learningObjectives: [
-      "Master advanced breathing techniques",
-      "Develop a personal anxiety toolkit",
-      "Create healthy coping strategies"
-    ],
-    accessTier: 'premium',
-    isFirstEpisode: false,
-    seriesId: "anxiety-series-1",
-    episodeNumber: 2
-  },
-  {
-    id: 3,
-    title: "Building Healthy Relationships",
-    expert: "Dr. Emily Rodriguez",
-    expertCredentials: "Relationship Therapist, LMFT",
-    expertAvatar: "https://images.unsplash.com/photo-1594824388853-d0b8ccbfbb3d?w=100&h=100&fit=crop&crop=face",
-    duration: "25:40",
-    category: "Relationships",
-    rating: 4.7,
-    views: "15.2k",
-    thumbnail: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=250&fit=crop",
-    isNew: true,
-    isTrending: false,
-    description: "Essential skills for maintaining healthy relationships.",
-    fullDescription: "Explore the fundamentals of building and maintaining strong, healthy relationships in all areas of your life.",
-    videoUrl: "https://www.youtube.com/watch?v=AznRJvAPtwM",
-    relatedTopics: ["Communication", "Emotional Intelligence", "Conflict Resolution"],
-    learningObjectives: [
-      "Improve communication skills",
-      "Set healthy boundaries",
-      "Resolve conflicts constructively"
-    ],
-    accessTier: 'free',
-  },
-  {
-    id: 4,
-    title: "Mindfulness for Beginners - Episode 1",
-    expert: "Dr. James Park",
-    expertCredentials: "Mindfulness Instructor, PhD in Neuroscience",
-    expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    duration: "16:20",
-    category: "Mindfulness",
-    rating: 4.9,
-    views: "20.1k",
-    thumbnail: "https://images.unsplash.com/photo-1545389336-cf090694435e?w=400&h=250&fit=crop",
-    isNew: false,
-    isTrending: true,
-    description: "Start your mindfulness journey with simple practices.",
-    fullDescription: "Begin your mindfulness practice with gentle, accessible techniques designed for complete beginners.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    relatedTopics: ["Meditation", "Present Moment Awareness", "Breathing Exercises"],
-    learningObjectives: [
-      "Learn basic mindfulness techniques",
-      "Establish a daily practice",
-      "Reduce mental chatter and increase focus"
-    ],
-    accessTier: 'free',
-    isFirstEpisode: true,
-    seriesId: "mindfulness-series-1",
-    episodeNumber: 1
-  },
-  {
-    id: 5,
-    title: "Advanced Mindfulness Techniques - Episode 2",
-    expert: "Dr. James Park",
-    expertCredentials: "Mindfulness Instructor, PhD in Neuroscience",
-    expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    duration: "19:45",
-    category: "Mindfulness",
-    rating: 4.8,
-    views: "11.7k",
-    thumbnail: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=250&fit=crop",
-    isNew: true,
-    isTrending: false,
-    description: "Deepen your mindfulness practice with advanced techniques.",
-    fullDescription: "Transform your mindfulness practice using advanced strategies for deeper awareness and presence.",
-    videoUrl: "https://www.youtube.com/watch?v=d9YM_9CVmtc",
-    relatedTopics: ["Deep Meditation", "Body Scanning", "Loving Kindness"],
-    learningObjectives: [
-      "Master advanced meditation techniques",
-      "Develop deeper self-awareness",
-      "Cultivate compassion and loving-kindness"
-    ],
-    accessTier: 'premium',
-    isFirstEpisode: false,
-    seriesId: "mindfulness-series-1",
-    episodeNumber: 2
-  },
-  {
-    id: 6,
-    title: "Nutrition for Mental Health",
-    expert: "Dr. Maria Garcia",
-    expertCredentials: "Nutritional Psychiatrist, MD, PhD",
-    expertAvatar: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&h=100&fit=crop&crop=face",
-    duration: "21:30",
-    category: "Nutrition",
-    rating: 4.6,
-    views: "9.8k",
-    thumbnail: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop",
-    isNew: false,
-    isTrending: false,
-    description: "How food choices impact your mental wellbeing.",
-    fullDescription: "Discover the powerful connection between nutrition and mental health, learning which foods support optimal brain function.",
-    videoUrl: "https://www.youtube.com/watch?v=D-ya6U-pbWo",
-    relatedTopics: ["Brain Health", "Mood Foods", "Nutritional Psychology"],
-    learningObjectives: [
-      "Understand the gut-brain connection",
-      "Identify mood-supporting nutrients",
-      "Plan meals for mental wellness"
-    ],
-    accessTier: 'premium',
-  }
-];
-
 // Fixed Size Video Card Component
 const FixedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
-  video: VideoContent;
-  videos: VideoContent[];
-  onPlay: (video: VideoContent) => void;
-  onUpgrade: (video: VideoContent) => void;
+  video: any;
+  videos: any[];
+  onPlay: (video: any) => void;
+  onUpgrade: (video: any) => void;
 }) => {
   const { canWatchVideo } = useVideoAccess();
   
@@ -286,8 +127,11 @@ const FixedVideoCard = ({ video, videos, onPlay, onUpgrade }: {
 };
 
 const VideoGrid = () => {
-  const [selectedVideo, setSelectedVideo] = useState<VideoContent | null>(null);
-  const [visibleVideos, setVisibleVideos] = useState(6);
+  const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
+  const [videos, setVideos] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
   
   // Use the hooks
   const { canWatchVideo } = useVideoAccess();
@@ -296,6 +140,33 @@ const VideoGrid = () => {
     trackNavigationEvent, 
     getNavigationContextFromUrl 
   } = useNavigationTracking();
+
+  // Fetch videos from backend using existing content service
+  const fetchVideos = useCallback(async (category?: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      console.log('📹 Fetching videos...', { category });
+
+      // Use your existing content service
+      const videos = await contentService.getVideosForFrontend(category);
+
+      setVideos(videos);
+      setIsLoading(false);
+
+      console.log('✅ Videos loaded:', videos.length);
+    } catch (error: any) {
+      console.error('❌ Failed to fetch videos:', error);
+      setError(error.message || 'Failed to load videos');
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    fetchVideos(selectedCategory);
+  }, [fetchVideos, selectedCategory]);
 
   // Track page view with context when component mounts
   useEffect(() => {
@@ -314,8 +185,8 @@ const VideoGrid = () => {
     }
   }, [trackNavigationEvent, getNavigationContextFromUrl]);
 
-  // Memoized callback for handling video play to prevent unnecessary re-renders
-  const handleVideoPlay = useCallback((video: VideoContent) => {
+  // Memoized callback for handling video play
+  const handleVideoPlay = useCallback((video: any) => {
     const canWatch = canWatchVideo(video, videos);
     
     if (canWatch) {
@@ -335,10 +206,10 @@ const VideoGrid = () => {
         episodeNumber: video.episodeNumber,
       });
     }
-  }, [canWatchVideo, trackNavigationEvent, navigateToUpgrade]);
+  }, [canWatchVideo, trackNavigationEvent, navigateToUpgrade, videos]);
 
   // Memoized callback for upgrade navigation
-  const handleUpgradeClick = useCallback((video: VideoContent) => {
+  const handleUpgradeClick = useCallback((video: any) => {
     navigateToUpgrade({
       source: 'upgrade_button',
       videoId: video.id,
@@ -348,18 +219,64 @@ const VideoGrid = () => {
     });
   }, [navigateToUpgrade]);
 
-  const handleLoadMore = useCallback(() => {
-    setVisibleVideos(prev => prev + 3);
-    trackNavigationEvent('Load More Videos', {
-      source: 'pagination',
-      feature: 'load_more',
-      section: 'video_grid'
+  // Handle category filter change
+  const handleCategoryFilter = useCallback((category: string | undefined) => {
+    setSelectedCategory(category);
+    trackNavigationEvent('Category Filter Changed', {
+      source: 'video_grid',
+    
     });
   }, [trackNavigationEvent]);
 
   const handleModalClose = useCallback(() => {
     setSelectedVideo(null);
   }, []);
+
+  // Loading State
+  if (isLoading && videos.length === 0) {
+    return (
+      <section className="py-12 relative">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+            <p className="text-muted-foreground">Loading videos...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error State
+  if (error && videos.length === 0) {
+    return (
+      <section className="py-12 relative">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+            <p className="text-foreground font-semibold mb-2">Failed to load videos</p>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <Button onClick={() => fetchVideos(selectedCategory)}>
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Empty State
+  if (!isLoading && videos.length === 0) {
+    return (
+      <section className="py-12 relative">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <p className="text-foreground font-semibold mb-2">No videos available</p>
+            <p className="text-muted-foreground">Check back soon for new content!</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 relative">
@@ -375,13 +292,25 @@ const VideoGrid = () => {
             
             {/* Filter Badges - Right aligned */}
             <div className="hidden lg:flex space-x-2">
-              <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full">
+              <Badge 
+                variant="outline" 
+                className={`cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full ${!selectedCategory ? 'bg-primary text-white' : ''}`}
+                onClick={() => handleCategoryFilter(undefined)}
+              >
                 All Videos
               </Badge>
-              <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full">
+              <Badge 
+                variant="outline" 
+                className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full"
+                onClick={() => handleCategoryFilter(undefined)} // You can add filter logic here
+              >
                 Popular
               </Badge>
-              <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full">
+              <Badge 
+                variant="outline" 
+                className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full"
+                onClick={() => handleCategoryFilter(undefined)} // You can add filter logic here
+              >
                 New
               </Badge>
             </div>
@@ -403,13 +332,25 @@ const VideoGrid = () => {
 
           {/* Mobile Filter Badges */}
           <div className="flex lg:hidden justify-center space-x-2 mt-4">
-            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full">
+            <Badge 
+              variant="outline" 
+              className={`cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full ${!selectedCategory ? 'bg-primary text-white' : ''}`}
+              onClick={() => handleCategoryFilter(undefined)}
+            >
               All Videos
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full">
+            <Badge 
+              variant="outline" 
+              className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full"
+              onClick={() => handleCategoryFilter(undefined)}
+            >
               Popular
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full">
+            <Badge 
+              variant="outline" 
+              className="cursor-pointer hover:bg-primary hover:text-white transition-all px-3 py-1 text-sm rounded-full"
+              onClick={() => handleCategoryFilter(undefined)}
+            >
               New
             </Badge>
           </div>
@@ -417,7 +358,7 @@ const VideoGrid = () => {
 
         {/* Fixed Size Video Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
-          {videos.slice(0, visibleVideos).map((video) => (
+          {videos.map((video) => (
             <FixedVideoCard
               key={video.id}
               video={video}
@@ -427,23 +368,8 @@ const VideoGrid = () => {
             />
           ))}
         </div>
-        
-        {/* Compact Load More Button */}
-        {visibleVideos < videos.length && (
-          <div className="text-center mt-8">
-            <Button 
-              variant="outline" 
-              size="default"
-              onClick={handleLoadMore}
-              className="rounded-full px-5 py-2 hover:bg-primary hover:text-white transition-all"
-            >
-              Load More Videos
-              <ArrowRight className="w-3 h-3 ml-1" />
-            </Button>
-          </div>
-        )}
 
-        {/* Video Modal */}
+        {/* Video Modal - Simplified without lessons/community/practice */}
         {selectedVideo && (
           <VideoModal 
             video={selectedVideo}
