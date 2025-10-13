@@ -108,9 +108,8 @@ const App = () => {
                 <Route path="/blog/post/:slug" element={<BlogPostPage />} />
                 <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
 
-                {/* ✅ NEW: Video Watch Page - Public (or make it protected if needed) */}
                 <Route
-                  path="/watch/:shortId"
+                  path="/watch/:id"  // ✅ CHANGED from :shortId to :id
                   element={
                     <ProtectedRoute>
                       <WatchPage />

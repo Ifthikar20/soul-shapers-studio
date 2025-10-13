@@ -1,4 +1,4 @@
-// src/pages/BrowsePage.tsx - With integrated search functionality
+// src/pages/BrowsePage.tsx - Fixed for UUID support
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,8 +12,9 @@ import Footer from '@/components/Footer';
 import HeroSection from '@/components/Browse/HeroSection';
 import VideoRow from '@/components/Browse/VideoRow';
 
+// ✅ UPDATED: Use UUID for id
 interface VideoContent {
-  id: number;
+  id: string; // ✅ CHANGED: UUID string instead of number
   title: string;
   expert: string;
   expertCredentials: string;
@@ -34,6 +35,9 @@ interface VideoContent {
   isFirstEpisode?: boolean;
   seriesId?: string;
   episodeNumber?: number;
+  accessible?: boolean;
+  contentType?: string;
+  hashtags?: string[];
 }
 
 interface Category {
@@ -52,10 +56,8 @@ const BrowsePage = () => {
   const { user } = useAuth();
   const { navigateToUpgrade, trackNavigationEvent } = useNavigationTracking();
 
-  // Get search query from URL
   const searchQuery = searchParams.get('q') || '';
 
-  // State for API data
   const [allVideos, setAllVideos] = useState<VideoContent[]>([]);
   const [filteredVideos, setFilteredVideos] = useState<VideoContent[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -70,11 +72,18 @@ const BrowsePage = () => {
         setLoading(true);
         setError(null);
 
+        console.log('🔄 Loading browse content...');
+
         // Load browse content and categories in parallel
         const [browseData, categoriesData] = await Promise.all([
           contentService.getBrowseContent(undefined, 50),
           contentService.getCategories()
         ]);
+
+        console.log('📦 Browse data received:', {
+          contentCount: browseData.content?.length || 0,
+          firstItem: browseData.content?.[0]
+        });
 
         // Helper: format views
         const formatViews = (count: number): string => {
@@ -86,38 +95,67 @@ const BrowsePage = () => {
           return count.toString();
         };
 
-        // Convert to frontend format
-        const videos: VideoContent[] = browseData.content.map((item: any) => ({
-          id: parseInt(item.id),
-          title: item.title,
-          expert: item.expert?.name || 'Unknown',
-          expertCredentials: item.expert?.title || '',
-          expertAvatar: item.expert?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${item.expert?.name || 'unknown'}`,
-          duration: item.duration_formatted,
-          category: item.category?.name || 'General',
-          contentType: item.content_type,
-          rating: 4.8,
-          views: formatViews(item.view_count || 0),
-          thumbnail: item.thumbnail_url || "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop",
-          isNew: !!item.is_new,
-          isTrending: !!item.trending,
-          description: item.description || '',
-          fullDescription: item.description || '',
-          videoUrl: item.video_url || "#",
-          relatedTopics: [],
-          learningObjectives: [],
-          accessTier: item.access_tier || 'free',
-          isFirstEpisode: item.access_tier === 'free',
-          accessible: !!item.accessible,
-          seriesId: item.series_id,
-          episodeNumber: item.episode_number,
-          hashtags: [`#${(item.category?.name || 'General').replace(/\s+/g, '')}`, `#${(item.expert?.name || 'Expert').split(' ')[0]}`]
-        }));
+        // Helper: format duration
+        const formatDuration = (seconds: number): string => {
+          const mins = Math.floor(seconds / 60);
+          const secs = seconds % 60;
+          return `${mins}:${secs.toString().padStart(2, '0')}`;
+        };
+
+        // ✅ FIXED: Convert to frontend format using UUID
+        const videos: VideoContent[] = browseData.content.map((item: any) => {
+          console.log('🔄 Converting item:', {
+            id: item.id,
+            title: item.title,
+            idType: typeof item.id
+          });
+
+          return {
+            id: item.id, // ✅ Keep UUID as string
+            title: item.title,
+            expert: item.expert_name || 'Unknown',
+            expertCredentials: item.expert_title || '',
+            expertAvatar: `https://api.dicebear.com/7.x/initials/svg?seed=${item.expert_name || 'unknown'}`,
+            duration: formatDuration(item.duration_seconds || 0),
+            category: item.category_name || 'General',
+            contentType: item.content_type || 'video',
+            rating: 4.8,
+            views: formatViews(item.view_count || 0),
+            thumbnail: item.thumbnail_url || "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop",
+            isNew: !!item.is_new,
+            isTrending: !!item.featured, // Backend uses 'featured' for trending
+            description: item.description || '',
+            fullDescription: item.description || '',
+            videoUrl: item.video_url || "#",
+            relatedTopics: [],
+            learningObjectives: [],
+            accessTier: item.access_tier || 'free',
+            isFirstEpisode: item.access_tier === 'free',
+            accessible: true, // Can be determined by user subscription
+            seriesId: item.series_id,
+            episodeNumber: item.episode_number,
+            hashtags: [
+              `#${(item.category_name || 'General').replace(/\s+/g, '')}`, 
+              `#${(item.expert_name || 'Expert').split(' ')[0]}`
+            ]
+          };
+        });
+
+        console.log('✅ Converted videos:', {
+          count: videos.length,
+          firstVideo: {
+            id: videos[0]?.id,
+            title: videos[0]?.title,
+            idType: typeof videos[0]?.id
+          }
+        });
 
         setAllVideos(videos);
         setCategories(categoriesData.categories || []);
+        console.log('✅ Content loaded successfully');
+        
       } catch (err) {
-        console.error('Failed to load content:', err);
+        console.error('❌ Failed to load content:', err);
         setError('Failed to load content. Please try again.');
       } finally {
         setLoading(false);
@@ -148,7 +186,6 @@ const BrowsePage = () => {
 
     setFilteredVideos(filtered);
 
-    // Track search event
     trackNavigationEvent('Search Performed', {
       query: searchQuery,
       resultCount: filtered.length,
@@ -156,17 +193,16 @@ const BrowsePage = () => {
     });
   }, [searchQuery, allVideos, trackNavigationEvent]);
 
-  // Clear search
   const handleClearSearch = () => {
     setSearchParams({});
     setIsSearching(false);
   };
 
-  // Event handlers
+  // ✅ UPDATED: Event handlers now use UUID string
   const handleUpgrade = (video: VideoContent) => {
     navigateToUpgrade({
       source: 'browse_page',
-      videoId: video.id,
+      videoId: video.id, // ✅ Now UUID string
       videoTitle: video.title,
       seriesId: video.seriesId,
       episodeNumber: video.episodeNumber
@@ -174,18 +210,25 @@ const BrowsePage = () => {
   };
 
   const handlePlay = (video: VideoContent) => {
+    console.log('▶️ Playing video:', {
+      id: video.id,
+      title: video.title,
+      navigateTo: `/watch/${video.id}`
+    });
+
     trackNavigationEvent('Video Play', {
-      videoId: video.id.toString(),
+      videoId: video.id, // ✅ UUID string
       source: 'browse_page'
     });
-    navigate(`/watch/${video.id}`);
+
+    navigate(`/watch/${video.id}`); // ✅ Navigate with UUID
   };
 
   const handleMoreInfo = (video: VideoContent) => {
-    navigate(`/video/${video.id}`);
+    navigate(`/video/${video.id}`); // ✅ Navigate with UUID
   };
 
-  // Data organization for non-search view
+  // Data organization
   const videosToShow = isSearching ? filteredVideos : allVideos;
   const featuredVideo = !isSearching ? (allVideos.find(v => v.isTrending) || allVideos[0] || null) : null;
   const trendingVideos = !isSearching ? allVideos.filter(v => v.isTrending) : [];
@@ -197,7 +240,6 @@ const BrowsePage = () => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
 
-      {/* Show Hero only when not searching */}
       {!isSearching && (
         <HeroSection 
           featuredVideo={featuredVideo} 
@@ -215,7 +257,6 @@ const BrowsePage = () => {
           </div>
         )}
 
-        {/* Search Results Header */}
         {isSearching && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
@@ -237,7 +278,6 @@ const BrowsePage = () => {
               </Button>
             </div>
 
-            {/* Search results badges */}
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary" className="text-sm">
                 <Search className="w-3 h-3 mr-1" />
@@ -250,7 +290,6 @@ const BrowsePage = () => {
           </div>
         )}
 
-        {/* No Search Results */}
         {isSearching && filteredVideos.length === 0 && !loading && (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -271,7 +310,6 @@ const BrowsePage = () => {
           </div>
         )}
 
-        {/* Search Results Grid */}
         {isSearching && filteredVideos.length > 0 && (
           <VideoRow
             title="Search Results"
@@ -282,7 +320,6 @@ const BrowsePage = () => {
           />
         )}
 
-        {/* Regular Browse Content (shown when not searching) */}
         {!isSearching && (
           <>
             <VideoRow
