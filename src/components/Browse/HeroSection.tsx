@@ -1,42 +1,18 @@
-// src/components/Browse/HeroSection.tsx
-import { useState } from 'react';
+// src/components/Browse/HeroSection.tsx - COMPLETE FIXED VERSION
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useVideoAccess } from '@/hooks/useVideoAccess';
+import { Video } from '@/types/video.types'; // ✅ FIXED: Use centralized type
 import {
   Play, Star, Clock, Award, Info
 } from 'lucide-react';
 
-interface VideoContent {
-  id: number;
-  title: string;
-  expert: string;
-  expertCredentials: string;
-  expertAvatar: string;
-  duration: string;
-  category: string;
-  rating: number;
-  views: string;
-  thumbnail: string;
-  isNew: boolean;
-  isTrending: boolean;
-  description: string;
-  fullDescription: string;
-  videoUrl: string;
-  relatedTopics: string[];
-  learningObjectives: string[];
-  accessTier: 'free' | 'premium';
-  isFirstEpisode?: boolean;
-  seriesId?: string;
-  episodeNumber?: number;
-}
-
 interface HeroSectionProps {
-  featuredVideo: VideoContent | null;
+  featuredVideo: Video | null; // ✅ FIXED: Use Video type
   loading: boolean;
-  onPlay?: (video: VideoContent) => void;
-  onMoreInfo?: (video: VideoContent) => void;
+  onPlay?: (video: Video) => void; // ✅ FIXED
+  onMoreInfo?: (video: Video) => void; // ✅ FIXED
 }
 
 const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSectionProps) => {
@@ -88,7 +64,11 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/30">
                 <img
-                  src={featuredVideo.expertAvatar}
+                  src={
+                    featuredVideo.expertAvatar || 
+                    featuredVideo.expert_avatar || 
+                    `https://api.dicebear.com/7.x/initials/svg?seed=${featuredVideo.expert}`
+                  }
                   alt={featuredVideo.expert}
                   className="w-full h-full object-cover"
                 />
@@ -111,7 +91,7 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
             <div className="flex items-center gap-4 mb-6 text-white/80">
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                <span className="font-medium">{featuredVideo.rating}</span>
+                <span className="font-medium">{featuredVideo.rating || '4.8'}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
@@ -123,7 +103,7 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
             </div>
 
             {/* Description */}
-            <p className="text-lg text-white/90 mb-8 leading-relaxed">
+            <p className="text-lg text-white/90 mb-8 leading-relaxed line-clamp-2">
               {featuredVideo.description}
             </p>
 

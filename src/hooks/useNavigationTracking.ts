@@ -2,14 +2,16 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useVideoAccess } from './useVideoAccess';
 
+// ✅ FIXED: Complete NavigationContext with all possible tracking fields
 export interface NavigationContext {
   source?: string;
   from?: string;
+  to?: string;
   feature?: string;
   section?: string;
   category?: string;
-  videoId?: string;
-  videoShortId?: string;
+  videoId?: string; // ✅ UUID string
+  videoShortId?: string; // Deprecated, use videoId
   videoTitle?: string;
   seriesId?: string;
   episode?: string;
@@ -18,14 +20,18 @@ export interface NavigationContext {
   trackingId?: string;
   timestamp?: string;
   query?: string;
-  to?: string;
   currentPage?: string;
+  resultCount?: number; // ✅ Added for search results
+  filterType?: string; // ✅ Added for filters
+  sortBy?: string; // ✅ Added for sorting
+  page?: number; // ✅ Added for pagination
+  limit?: number; // ✅ Added for pagination
 }
 
 export interface UpgradeContext {
   source: string;
-  videoId?: number;
-  videoShortId?: string;
+  videoId?: string; // ✅ UUID string
+  videoShortId?: string; // Deprecated, use videoId
   videoTitle?: string;
   seriesId?: string;
   episodeNumber?: number;
@@ -35,8 +41,8 @@ export interface UpgradeContext {
 
 export interface TrackingNavigationContext {
   source: string;
-  videoId?: number;
-  videoShortId?: string;
+  videoId?: string; // ✅ UUID string
+  videoShortId?: string; // Deprecated, use videoId
   videoTitle?: string;
   seriesId?: string;
   feature?: string;
@@ -108,7 +114,6 @@ export const useNavigationTracking = () => {
     path: string,
     context: TrackingNavigationContext
   ) => {
-    // ✅ FIX: Only pass properties that exist in TrackingContext
     const trackingUrl = generateTrackingUrl(path, {
       source: context.source,
       videoId: context.videoId,
@@ -124,7 +129,7 @@ export const useNavigationTracking = () => {
       from: location.pathname,
       to: path,
       source: context.source,
-      videoId: context.videoId?.toString(),
+      videoId: context.videoId,
       videoShortId: context.videoShortId,
       feature: context.feature,
       query: context.query,
@@ -139,11 +144,10 @@ export const useNavigationTracking = () => {
    * Used for clicking on video cards
    */
   const navigateToVideo = (
-    videoId: number, 
+    videoId: string, // ✅ UUID string
     videoShortId: string, 
     source: string = 'browse_click'
   ) => {
-    // ✅ FIX: Only pass properties that exist in TrackingContext
     const trackingUrl = generateTrackingUrl('/browse', {
       source,
       videoId,
@@ -151,7 +155,7 @@ export const useNavigationTracking = () => {
     });
 
     trackNavigationEvent('Video Click', {
-      videoId: videoId.toString(),
+      videoId: videoId,
       videoShortId: videoShortId,
       source,
       from: location.pathname,
@@ -184,7 +188,6 @@ export const useNavigationTracking = () => {
    * Used when user clicks upgrade button or tries to access locked content
    */
   const navigateToUpgrade = (context: UpgradeContext) => {
-    // ✅ FIX: Only pass properties that exist in TrackingContext
     const upgradeUrl = generateTrackingUrl('/upgrade', {
       source: context.source,
       videoId: context.videoId,
@@ -197,7 +200,7 @@ export const useNavigationTracking = () => {
     trackNavigationEvent('Upgrade Navigation', {
       from: location.pathname,
       source: context.source,
-      videoId: context.videoId?.toString(),
+      videoId: context.videoId,
       videoShortId: context.videoShortId,
       videoTitle: context.videoTitle,
       seriesId: context.seriesId,

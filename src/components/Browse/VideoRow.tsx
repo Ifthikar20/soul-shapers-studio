@@ -1,39 +1,16 @@
-// src/components/Browse/VideoRow.tsx
+// src/components/Browse/VideoRow.tsx - COMPLETE FIXED VERSION
 import { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import HybridVideoCard from './HybridVideoCard';
 import VideoCardSkeleton from './VideoCardSkeleton';
-
-interface VideoContent {
-  id: number;
-  title: string;
-  expert: string;
-  expertCredentials: string;
-  expertAvatar: string;
-  duration: string;
-  category: string;
-  rating: number;
-  views: string;
-  thumbnail: string;
-  isNew: boolean;
-  isTrending: boolean;
-  description: string;
-  fullDescription: string;
-  videoUrl: string;
-  relatedTopics: string[];
-  learningObjectives: string[];
-  accessTier: 'free' | 'premium';
-  isFirstEpisode?: boolean;
-  seriesId?: string;
-  episodeNumber?: number;
-}
+import { Video } from '@/types/video.types'; // ✅ FIXED: Use centralized Video type
 
 interface VideoRowProps {
   title: string;
-  videos: VideoContent[];
+  videos: Video[]; // ✅ FIXED: Use Video type
   loading: boolean;
-  onPlay: (video: VideoContent) => void;
-  onUpgrade: (video: VideoContent) => void;
+  onPlay: (video: Video) => void; // ✅ FIXED
+  onUpgrade: (video: Video) => void; // ✅ FIXED
 }
 
 const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) => {
@@ -109,16 +86,16 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
             ))
           ) : (
             videos
-            .filter(video => video.id != null && !isNaN(video.id))
-            .map((video, index) => (
-              <div key={`video-${video.id}-${index}`} className="flex-none w-72">
-                <HybridVideoCard
-                  video={video}
-                  onPlay={onPlay}
-                  onUpgrade={onUpgrade}
-                />
-              </div>
-            ))
+              .filter(video => video.id != null && typeof video.id === 'string') // ✅ Filter valid UUIDs
+              .map((video, index) => (
+                <div key={`video-${video.id}-${index}`} className="flex-none w-72">
+                  <HybridVideoCard
+                    video={video}
+                    onPlay={onPlay}
+                    onUpgrade={onUpgrade}
+                  />
+                </div>
+              ))
           )}
         </div>
       </div>

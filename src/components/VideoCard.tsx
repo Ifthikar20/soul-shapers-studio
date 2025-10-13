@@ -1,3 +1,4 @@
+// src/components/VideoCard.tsx - COMPLETE FIXED VERSION
 import { memo } from "react";
 import { 
   Play, Clock, User, Star, TrendingUp, Crown
@@ -6,13 +7,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useVideoAccess } from '@/hooks/useVideoAccess';
-import { VideoContent } from '@/types/video.types';
+import { Video } from '@/types/video.types'; // ✅ FIXED: Use centralized type
 
 interface VideoCardProps {
-  video: VideoContent;
-  videos: VideoContent[];
-  onPlay: (video: VideoContent) => void;
-  onUpgrade: (video: VideoContent) => void;
+  video: Video; // ✅ FIXED: Use Video type instead of VideoContent
+  videos: Video[]; // ✅ FIXED: Use Video array
+  onPlay: (video: Video) => void; // ✅ FIXED
+  onUpgrade: (video: Video) => void; // ✅ FIXED
 }
 
 const VideoCard = memo(({ video, videos, onPlay, onUpgrade }: VideoCardProps) => {
@@ -92,7 +93,7 @@ const VideoCard = memo(({ video, videos, onPlay, onUpgrade }: VideoCardProps) =>
         <div className="flex items-center justify-between">
           <div className="flex items-center text-xs text-muted-foreground">
             <Star className="w-3 h-3 mr-1 text-yellow-500" />
-            <span>{video.rating}</span>
+            <span>{video.rating || '4.8'}</span>
             <span className="mx-2">•</span>
             <span>{video.views}</span>
           </div>
