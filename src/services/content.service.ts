@@ -1,11 +1,11 @@
 // ============================================
-// FILE: src/services/content.service.ts - FIXED VERSION
+// FILE: src/services/content.service.ts - WITH SIMPLE FALLBACK
 // ============================================
 import axios from 'axios';
-import { Video, normalizeVideo } from '@/types/video.types'; // ✅ Import normalizeVideo
+import { Video, normalizeVideo } from '@/types/video.types';
 
 interface ContentItem {
-  id: string; // UUID from backend
+  id: string;
   title: string;
   slug: string;
   description: string;
@@ -43,10 +43,6 @@ class ContentService {
     timeout: 10000,
   });
 
-  /**
-   * ✅ Get all videos for frontend display
-   * Uses normalizeVideo helper for consistent data format
-   */
   async getVideosForFrontend(category?: string): Promise<Video[]> {
     try {
       const params = new URLSearchParams();
@@ -54,16 +50,7 @@ class ContentService {
       params.append('limit', '20');
 
       const response = await this.api.get(`/content/browse?${params.toString()}`);
-      
-      console.log('📦 Raw backend data (first item):', response.data.content[0]);
-      
-      // ✅ Use normalizeVideo helper instead of custom conversion
       const videos = response.data.content.map((item: any) => normalizeVideo(item));
-      
-      console.log('📦 Converted video (first item):', {
-        id: videos[0]?.id,
-        title: videos[0]?.title
-      });
       
       return videos;
     } catch (error) {
@@ -72,33 +59,22 @@ class ContentService {
     }
   }
 
-  /**
-   * ✅ FIXED: Get single video by UUID
-   * Updated to handle backend response correctly
-   */
   async getVideoByUUID(uuid: string): Promise<Video> {
     try {
       console.log('🔍 Fetching video with UUID:', uuid);
       
-      // ✅ Try the detail endpoint first
       const response = await this.api.get(`/content/detail/${uuid}`);
-      
       console.log('✅ Video loaded from backend:', response.data);
       
-      // ✅ Use normalizeVideo to ensure consistent format
       return normalizeVideo(response.data);
     } catch (error: any) {
       console.error('❌ Failed to fetch video by UUID:', error);
-      console.error('Error response:', error.response?.data);
-      console.error('Error status:', error.response?.status);
       
-      // ✅ Better error handling
       if (error.response?.status === 404) {
         throw new Error('Video not found');
       } else if (error.response?.status === 403) {
         throw new Error('Access denied. Please upgrade your subscription.');
       } else if (error.response?.status === 500) {
-        // Backend error - try to get from browse instead
         console.warn('⚠️ Backend detail endpoint failed, trying browse endpoint...');
         return this.getVideoFromBrowse(uuid);
       } else {
@@ -107,10 +83,6 @@ class ContentService {
     }
   }
 
-  /**
-   * ✅ FALLBACK: Get video from browse endpoint if detail fails
-   * This is a workaround for backend issues
-   */
   private async getVideoFromBrowse(uuid: string): Promise<Video> {
     try {
       console.log('🔄 Attempting to fetch video from browse endpoint...');
@@ -131,47 +103,88 @@ class ContentService {
   }
 
   /**
-   * ✅ NEW: Get video streaming URLs by UUID
-   * Returns secure streaming data from backend
+   * ✅ UPDATED: Get video streaming URLs with fallback
+   * Tries multiple endpoints, then falls back to using video_url directly
    */
   async getVideoStreamData(uuid: string): Promise<{
     streamUrl: string;
     qualities: string[];
     thumbnailUrl?: string;
   }> {
+    console.log('🎬 Fetching stream data for UUID:', uuid);
+    
+    // Step 1: Try dedicated streaming endpoints
+    const streamingEndpoints = [
+      `/api/streaming/content/${uuid}/stream`,
+      `/content/${uuid}/stream`,
+      `/api/videos/${uuid}/stream`,
+    ];
+
+    for (const endpoint of streamingEndpoints) {
+      try {
+        console.log(`🔄 Trying streaming endpoint: ${endpoint}`);
+        const response = await this.api.get(endpoint);
+        
+        const streamUrl = 
+          response.data.streaming_urls?.['720p'] || 
+          response.data.streaming_urls?.['1080p'] || 
+          response.data.hls_playlist_url ||
+          response.data.stream_url ||
+          response.data.video_url;
+
+        if (streamUrl) {
+          console.log('✅ Stream URL found from streaming endpoint');
+          return {
+            streamUrl,
+            qualities: response.data.available_qualities || ['auto'],
+            thumbnailUrl: response.data.thumbnail_url,
+          };
+        }
+      } catch (error: any) {
+        console.log(`❌ Endpoint ${endpoint} failed:`, error.message);
+        
+        // Don't try other endpoints on auth errors
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          throw error;
+        }
+      }
+    }
+
+    // Step 2: Fallback - Get video_url directly from video metadata
+    console.log('⚠️ No streaming endpoints available, using video_url fallback');
+    
     try {
-      console.log('🎬 Fetching stream data for UUID:', uuid);
+      const video = await this.getVideoByUUID(uuid);
       
-      // ✅ Try streaming endpoint
-      const response = await this.api.get(`/api/streaming/content/${uuid}/stream`);
+      // Check if video has a video_url
+      if (video.videoUrl || video.video_url) {
+        const fallbackUrl = video.videoUrl || video.video_url;
+        console.log('✅ Using video_url from metadata:', fallbackUrl);
+        
+        return {
+          streamUrl: fallbackUrl,
+          qualities: ['auto'],
+          thumbnailUrl: video.thumbnail,
+        };
+      }
       
-      console.log('✅ Stream data received:', response.data);
+      // No video URL available at all
+      console.error('❌ No video_url found in metadata');
+      throw new Error('Video source not available');
       
-      return {
-        streamUrl: response.data.streaming_urls?.['720p'] || 
-                   response.data.streaming_urls?.['1080p'] || 
-                   response.data.hls_playlist_url || '',
-        qualities: response.data.available_qualities || [],
-        thumbnailUrl: response.data.thumbnail_url,
-      };
     } catch (error: any) {
-      console.error('❌ Failed to get stream data:', error);
+      console.error('❌ Fallback failed:', error);
       
       if (error.response?.status === 401) {
         throw new Error('Please sign in to watch this video');
       } else if (error.response?.status === 403) {
         throw new Error('Upgrade required to access this content');
-      } else if (error.response?.status === 404) {
-        throw new Error('Video stream not found');
       } else {
-        throw new Error('Failed to load video stream');
+        throw new Error('Failed to load video stream. Please try again.');
       }
     }
   }
 
-  /**
-   * ✅ Get all categories
-   */
   async getCategories(): Promise<{ categories: Category[]; total: number }> {
     try {
       const response = await this.api.get('/content/categories');
@@ -182,9 +195,6 @@ class ContentService {
     }
   }
 
-  /**
-   * ✅ Get browse content
-   */
   async getBrowseContent(category?: string, limit: number = 20): Promise<{
     content: ContentItem[];
     total: number;
@@ -202,13 +212,10 @@ class ContentService {
     }
   }
 
-  /**
-   * ✅ NEW: Check if video exists and user has access
-   */
   async checkVideoAccess(uuid: string): Promise<{
     hasAccess: boolean;
     requiresUpgrade: boolean;
-    tier: 'free' | 'basic' | 'premium'; // ✅ Fixed to include 'basic'
+    tier: 'free' | 'basic' | 'premium';
   }> {
     try {
       const video = await this.getVideoByUUID(uuid);
@@ -227,25 +234,29 @@ class ContentService {
     }
   }
 
-  /**
-   * ✅ NEW: Debug helper to check backend connectivity
-   */
   async debugBackendHealth(): Promise<void> {
     try {
       console.log('🔍 Testing backend connectivity...');
       console.log('📍 API Base URL:', this.api.defaults.baseURL);
       
-      // Test basic connectivity
       const response = await this.api.get('/content/categories');
       console.log('✅ Backend is reachable');
       console.log('📊 Categories endpoint working:', response.status === 200);
       
-      // Test browse endpoint
       const browseResponse = await this.api.get('/content/browse?limit=1');
       console.log('📊 Browse endpoint working:', browseResponse.status === 200);
-      console.log('📦 Sample content ID:', browseResponse.data.content[0]?.id);
+      console.log('📦 Sample content:', browseResponse.data.content[0]);
       
-      return;
+      // Check if video has video_url field
+      if (browseResponse.data.content[0]) {
+        const sampleVideo = browseResponse.data.content[0];
+        console.log('📹 Sample video fields:', {
+          id: sampleVideo.id,
+          video_url: sampleVideo.video_url ? '✅ Present' : '❌ Missing',
+          thumbnail_url: sampleVideo.thumbnail_url ? '✅ Present' : '❌ Missing',
+        });
+      }
+      
     } catch (error: any) {
       console.error('❌ Backend health check failed:', error.message);
       console.error('🔍 Error details:', {
@@ -259,7 +270,6 @@ class ContentService {
 
 export const contentService = new ContentService();
 
-// ✅ Export for debugging in console
 if (import.meta.env.DEV) {
   (window as any).contentService = contentService;
   console.log('🔧 Development mode: contentService available in console');

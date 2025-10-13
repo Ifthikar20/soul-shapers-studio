@@ -1,6 +1,4 @@
-// ============================================
-// FILE 3: src/pages/WatchPage.tsx
-// ============================================
+// src/pages/WatchPage.tsx - FIXED VERSION WITH BETTER ERROR HANDLING
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -10,11 +8,10 @@ import { contentService } from '@/services/content.service';
 import { Video, isUUID } from '@/types/video.types';
 import { toast } from 'sonner';
 import { 
-  X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft
+  X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw
 } from 'lucide-react';
 
 const WatchPage = () => {
-  // ✅ Get UUID from URL params (changed from shortId to id)
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const videoRef = useRef<HLSVideoPlayerRef>(null);
@@ -23,81 +20,102 @@ const WatchPage = () => {
   const [streamUrl, setStreamUrl] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retrying, setRetrying] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [copied, setCopied] = useState(false);
 
-  // ✅ Fetch video by UUID
-  useEffect(() => {
-    const fetchVideo = async () => {
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log('🎬 WatchPage MOUNTED');
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log('🌐 Full URL:', window.location.href);
-      console.log('📍 Pathname:', window.location.pathname);
-      console.log('🔍 id from useParams:', id);
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      
-      if (!id) {
-        console.error('❌ FAILED: No id in params');
-        setError('No video ID provided');
-        setLoading(false);
-        return;
-      }
+  // Debug info
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-      console.log('✅ PASSED: id exists:', id);
-      console.log('📏 id length:', id.length);
-      console.log('🔍 UUID validation:', isUUID(id));
+  const fetchVideo = async (isRetry = false) => {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🎬 WatchPage - Fetching Video');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('📍 Video ID:', id);
+    console.log('🌐 API URL:', apiUrl);
+    console.log('🔄 Is Retry:', isRetry);
+    
+    if (!id) {
+      console.error('❌ No video ID provided');
+      setError('No video ID provided');
+      setLoading(false);
+      return;
+    }
 
-      // ✅ Validate UUID format
-      if (!isUUID(id)) {
-        console.error('❌ FAILED: Invalid UUID format');
-        console.error('Expected: UUID (e.g., 0b8df95c-4a61-4446-b3a9-431091477455)');
-        console.error('Got:', id);
-        setError('Invalid video ID format');
-        setLoading(false);
-        return;
-      }
+    if (!isUUID(id)) {
+      console.error('❌ Invalid UUID format:', id);
+      setError('Invalid video ID format');
+      setLoading(false);
+      return;
+    }
 
-      console.log('✅ PASSED: UUID format valid');
-      console.log('🔄 Fetching video...');
-
-      try {
+    try {
+      if (isRetry) {
+        setRetrying(true);
+      } else {
         setLoading(true);
-        setError(null);
-        
-        // Fetch video metadata
-        const videoData = await contentService.getVideoByUUID(id);
-        
-        console.log('✅ VIDEO LOADED:', videoData);
-        
-        setVideo(videoData);
-        
-        // Fetch streaming URLs
-        console.log('🔄 Fetching stream data...');
-        const streamData = await contentService.getVideoStreamData(id);
-        
-        console.log('✅ STREAM DATA LOADED:', streamData);
-        
-        setStreamUrl(streamData.streamUrl);
-        
-      } catch (err: any) {
-        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.error('❌ ERROR FETCHING VIDEO');
-        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.error('Error:', err);
-        console.error('Error message:', err.message);
-        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        
-        setError(err.message || 'Failed to load video');
-      } finally {
-        setLoading(false);
       }
-    };
+      setError(null);
 
+      console.log('📥 Step 1: Fetching video metadata...');
+      const videoData = await contentService.getVideoByUUID(id);
+      console.log('✅ Video metadata loaded:', {
+        id: videoData.id,
+        title: videoData.title,
+        accessTier: videoData.accessTier
+      });
+      setVideo(videoData);
+
+      console.log('📥 Step 2: Fetching stream data...');
+      const streamData = await contentService.getVideoStreamData(id);
+      console.log('✅ Stream data loaded:', {
+        streamUrl: streamData.streamUrl ? 'Present' : 'Missing',
+        qualities: streamData.qualities,
+        thumbnailUrl: streamData.thumbnailUrl ? 'Present' : 'Missing'
+      });
+
+      if (!streamData.streamUrl) {
+        throw new Error('No stream URL returned from server');
+      }
+
+      setStreamUrl(streamData.streamUrl);
+      console.log('✅ Video loaded successfully');
+      
+    } catch (err: any) {
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.error('❌ ERROR FETCHING VIDEO');
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.error('Error:', err);
+      console.error('Error message:', err.message);
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      
+      setError(err.message || 'Failed to load video');
+      
+      // Show toast with helpful message
+      if (err.message.includes('not found')) {
+        toast.error('Video not found');
+      } else if (err.message.includes('Access denied')) {
+        toast.error('Upgrade required to watch this video');
+      } else {
+        toast.error('Failed to load video. Please try again.');
+      }
+      
+    } finally {
+      setLoading(false);
+      setRetrying(false);
+    }
+  };
+
+  useEffect(() => {
     fetchVideo();
   }, [id]);
 
-  // ✅ Handle share/copy link with UUID
+  const handleRetry = () => {
+    fetchVideo(true);
+  };
+
   const handleCopyLink = () => {
     if (!video) return;
     
@@ -118,34 +136,71 @@ const WatchPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-4" />
+        <div className="text-center space-y-4">
+          <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto" />
           <p className="text-gray-400">Loading video...</p>
+          <p className="text-xs text-gray-600">
+            Video ID: {id}
+          </p>
         </div>
       </div>
     );
   }
 
-  // Error state
+  // Error state with retry option
   if (error || !video) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">
-            {error || 'Video not found'}
-          </h2>
-          <p className="text-gray-400 mb-6">
-            The video you're looking for doesn't exist or has been removed.
-          </p>
-          <Button
-            onClick={() => navigate('/browse')}
-            variant="outline"
-            className="border-gray-700 text-white hover:bg-gray-800"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Browse
-          </Button>
+        <div className="text-center max-w-md space-y-6">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
+          
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              {error || 'Video not found'}
+            </h2>
+            <p className="text-gray-400 mb-2">
+              The video you're looking for doesn't exist or has been removed.
+            </p>
+          </div>
+
+          {/* Debug Info */}
+          <div className="bg-gray-900 p-4 rounded-lg text-left text-xs text-gray-500 space-y-1">
+            <p className="font-bold text-gray-400 mb-2">Debug Info:</p>
+            <p>Video ID: {id}</p>
+            <p>Error: {error || 'Unknown error'}</p>
+            <p>API URL: {apiUrl}</p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 justify-center">
+            <Button
+              onClick={handleRetry}
+              disabled={retrying}
+              variant="outline"
+              className="border-gray-700 text-white hover:bg-gray-800"
+            >
+              {retrying ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Retrying...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Try Again
+                </>
+              )}
+            </Button>
+            
+            <Button
+              onClick={() => navigate('/browse')}
+              variant="outline"
+              className="border-gray-700 text-white hover:bg-gray-800"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Browse
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -154,6 +209,7 @@ const WatchPage = () => {
   // Success - render video player
   return (
     <div className="min-h-screen bg-black">
+      {/* Close Button */}
       <div className="relative">
         <Button
           variant="ghost"
@@ -164,17 +220,28 @@ const WatchPage = () => {
           <X className="w-5 h-5" />
         </Button>
 
+        {/* Video Player */}
         <div className="relative w-full aspect-video bg-black max-w-[1920px] mx-auto">
-          <HLSVideoPlayer
-            ref={videoRef}
-            src={streamUrl}
-            poster={video.thumbnail}
-            className="w-full h-full"
-            autoPlay={true}
-          />
+          {streamUrl ? (
+            <HLSVideoPlayer
+              ref={videoRef}
+              src={streamUrl}
+              poster={video.thumbnail}
+              className="w-full h-full"
+              autoPlay={true}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-black">
+              <div className="text-center text-white">
+                <AlertCircle className="w-12 h-12 mx-auto mb-4" />
+                <p>No stream URL available</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Video Info */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-white mb-4">{video.title}</h1>
         
@@ -201,9 +268,46 @@ const WatchPage = () => {
           )}
         </div>
 
-        <p className="text-gray-300 leading-relaxed">
+        <p className="text-gray-300 leading-relaxed mb-6">
           {video.fullDescription || video.description}
         </p>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <Button
+            onClick={handleCopyLink}
+            variant="outline"
+            className="border-gray-700 text-white hover:bg-gray-800"
+          >
+            {copied ? (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </>
+            )}
+          </Button>
+          
+          <Button
+            variant="outline"
+            className="border-gray-700 text-white hover:bg-gray-800"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add to List
+          </Button>
+          
+          <Button
+            variant="outline"
+            className="border-gray-700 text-white hover:bg-gray-800"
+          >
+            <ThumbsUp className="w-4 h-4 mr-2" />
+            Like
+          </Button>
+        </div>
       </div>
     </div>
   );
