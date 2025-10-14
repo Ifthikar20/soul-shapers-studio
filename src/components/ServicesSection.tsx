@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
 // Import watercolor images
-import watercolor1 from '/src/assets/watercolor-1.png';
-import watercolor2 from '/src/assets/watercolor-2.png';
+import watercolor1 from '/src/assets/watercolor-0.png';
+import watercolor2 from '/src/assets/watercolor-5.png';
+import watercolor6 from '/src/assets/watercolor-6.png';
 
 const ServicesSection = () => {
   const [activeService, setActiveService] = useState(0);
@@ -21,7 +22,7 @@ const ServicesSection = () => {
     {
       title: "Share your story and upvote it",
       description: "Connect with others on similar wellness journeys. Share experiences, offer support, and build meaningful connections in a safe, moderated environment.",
-      image: watercolor1
+      image: watercolor6
     },
     {
       title: "Grow Your Milestone, earn wellness points",

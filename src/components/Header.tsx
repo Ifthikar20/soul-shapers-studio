@@ -182,17 +182,17 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     return (
       <div className="relative max-w-md mx-auto">
         <form onSubmit={handleSearchSubmit} className="relative group">
-          <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors ${
+          <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
             getTextClasses('secondary')
           }`} />
           <Input
             placeholder="Search wellness topics, experts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`pl-12 pr-4 h-11 rounded-full transition-all duration-300 focus:ring-2 focus:ring-primary/20 ${
+            className={`pl-12 pr-4 h-12 text-base rounded-full transition-all duration-300 focus:ring-2 focus:ring-primary/30 shadow-md ${
               isScrolled
-                ? 'bg-background/80 border-border/40 text-foreground placeholder:text-muted-foreground/70'
-                : 'bg-white/10 border-white/20 text-black placeholder:text-black/50'
+                ? 'bg-background/90 border-2 border-primary/40 text-foreground placeholder:text-muted-foreground/70'
+                : 'bg-white/20 border-2 border-white/40 text-black placeholder:text-black/50'
             }`}
           />
           
@@ -221,7 +221,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   const CategoriesDropdown = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className={`font-medium flex items-center gap-1 transition-all hover:scale-105 ${getTextClasses()}`}>
+        <Button variant="ghost" className={`font-medium text-base flex items-center gap-1 transition-all hover:scale-105 ${getTextClasses()}`}>
           Categories
           <ChevronDown className="w-3 h-3 transition-transform" />
         </Button>
@@ -250,7 +250,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   const ExpertsDropdown = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className={`font-medium flex items-center gap-1 transition-all hover:scale-105 ${getTextClasses()}`}>
+        <Button variant="ghost" className={`font-medium text-base flex items-center gap-1 transition-all hover:scale-105 ${getTextClasses()}`}>
           Experts
           <ChevronDown className="w-3 h-3 transition-transform" />
         </Button>
@@ -296,7 +296,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             key={item.href}
             variant="ghost"
             onClick={() => navigate(item.href)}
-            className={`font-medium transition-all hover:scale-105 ${getTextClasses()}`}
+            className={`font-medium text-base transition-all hover:scale-105 ${getTextClasses()}`}
           >
             {item.label}
           </Button>
@@ -390,11 +390,11 @@ const Header = ({ onShowAuth }: HeaderProps) => {
       <div className="flex items-center gap-3">
         <Button 
           variant="ghost" 
-          className={`font-medium rounded-full hover:scale-105 transition-all ${
+          className={`font-medium text-base rounded-full hover:scale-105 transition-all border ring-2 ring-purple-400/50 bg-purple-50 hover:bg-purple-100 ${
             isScrolled 
               ? 'text-foreground hover:text-primary border-border/40' 
-              : 'text-black hover:text-black/90 border-white/30'
-          } border`}
+              : 'text-black hover:text-black/90 border-white/40'
+          }`}
           onClick={() => navigate('/login')}
         >
           Sign In

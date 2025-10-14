@@ -8,7 +8,7 @@ import logoLeaf from '/src/assets/logo-leaf.png';
 import logoTarget from '/src/assets/logo-target.png';
 
 // Import watercolor images
-import watercolor1 from '/src/assets/watercolor-1.png';
+import watercolor1 from '/src/assets/watercolor-4.png';
 import watercolor2 from '/src/assets/watercolor-2.png';
 
 const Categories = () => {
