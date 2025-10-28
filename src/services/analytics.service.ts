@@ -3,6 +3,7 @@ import ReactGA from 'react-ga4';
 import { GA_CONFIG, GA_DEBUG } from '@/config/analytics.config';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 interface VideoMetadata {
   content_id: string;
@@ -14,6 +15,18 @@ interface VideoMetadata {
   expert: string | null;
   series: string | null;
   episode_number: number | null;
+}
+
+// Backend view tracking interface
+export interface TrackViewParams {
+  content_id: string;
+  video_title?: string;
+  category?: string;
+  expert?: string;
+  duration_seconds?: number;
+  user_id?: string;
+  session_id?: string;
+  watch_duration?: number;
 }
 
 class AnalyticsService {
@@ -396,6 +409,76 @@ class AnalyticsService {
 
     if (GA_DEBUG) {
       console.log('📊 Custom event tracked:', eventName, parameters);
+    }
+  }
+
+  /**
+   * Track view on backend (for view counting)
+   * This is separate from Google Analytics tracking
+   */
+  async trackView(params: TrackViewParams): Promise<void> {
+    try {
+      const response = await fetch(`${API_URL}/api/analytics/track/view`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(params)
+      });
+
+      if (!response.ok) {
+        console.warn('Failed to track view on backend:', response.status);
+        return;
+      }
+
+      console.log('✅ Backend view tracked:', params.content_id);
+    } catch (error) {
+      console.error('Failed to track view on backend:', error);
+      // Don't throw - tracking failures shouldn't break the app
+    }
+  }
+
+  /**
+   * Get view count for a specific content
+   */
+  async getViewCount(contentId: string): Promise<number> {
+    try {
+      const response = await fetch(`${API_URL}/api/analytics/views/${contentId}`, {
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        console.warn('Failed to get view count:', response.status);
+        return 0;
+      }
+
+      const data = await response.json();
+      return data.view_count || 0;
+    } catch (error) {
+      console.error('Failed to get view count:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Get trending content
+   */
+  async getTrending(limit: number = 10, days: number = 7) {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/analytics/trending?limit=${limit}&days=${days}`,
+        { credentials: 'include' }
+      );
+
+      if (!response.ok) {
+        console.warn('Failed to get trending content:', response.status);
+        return [];
+      }
+
+      const data = await response.json();
+      return data.trending_content || [];
+    } catch (error) {
+      console.error('Failed to get trending content:', error);
+      return [];
     }
   }
 

@@ -1,6 +1,6 @@
 // src/pages/WatchPage.tsx - FIXED VERSION WITH BETTER ERROR HANDLING
 import { useParams, useNavigate } from 'react-router-dom';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import HLSVideoPlayer, { HLSVideoPlayerRef } from '@/components/VideoModal/HLSVideoPlayer';
@@ -8,7 +8,7 @@ import { contentService } from '@/services/content.service';
 import { Video, isUUID } from '@/types/video.types';
 import { toast } from 'sonner';
 import { analyticsService } from '@/services/analytics.service';
-import { 
+import {
   X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw
 } from 'lucide-react';
 
@@ -16,7 +16,7 @@ const WatchPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const videoRef = useRef<HLSVideoPlayerRef>(null);
-  
+
   const [video, setVideo] = useState<Video | null>(null);
   const [streamUrl, setStreamUrl] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -24,6 +24,7 @@ const WatchPage = () => {
   const [retrying, setRetrying] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [copied, setCopied] = useState(false);
+  const [viewTracked, setViewTracked] = useState(false);
 
   // Debug info
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -81,7 +82,10 @@ const WatchPage = () => {
 
       setStreamUrl(streamData.streamUrl);
       console.log('✅ Video loaded successfully');
-      
+
+      // Track view when stream loads successfully
+      await trackVideoView(videoData);
+
     } catch (err: any) {
       console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.error('❌ ERROR FETCHING VIDEO');
@@ -109,31 +113,38 @@ const WatchPage = () => {
     }
   };
 
+  // Track video view (call once when video starts)
+  const trackVideoView = useCallback(async (videoData: Video) => {
+    if (viewTracked || !videoData?.id) return;
+
+    try {
+      // Generate or get session ID
+      const sessionId = sessionStorage.getItem('sessionId') ||
+        (() => {
+          const id = crypto.randomUUID();
+          sessionStorage.setItem('sessionId', id);
+          return id;
+        })();
+
+      await analyticsService.trackView({
+        content_id: videoData.id,
+        video_title: videoData.title,
+        category: videoData.category_name || videoData.category,
+        expert: videoData.expert,
+        duration_seconds: videoData.duration_seconds,
+        session_id: sessionId
+      });
+
+      setViewTracked(true);
+      console.log('✅ Video view tracked:', videoData.title);
+    } catch (error) {
+      console.error('❌ Failed to track video view:', error);
+    }
+  }, [viewTracked]);
+
   useEffect(() => {
     fetchVideo();
   }, [id]);
-  
-  useEffect(() => {
-    const fetchStream = async () => {
-      if (!id || !video) return;
-  
-      try {
-        setStreamLoading(true);
-        const streamData = await contentService.getVideoStreamData(id);
-        setStreamUrl(streamData.streaming_urls['720p'] || streamData.streaming_urls['1080p']);
-  
-        // ✅ ADD THIS: Track view when stream loads successfully
-        await trackVideoView();
-  
-      } catch (err) {
-        console.error('Failed to load stream:', err);
-      } finally {
-        setStreamLoading(false);
-      }
-    };
-  
-    fetchStream();
-  }, [id, video]);
 
   const handleRetry = () => {
     fetchVideo(true);
@@ -141,9 +152,9 @@ const WatchPage = () => {
 
   const handleCopyLink = () => {
     if (!video) return;
-    
+
     const shareUrl = `${window.location.origin}/watch/${video.id}`;
-    
+
     navigator.clipboard.writeText(shareUrl)
       .then(() => {
         setCopied(true);
@@ -153,26 +164,6 @@ const WatchPage = () => {
       .catch(() => {
         toast.error('Failed to copy link');
       });
-  };
-
-  const trackVideoView = async () => {
-    if (!video?.id) return;
-  
-    try {
-      await analyticsService.trackView({
-        content_id: video.id,
-        video_title: video.title,
-        category: video.category_name,
-        expert: video.expert_name,
-        duration_seconds: video.duration_seconds,
-        user_id: user?.id, // if you have user context
-        session_id: sessionStorage.getItem('sessionId') || undefined
-      });
-  
-      console.log('✅ Video view tracked:', video.id);
-    } catch (error) {
-      console.error('Failed to track video view:', error);
-    }
   };
 
   // Loading state
