@@ -3,16 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import HLSVideoPlayer, { HLSVideoPlayerRef } from '@/components/VideoModal/HLSVideoPlayer';
 import { contentService } from '@/services/content.service';
 import { Video, isUUID } from '@/types/video.types';
 import { toast } from 'sonner';
 import { analyticsService } from '@/services/analytics.service';
-import { dummySeriesVideos, dummyRelatedVideos } from '@/data/dummyVideos';
+import { dummySeriesVideos } from '@/data/dummyVideos';
 import {
   X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw,
-  PlayCircle, Clock, BookOpen, Hash, ChevronRight
+  Clock, BookOpen, Hash
 } from 'lucide-react';
 
 const WatchPage = () => {
@@ -28,7 +27,6 @@ const WatchPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [copied, setCopied] = useState(false);
   const [viewTracked, setViewTracked] = useState(false);
-  const [relatedVideos, setRelatedVideos] = useState<Video[]>([]);
   const [seriesEpisodes, setSeriesEpisodes] = useState<Video[]>([]);
 
   // Debug info
@@ -147,23 +145,17 @@ const WatchPage = () => {
     }
   }, [viewTracked]);
 
-  // Fetch related videos and next episodes
+  // Fetch next episodes
   const fetchRelatedContent = useCallback(async (currentVideo: Video) => {
     try {
       // Try to fetch videos from the same category from API
       let allVideos: Video[] = [];
-      let apiRelatedVideos: Video[] = [];
 
       try {
         allVideos = await contentService.getVideosForFrontend(currentVideo.category);
-        apiRelatedVideos = allVideos.filter(v => v.id !== currentVideo.id).slice(0, 6);
       } catch (error) {
         console.log('API fetch failed, using dummy data');
       }
-
-      // Use API data if available, otherwise use dummy data
-      const relatedToShow = apiRelatedVideos.length > 0 ? apiRelatedVideos : dummyRelatedVideos;
-      setRelatedVideos(relatedToShow);
 
       // Check if video is part of a series
       if (currentVideo.series_id || currentVideo.seriesId) {
@@ -204,7 +196,6 @@ const WatchPage = () => {
     } catch (error) {
       console.error('Failed to fetch related content:', error);
       // Fallback to dummy data on error
-      setRelatedVideos(dummyRelatedVideos);
       setSeriesEpisodes(dummySeriesVideos.slice(1, 4)); // Episodes 2, 3, 4
     }
   }, []);
@@ -418,144 +409,87 @@ const WatchPage = () => {
         </div>
 
         {/* Content Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Learning Objectives */}
-            {video.learningObjectives && video.learningObjectives.length > 0 && (
-              <Card className="bg-gray-900 border-gray-800">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-purple-500" />
-                    What You'll Learn
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {video.learningObjectives.map((objective, index) => (
-                      <li key={index} className="text-gray-300 flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span>{objective}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
+        <div className="max-w-4xl">
+          {/* Learning Objectives */}
+          {video.learningObjectives && video.learningObjectives.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-purple-500" />
+                What You'll Learn
+              </h2>
+              <ul className="space-y-2">
+                {video.learningObjectives.map((objective, index) => (
+                  <li key={index} className="text-gray-300 flex items-start gap-2">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>{objective}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-            {/* Related Topics */}
-            {video.relatedTopics && video.relatedTopics.length > 0 && (
-              <Card className="bg-gray-900 border-gray-800">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Hash className="w-5 h-5 text-purple-500" />
-                    Related Topics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {video.relatedTopics.map((topic, index) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 cursor-pointer"
-                      >
-                        {topic}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+          {/* Related Topics */}
+          {video.relatedTopics && video.relatedTopics.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
+                <Hash className="w-5 h-5 text-purple-500" />
+                Related Topics
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {video.relatedTopics.map((topic, index) => (
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 cursor-pointer"
+                  >
+                    {topic}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
 
-            {/* Next Episodes */}
-            {seriesEpisodes.length > 0 && (
-              <div className="space-y-6">
-                {seriesEpisodes.map((episode) => {
-                  const episodeNum = episode.episode_number || episode.episodeNumber;
+          {/* Next Episodes */}
+          {seriesEpisodes.length > 0 && (
+            <div className="space-y-4">
+              {seriesEpisodes.map((episode) => {
+                const episodeNum = episode.episode_number || episode.episodeNumber;
 
-                  return (
-                    <div
-                      key={episode.id}
-                      onClick={() => navigate(`/watch/${episode.id}`)}
-                      className="cursor-pointer group"
-                    >
-                      <div className="relative overflow-hidden rounded-lg mb-3">
-                        <img
-                          src={episode.thumbnail}
-                          alt={episode.title}
-                          className="w-full aspect-video object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        {episodeNum && (
-                          <div className="absolute top-3 left-3 bg-black/90 text-white text-sm px-3 py-1 rounded">
-                            Episode {episodeNum}
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
-                          <PlayCircle className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                return (
+                  <div
+                    key={episode.id}
+                    onClick={() => navigate(`/watch/${episode.id}`)}
+                    className="flex gap-4 cursor-pointer group py-2"
+                  >
+                    <div className="relative flex-shrink-0 w-48">
+                      <img
+                        src={episode.thumbnail}
+                        alt={episode.title}
+                        className="w-full aspect-video object-cover rounded"
+                      />
+                      {episodeNum && (
+                        <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded">
+                          Episode {episodeNum}
                         </div>
-                      </div>
-                      <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-purple-400 transition-colors">
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-white font-medium text-base mb-1 group-hover:text-purple-400 transition-colors line-clamp-1">
                         {episode.title}
                       </h3>
                       <p className="text-gray-400 text-sm line-clamp-2 mb-2">
                         {episode.description}
                       </p>
-                      <div className="flex items-center gap-3 text-sm text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {episode.duration}
-                        </span>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <Clock className="w-3 h-3" />
+                        <span>{episode.duration}</span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Right Column - Related Videos */}
-          <div className="lg:col-span-1">
-            {relatedVideos.length > 0 && (
-              <Card className="bg-gray-900 border-gray-800">
-                <CardHeader>
-                  <CardTitle className="text-white">More Like This</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {relatedVideos.map((relatedVideo) => (
-                      <div
-                        key={relatedVideo.id}
-                        onClick={() => navigate(`/watch/${relatedVideo.id}`)}
-                        className="group cursor-pointer"
-                      >
-                        <div className="relative mb-2 overflow-hidden rounded-lg">
-                          <img
-                            src={relatedVideo.thumbnail}
-                            alt={relatedVideo.title}
-                            className="w-full h-32 object-cover transition-transform group-hover:scale-105"
-                          />
-                          <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                            {relatedVideo.duration}
-                          </div>
-                        </div>
-                        <h4 className="text-white font-medium text-sm mb-1 line-clamp-2 group-hover:text-purple-400 transition-colors">
-                          {relatedVideo.title}
-                        </h4>
-                        <p className="text-gray-400 text-xs mb-1">{relatedVideo.expert}</p>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <span>{relatedVideo.views} views</span>
-                          {relatedVideo.isNew && (
-                            <Badge className="bg-purple-600 text-white text-xs">New</Badge>
-                          )}
-                        </div>
-                      </div>
-                    ))}
                   </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
