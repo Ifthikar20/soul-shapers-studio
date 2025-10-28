@@ -4,8 +4,8 @@ import betterBlissLogo from "@/assets/betterandblisslogo.png";
 const Footer = () => {
   return (
     <footer className="bg-gradient-card/50 border-t border-border/20 backdrop-blur-sm">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
@@ -100,7 +100,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-border/20 mt-12 pt-8 text-center">
+        <div className="border-t border-border/20 mt-6 pt-4 text-center">
           <p className="text-muted-foreground text-sm">
             © 2024 Better & Bliss. All rights reserved. • Your mental health matters. • 
             <span className="bg-gradient-primary bg-clip-text text-transparent font-medium">
