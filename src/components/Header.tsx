@@ -1,7 +1,8 @@
-// src/components/Header.tsx - Updated with auth-only search
+// src/components/Header.tsx - Updated with secure search
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSecureSearch } from "@/hooks/useSecureSearch";
 import {
   Search,
   User,
@@ -83,10 +84,25 @@ const NAVIGATION_CONFIG = {
 };
 
 const Header = ({ onShowAuth }: HeaderProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, loading } = useAuth();
+
+  // Secure search hook with validation and rate limiting
+  const {
+    searchState,
+    setQuery,
+    performSearch,
+    canSearch,
+    isRateLimited,
+  } = useSecureSearch({
+    autoValidate: true,
+    onSearchError: (errors) => {
+      console.error('Search validation failed:', errors);
+    },
+    debounceMs: 300,
+  });
 
   useEffect(() => {
     let ticking = false;
@@ -104,27 +120,30 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSearch = (query: string) => {
-    if (!isAuthenticated) {
-      // Redirect to login if not authenticated
-      navigate('/login', { 
-        state: { 
-          from: { pathname: `/browse?q=${encodeURIComponent(query.trim())}` },
-          message: 'Please sign in to search content'
-        } 
-      });
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowSearchSuggestions(false);
+
+    if (!canSearch) {
+      if (isRateLimited) {
+        alert('Too many search requests. Please wait a moment before searching again.');
+      }
       return;
     }
 
-    if (query.trim()) {
-      // Navigate to browse page with search query
-      navigate(`/browse?q=${encodeURIComponent(query.trim())}`);
-    }
+    performSearch('/browse');
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSearch(searchQuery);
+  const handleSuggestionClick = (suggestion: string) => {
+    setQuery(suggestion);
+    setShowSearchSuggestions(false);
+
+    // Small delay to allow state to update
+    setTimeout(() => {
+      if (canSearch) {
+        performSearch('/browse');
+      }
+    }, 100);
   };
 
   const handleLogout = async () => {
@@ -187,16 +206,42 @@ const Header = ({ onShowAuth }: HeaderProps) => {
           }`} />
           <Input
             placeholder="Search wellness topics, experts..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchState.query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setShowSearchSuggestions(!!e.target.value.trim());
+            }}
+            onFocus={() => setShowSearchSuggestions(!!searchState.query.trim())}
+            onBlur={() => setTimeout(() => setShowSearchSuggestions(false), 200)}
+            disabled={isRateLimited}
             className={`pl-12 pr-4 h-12 text-base rounded-full transition-all duration-300 focus:ring-2 focus:ring-primary/30 shadow-md ${
               isScrolled
                 ? 'bg-background/90 border-2 border-primary/40 text-foreground placeholder:text-muted-foreground/70'
                 : 'bg-white/20 border-2 border-white/40 text-black placeholder:text-black/50'
-            }`}
+            } ${searchState.errors.length > 0 ? 'border-red-500' : ''} ${isRateLimited ? 'opacity-50 cursor-not-allowed' : ''}`}
           />
-          
-          {searchQuery && (
+
+          {/* Rate limit warning */}
+          {isRateLimited && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-red-50 border border-red-200 rounded-xl p-3 z-50 animate-in slide-in-from-top-2">
+              <p className="text-xs text-red-600 font-medium">
+                Too many searches. Please wait a moment before searching again.
+              </p>
+            </div>
+          )}
+
+          {/* Validation errors */}
+          {!isRateLimited && searchState.errors.length > 0 && searchState.query && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-red-50 border border-red-200 rounded-xl p-3 z-50 animate-in slide-in-from-top-2">
+              <p className="text-xs text-red-600 font-medium mb-1">Search Error:</p>
+              {searchState.errors.map((error, index) => (
+                <p key={index} className="text-xs text-red-600">{error}</p>
+              ))}
+            </div>
+          )}
+
+          {/* Search suggestions */}
+          {!isRateLimited && showSearchSuggestions && searchState.errors.length === 0 && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border/20 rounded-xl shadow-lg p-3 z-50 animate-in slide-in-from-top-2">
               <p className="text-xs text-muted-foreground mb-2">Popular searches:</p>
               <div className="flex flex-wrap gap-2">
@@ -205,12 +250,21 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                     key={index}
                     variant="secondary"
                     className="cursor-pointer hover:bg-primary hover:text-white text-s rounded-full transition-colors"
-                    onClick={() => handleSearch(suggestion)}
+                    onClick={() => handleSuggestionClick(suggestion)}
                   >
                     {suggestion}
                   </Badge>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Warning messages */}
+          {searchState.warnings.length > 0 && searchState.query && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-yellow-50 border border-yellow-200 rounded-xl p-3 z-50 animate-in slide-in-from-top-2">
+              {searchState.warnings.map((warning, index) => (
+                <p key={index} className="text-xs text-yellow-700">{warning}</p>
+              ))}
             </div>
           )}
         </form>
