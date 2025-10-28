@@ -147,7 +147,7 @@ const WatchPage = () => {
     }
   }, [viewTracked]);
 
-  // Fetch related videos and next episode
+  // Fetch related videos and next episodes
   const fetchRelatedContent = useCallback(async (currentVideo: Video) => {
     try {
       // Try to fetch videos from the same category from API
@@ -170,8 +170,8 @@ const WatchPage = () => {
         const seriesId = currentVideo.series_id || currentVideo.seriesId;
         const currentEpisodeNum = currentVideo.episode_number || currentVideo.episodeNumber || 0;
 
-        // Try to find next episode from API data
-        let nextEpisode: Video | null = null;
+        // Try to find next episodes from API data
+        let nextEpisodes: Video[] = [];
 
         if (allVideos.length > 0) {
           const allSeriesEpisodes = allVideos
@@ -182,34 +182,30 @@ const WatchPage = () => {
               return aEp - bEp;
             });
 
-          nextEpisode = allSeriesEpisodes.find(ep => {
+          nextEpisodes = allSeriesEpisodes.filter(ep => {
             const epNum = ep.episode_number || ep.episodeNumber || 0;
             return epNum > currentEpisodeNum;
-          }) || null;
+          }).slice(0, 3); // Get next 3 episodes
         }
 
-        // Fallback to dummy data if no next episode found
-        if (!nextEpisode && currentEpisodeNum < 5) {
-          nextEpisode = dummySeriesVideos.find(ep =>
-            ep.episode_number === currentEpisodeNum + 1
-          ) || null;
+        // Fallback to dummy data if no next episodes found
+        if (nextEpisodes.length === 0) {
+          nextEpisodes = dummySeriesVideos.filter(ep =>
+            (ep.episode_number || 0) > currentEpisodeNum && (ep.episode_number || 0) <= currentEpisodeNum + 3
+          );
         }
 
-        setSeriesEpisodes(nextEpisode ? [nextEpisode] : []);
+        setSeriesEpisodes(nextEpisodes);
       } else {
-        // For videos not in a series, show dummy next episode for demonstration
-        // This helps users see the feature even when watching standalone videos
-        const currentEpNum = 1; // Treat as episode 1
-        const dummyNext = dummySeriesVideos.find(ep => ep.episode_number === currentEpNum + 1);
-        if (dummyNext) {
-          setSeriesEpisodes([dummyNext]);
-        }
+        // For videos not in a series, show dummy next episodes for demonstration
+        const dummyNext = dummySeriesVideos.slice(1, 4); // Episodes 2, 3, 4
+        setSeriesEpisodes(dummyNext);
       }
     } catch (error) {
       console.error('Failed to fetch related content:', error);
       // Fallback to dummy data on error
       setRelatedVideos(dummyRelatedVideos);
-      setSeriesEpisodes([dummySeriesVideos[1]]); // Show episode 2 as next
+      setSeriesEpisodes(dummySeriesVideos.slice(1, 4)); // Episodes 2, 3, 4
     }
   }, []);
 
@@ -472,63 +468,49 @@ const WatchPage = () => {
               </Card>
             )}
 
-            {/* Next Episode */}
+            {/* Next Episodes */}
             {seriesEpisodes.length > 0 && (
-              <Card className="bg-gray-900 border-gray-800 hover:border-purple-500/50 transition-all">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white text-base font-medium">
-                    Next Episode
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  {seriesEpisodes.map((episode) => {
-                    const episodeNum = episode.episode_number || episode.episodeNumber;
+              <div className="space-y-6">
+                {seriesEpisodes.map((episode) => {
+                  const episodeNum = episode.episode_number || episode.episodeNumber;
 
-                    return (
-                      <div
-                        key={episode.id}
-                        onClick={() => navigate(`/watch/${episode.id}`)}
-                        className="cursor-pointer group"
-                      >
-                        <div className="relative overflow-hidden">
-                          <img
-                            src={episode.thumbnail}
-                            alt={episode.title}
-                            className="w-full aspect-video object-cover transition-transform duration-300 group-hover:scale-105"
-                          />
-                          {episodeNum && (
-                            <Badge className="absolute top-3 left-3 bg-black/80 text-white">
-                              Episode {episodeNum}
-                            </Badge>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                            <div className="bg-purple-600 rounded-full p-4">
-                              <PlayCircle className="w-12 h-12 text-white" />
-                            </div>
+                  return (
+                    <div
+                      key={episode.id}
+                      onClick={() => navigate(`/watch/${episode.id}`)}
+                      className="cursor-pointer group"
+                    >
+                      <div className="relative overflow-hidden rounded-lg mb-3">
+                        <img
+                          src={episode.thumbnail}
+                          alt={episode.title}
+                          className="w-full aspect-video object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        {episodeNum && (
+                          <div className="absolute top-3 left-3 bg-black/90 text-white text-sm px-3 py-1 rounded">
+                            Episode {episodeNum}
                           </div>
-                        </div>
-                        <div className="p-4">
-                          <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-purple-400 transition-colors">
-                            {episode.title}
-                          </h3>
-                          <p className="text-gray-400 text-sm line-clamp-2 mb-3">
-                            {episode.description}
-                          </p>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-4 h-4" />
-                              {episode.duration}
-                            </span>
-                            {episode.views && (
-                              <span>{episode.views} views</span>
-                            )}
-                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
+                          <PlayCircle className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>
                       </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
+                      <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-purple-400 transition-colors">
+                        {episode.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm line-clamp-2 mb-2">
+                        {episode.description}
+                      </p>
+                      <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {episode.duration}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
 
