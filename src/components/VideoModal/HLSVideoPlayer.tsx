@@ -32,6 +32,7 @@ const HLSVideoPlayer = React.forwardRef<HLSVideoPlayerRef, HLSVideoPlayerProps>(
   controls = false, // Custom controls, so disable native
   poster,
   onError,
+  onPlay,
   onTimeUpdate,
   onDurationChange,
   onPause,
