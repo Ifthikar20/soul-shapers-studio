@@ -9,6 +9,7 @@ import { contentService } from '@/services/content.service';
 import { Video, isUUID } from '@/types/video.types';
 import { toast } from 'sonner';
 import { analyticsService } from '@/services/analytics.service';
+import { dummySeriesVideos, dummyRelatedVideos } from '@/data/dummyVideos';
 import {
   X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw,
   PlayCircle, Clock, BookOpen, Hash, ChevronRight
@@ -149,39 +150,66 @@ const WatchPage = () => {
   // Fetch related videos and next episode
   const fetchRelatedContent = useCallback(async (currentVideo: Video) => {
     try {
-      // Fetch videos from the same category
-      const allVideos = await contentService.getVideosForFrontend(currentVideo.category);
+      // Try to fetch videos from the same category from API
+      let allVideos: Video[] = [];
+      let apiRelatedVideos: Video[] = [];
 
-      // Filter out current video and get random 6
-      const related = allVideos
-        .filter(v => v.id !== currentVideo.id)
-        .slice(0, 6);
+      try {
+        allVideos = await contentService.getVideosForFrontend(currentVideo.category);
+        apiRelatedVideos = allVideos.filter(v => v.id !== currentVideo.id).slice(0, 6);
+      } catch (error) {
+        console.log('API fetch failed, using dummy data');
+      }
 
-      setRelatedVideos(related);
+      // Use API data if available, otherwise use dummy data
+      const relatedToShow = apiRelatedVideos.length > 0 ? apiRelatedVideos : dummyRelatedVideos;
+      setRelatedVideos(relatedToShow);
 
-      // If video is part of a series, find the next episode
+      // Check if video is part of a series
       if (currentVideo.series_id || currentVideo.seriesId) {
         const seriesId = currentVideo.series_id || currentVideo.seriesId;
         const currentEpisodeNum = currentVideo.episode_number || currentVideo.episodeNumber || 0;
 
-        const allSeriesEpisodes = allVideos
-          .filter(v => (v.series_id || v.seriesId) === seriesId)
-          .sort((a, b) => {
-            const aEp = a.episode_number || a.episodeNumber || 0;
-            const bEp = b.episode_number || b.episodeNumber || 0;
-            return aEp - bEp;
-          });
+        // Try to find next episode from API data
+        let nextEpisode: Video | null = null;
 
-        // Find next episode only
-        const nextEpisode = allSeriesEpisodes.find(ep => {
-          const epNum = ep.episode_number || ep.episodeNumber || 0;
-          return epNum > currentEpisodeNum;
-        });
+        if (allVideos.length > 0) {
+          const allSeriesEpisodes = allVideos
+            .filter(v => (v.series_id || v.seriesId) === seriesId)
+            .sort((a, b) => {
+              const aEp = a.episode_number || a.episodeNumber || 0;
+              const bEp = b.episode_number || b.episodeNumber || 0;
+              return aEp - bEp;
+            });
+
+          nextEpisode = allSeriesEpisodes.find(ep => {
+            const epNum = ep.episode_number || ep.episodeNumber || 0;
+            return epNum > currentEpisodeNum;
+          }) || null;
+        }
+
+        // Fallback to dummy data if no next episode found
+        if (!nextEpisode && currentEpisodeNum < 5) {
+          nextEpisode = dummySeriesVideos.find(ep =>
+            ep.episode_number === currentEpisodeNum + 1
+          ) || null;
+        }
 
         setSeriesEpisodes(nextEpisode ? [nextEpisode] : []);
+      } else {
+        // For videos not in a series, show dummy next episode for demonstration
+        // This helps users see the feature even when watching standalone videos
+        const currentEpNum = 1; // Treat as episode 1
+        const dummyNext = dummySeriesVideos.find(ep => ep.episode_number === currentEpNum + 1);
+        if (dummyNext) {
+          setSeriesEpisodes([dummyNext]);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch related content:', error);
+      // Fallback to dummy data on error
+      setRelatedVideos(dummyRelatedVideos);
+      setSeriesEpisodes([dummySeriesVideos[1]]); // Show episode 2 as next
     }
   }, []);
 
