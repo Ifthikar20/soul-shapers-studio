@@ -249,7 +249,10 @@ const HLSVideoPlayer = React.forwardRef<HLSVideoPlayerRef, HLSVideoPlayerProps>(
       if (onDurationChange) onDurationChange(dur);
     };
 
-    const handlePlay = () => setIsPlaying(true);
+    const handlePlay = () => {
+      setIsPlaying(true);
+      if (onPlay) onPlay();
+    };
     const handlePause = () => {
       setIsPlaying(false);
       if (onPause) onPause();
@@ -276,7 +279,7 @@ const HLSVideoPlayer = React.forwardRef<HLSVideoPlayerRef, HLSVideoPlayerProps>(
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('volumechange', handleVolumeChange);
     };
-  }, [volume, onTimeUpdate, onDurationChange, onPause]);
+  }, [volume, onTimeUpdate, onDurationChange, onPause, onPlay]);
 
   // Auto-hide controls
   const resetControlsTimeout = () => {
