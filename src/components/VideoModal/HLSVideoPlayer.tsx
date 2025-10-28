@@ -14,6 +14,7 @@ interface HLSVideoPlayerProps {
   controls?: boolean;
   poster?: string;
   onError?: (error: any) => void;
+  onPlay?: () => void;
   onTimeUpdate?: (currentTime: number) => void;
   onDurationChange?: (duration: number) => void;
   onPause?: () => void;

@@ -7,6 +7,7 @@ import HLSVideoPlayer, { HLSVideoPlayerRef } from '@/components/VideoModal/HLSVi
 import { contentService } from '@/services/content.service';
 import { Video, isUUID } from '@/types/video.types';
 import { toast } from 'sonner';
+import { analyticsService } from '@/services/analytics.service';
 import { 
   X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw
 } from 'lucide-react';
@@ -111,6 +112,28 @@ const WatchPage = () => {
   useEffect(() => {
     fetchVideo();
   }, [id]);
+  
+  useEffect(() => {
+    const fetchStream = async () => {
+      if (!id || !video) return;
+  
+      try {
+        setStreamLoading(true);
+        const streamData = await contentService.getVideoStreamData(id);
+        setStreamUrl(streamData.streaming_urls['720p'] || streamData.streaming_urls['1080p']);
+  
+        // ✅ ADD THIS: Track view when stream loads successfully
+        await trackVideoView();
+  
+      } catch (err) {
+        console.error('Failed to load stream:', err);
+      } finally {
+        setStreamLoading(false);
+      }
+    };
+  
+    fetchStream();
+  }, [id, video]);
 
   const handleRetry = () => {
     fetchVideo(true);
@@ -130,6 +153,26 @@ const WatchPage = () => {
       .catch(() => {
         toast.error('Failed to copy link');
       });
+  };
+
+  const trackVideoView = async () => {
+    if (!video?.id) return;
+  
+    try {
+      await analyticsService.trackView({
+        content_id: video.id,
+        video_title: video.title,
+        category: video.category_name,
+        expert: video.expert_name,
+        duration_seconds: video.duration_seconds,
+        user_id: user?.id, // if you have user context
+        session_id: sessionStorage.getItem('sessionId') || undefined
+      });
+  
+      console.log('✅ Video view tracked:', video.id);
+    } catch (error) {
+      console.error('Failed to track video view:', error);
+    }
   };
 
   // Loading state
