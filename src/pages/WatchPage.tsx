@@ -3,13 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import HLSVideoPlayer, { HLSVideoPlayerRef } from '@/components/VideoModal/HLSVideoPlayer';
 import { contentService } from '@/services/content.service';
 import { Video, isUUID } from '@/types/video.types';
 import { toast } from 'sonner';
 import { analyticsService } from '@/services/analytics.service';
 import {
-  X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw
+  X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw,
+  PlayCircle, Clock, BookOpen, Hash, ChevronRight
 } from 'lucide-react';
 
 const WatchPage = () => {
@@ -25,6 +27,8 @@ const WatchPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [copied, setCopied] = useState(false);
   const [viewTracked, setViewTracked] = useState(false);
+  const [relatedVideos, setRelatedVideos] = useState<Video[]>([]);
+  const [seriesEpisodes, setSeriesEpisodes] = useState<Video[]>([]);
 
   // Debug info
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -142,9 +146,47 @@ const WatchPage = () => {
     }
   }, [viewTracked]);
 
+  // Fetch related videos and series episodes
+  const fetchRelatedContent = useCallback(async (currentVideo: Video) => {
+    try {
+      // Fetch videos from the same category
+      const allVideos = await contentService.getVideosForFrontend(currentVideo.category);
+
+      // Filter out current video and get random 6
+      const related = allVideos
+        .filter(v => v.id !== currentVideo.id)
+        .slice(0, 6);
+
+      setRelatedVideos(related);
+
+      // If video is part of a series, fetch series episodes
+      if (currentVideo.series_id || currentVideo.seriesId) {
+        const seriesId = currentVideo.series_id || currentVideo.seriesId;
+        const episodes = allVideos
+          .filter(v => (v.series_id || v.seriesId) === seriesId)
+          .sort((a, b) => {
+            const aEp = a.episode_number || a.episodeNumber || 0;
+            const bEp = b.episode_number || b.episodeNumber || 0;
+            return aEp - bEp;
+          });
+
+        setSeriesEpisodes(episodes);
+      }
+    } catch (error) {
+      console.error('Failed to fetch related content:', error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchVideo();
   }, [id]);
+
+  // Fetch related content when video loads
+  useEffect(() => {
+    if (video) {
+      fetchRelatedContent(video);
+    }
+  }, [video, fetchRelatedContent]);
 
   const handleRetry = () => {
     fetchVideo(true);
@@ -307,7 +349,7 @@ const WatchPage = () => {
         </p>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        <div className="flex gap-3 mb-8">
           <Button
             onClick={handleCopyLink}
             variant="outline"
@@ -325,7 +367,7 @@ const WatchPage = () => {
               </>
             )}
           </Button>
-          
+
           <Button
             variant="outline"
             className="border-gray-700 text-white hover:bg-gray-800"
@@ -333,7 +375,7 @@ const WatchPage = () => {
             <Plus className="w-4 h-4 mr-2" />
             Add to List
           </Button>
-          
+
           <Button
             variant="outline"
             className="border-gray-700 text-white hover:bg-gray-800"
@@ -341,6 +383,171 @@ const WatchPage = () => {
             <ThumbsUp className="w-4 h-4 mr-2" />
             Like
           </Button>
+        </div>
+
+        {/* Content Sections */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Learning Objectives */}
+            {video.learningObjectives && video.learningObjectives.length > 0 && (
+              <Card className="bg-gray-900 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-purple-500" />
+                    What You'll Learn
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {video.learningObjectives.map((objective, index) => (
+                      <li key={index} className="text-gray-300 flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span>{objective}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Related Topics */}
+            {video.relatedTopics && video.relatedTopics.length > 0 && (
+              <Card className="bg-gray-900 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Hash className="w-5 h-5 text-purple-500" />
+                    Related Topics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {video.relatedTopics.map((topic, index) => (
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 cursor-pointer"
+                      >
+                        {topic}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Series Episodes */}
+            {seriesEpisodes.length > 0 && (
+              <Card className="bg-gray-900 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <PlayCircle className="w-5 h-5 text-purple-500" />
+                    Episodes in This Series
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {seriesEpisodes.map((episode) => {
+                      const episodeNum = episode.episode_number || episode.episodeNumber;
+                      const isCurrentEpisode = episode.id === video.id;
+
+                      return (
+                        <div
+                          key={episode.id}
+                          onClick={() => !isCurrentEpisode && navigate(`/watch/${episode.id}`)}
+                          className={`flex items-center gap-4 p-3 rounded-lg transition-all cursor-pointer ${
+                            isCurrentEpisode
+                              ? 'bg-purple-600/20 border border-purple-500/50'
+                              : 'bg-gray-800 hover:bg-gray-700 border border-transparent'
+                          }`}
+                        >
+                          <div className="relative flex-shrink-0">
+                            <img
+                              src={episode.thumbnail}
+                              alt={episode.title}
+                              className="w-32 h-18 object-cover rounded"
+                            />
+                            {episodeNum && (
+                              <Badge className="absolute top-1 left-1 bg-black/80 text-white text-xs">
+                                EP {episodeNum}
+                              </Badge>
+                            )}
+                            {isCurrentEpisode && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded">
+                                <PlayCircle className="w-8 h-8 text-purple-500" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className={`font-semibold mb-1 truncate ${
+                              isCurrentEpisode ? 'text-purple-300' : 'text-white'
+                            }`}>
+                              {episode.title}
+                            </h3>
+                            <p className="text-gray-400 text-sm line-clamp-2">
+                              {episode.description}
+                            </p>
+                            <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {episode.duration}
+                              </span>
+                            </div>
+                          </div>
+                          {!isCurrentEpisode && (
+                            <ChevronRight className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Right Column - Related Videos */}
+          <div className="lg:col-span-1">
+            {relatedVideos.length > 0 && (
+              <Card className="bg-gray-900 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white">More Like This</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {relatedVideos.map((relatedVideo) => (
+                      <div
+                        key={relatedVideo.id}
+                        onClick={() => navigate(`/watch/${relatedVideo.id}`)}
+                        className="group cursor-pointer"
+                      >
+                        <div className="relative mb-2 overflow-hidden rounded-lg">
+                          <img
+                            src={relatedVideo.thumbnail}
+                            alt={relatedVideo.title}
+                            className="w-full h-32 object-cover transition-transform group-hover:scale-105"
+                          />
+                          <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                            {relatedVideo.duration}
+                          </div>
+                        </div>
+                        <h4 className="text-white font-medium text-sm mb-1 line-clamp-2 group-hover:text-purple-400 transition-colors">
+                          {relatedVideo.title}
+                        </h4>
+                        <p className="text-gray-400 text-xs mb-1">{relatedVideo.expert}</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span>{relatedVideo.views} views</span>
+                          {relatedVideo.isNew && (
+                            <Badge className="bg-purple-600 text-white text-xs">New</Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
     </div>
