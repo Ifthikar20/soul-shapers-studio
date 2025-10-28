@@ -8,8 +8,10 @@ import { contentService } from '@/services/content.service';
 import { Video, isUUID } from '@/types/video.types';
 import { toast } from 'sonner';
 import { analyticsService } from '@/services/analytics.service';
+import { dummySeriesVideos } from '@/data/dummyVideos';
 import {
-  X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw
+  X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw,
+  Clock, BookOpen, Hash
 } from 'lucide-react';
 
 const WatchPage = () => {
@@ -25,6 +27,7 @@ const WatchPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [copied, setCopied] = useState(false);
   const [viewTracked, setViewTracked] = useState(false);
+  const [seriesEpisodes, setSeriesEpisodes] = useState<Video[]>([]);
 
   // Debug info
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -142,9 +145,71 @@ const WatchPage = () => {
     }
   }, [viewTracked]);
 
+  // Fetch next episodes
+  const fetchRelatedContent = useCallback(async (currentVideo: Video) => {
+    try {
+      // Try to fetch videos from the same category from API
+      let allVideos: Video[] = [];
+
+      try {
+        allVideos = await contentService.getVideosForFrontend(currentVideo.category);
+      } catch (error) {
+        console.log('API fetch failed, using dummy data');
+      }
+
+      // Check if video is part of a series
+      if (currentVideo.series_id || currentVideo.seriesId) {
+        const seriesId = currentVideo.series_id || currentVideo.seriesId;
+        const currentEpisodeNum = currentVideo.episode_number || currentVideo.episodeNumber || 0;
+
+        // Try to find next episodes from API data
+        let nextEpisodes: Video[] = [];
+
+        if (allVideos.length > 0) {
+          const allSeriesEpisodes = allVideos
+            .filter(v => (v.series_id || v.seriesId) === seriesId)
+            .sort((a, b) => {
+              const aEp = a.episode_number || a.episodeNumber || 0;
+              const bEp = b.episode_number || b.episodeNumber || 0;
+              return aEp - bEp;
+            });
+
+          nextEpisodes = allSeriesEpisodes.filter(ep => {
+            const epNum = ep.episode_number || ep.episodeNumber || 0;
+            return epNum > currentEpisodeNum;
+          }).slice(0, 3); // Get next 3 episodes
+        }
+
+        // Fallback to dummy data if no next episodes found
+        if (nextEpisodes.length === 0) {
+          nextEpisodes = dummySeriesVideos.filter(ep =>
+            (ep.episode_number || 0) > currentEpisodeNum && (ep.episode_number || 0) <= currentEpisodeNum + 3
+          );
+        }
+
+        setSeriesEpisodes(nextEpisodes);
+      } else {
+        // For videos not in a series, show dummy next episodes for demonstration
+        const dummyNext = dummySeriesVideos.slice(1, 4); // Episodes 2, 3, 4
+        setSeriesEpisodes(dummyNext);
+      }
+    } catch (error) {
+      console.error('Failed to fetch related content:', error);
+      // Fallback to dummy data on error
+      setSeriesEpisodes(dummySeriesVideos.slice(1, 4)); // Episodes 2, 3, 4
+    }
+  }, []);
+
   useEffect(() => {
     fetchVideo();
   }, [id]);
+
+  // Fetch related content when video loads
+  useEffect(() => {
+    if (video) {
+      fetchRelatedContent(video);
+    }
+  }, [video, fetchRelatedContent]);
 
   const handleRetry = () => {
     fetchVideo(true);
@@ -307,7 +372,7 @@ const WatchPage = () => {
         </p>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        <div className="flex gap-3 mb-8">
           <Button
             onClick={handleCopyLink}
             variant="outline"
@@ -325,7 +390,7 @@ const WatchPage = () => {
               </>
             )}
           </Button>
-          
+
           <Button
             variant="outline"
             className="border-gray-700 text-white hover:bg-gray-800"
@@ -333,7 +398,7 @@ const WatchPage = () => {
             <Plus className="w-4 h-4 mr-2" />
             Add to List
           </Button>
-          
+
           <Button
             variant="outline"
             className="border-gray-700 text-white hover:bg-gray-800"
@@ -341,6 +406,90 @@ const WatchPage = () => {
             <ThumbsUp className="w-4 h-4 mr-2" />
             Like
           </Button>
+        </div>
+
+        {/* Content Sections */}
+        <div className="max-w-4xl">
+          {/* Learning Objectives */}
+          {video.learningObjectives && video.learningObjectives.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-purple-500" />
+                What You'll Learn
+              </h2>
+              <ul className="space-y-2">
+                {video.learningObjectives.map((objective, index) => (
+                  <li key={index} className="text-gray-300 flex items-start gap-2">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>{objective}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Related Topics */}
+          {video.relatedTopics && video.relatedTopics.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
+                <Hash className="w-5 h-5 text-purple-500" />
+                Related Topics
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {video.relatedTopics.map((topic, index) => (
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 cursor-pointer"
+                  >
+                    {topic}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Next Episodes */}
+          {seriesEpisodes.length > 0 && (
+            <div className="space-y-4">
+              {seriesEpisodes.map((episode) => {
+                const episodeNum = episode.episode_number || episode.episodeNumber;
+
+                return (
+                  <div
+                    key={episode.id}
+                    onClick={() => navigate(`/watch/${episode.id}`)}
+                    className="flex gap-4 cursor-pointer group py-2"
+                  >
+                    <div className="relative flex-shrink-0 w-48">
+                      <img
+                        src={episode.thumbnail}
+                        alt={episode.title}
+                        className="w-full aspect-video object-cover rounded"
+                      />
+                      {episodeNum && (
+                        <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded">
+                          Episode {episodeNum}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-white font-medium text-base mb-1 group-hover:text-purple-400 transition-colors line-clamp-1">
+                        {episode.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm line-clamp-2 mb-2">
+                        {episode.description}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <Clock className="w-3 h-3" />
+                        <span>{episode.duration}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
