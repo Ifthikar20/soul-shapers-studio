@@ -1,13 +1,15 @@
-// src/pages/BrowsePage.tsx - FINAL COMPLETE FIXED VERSION
+// src/pages/BrowsePage.tsx - FINAL COMPLETE FIXED VERSION WITH SECURE SEARCH
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigationTracking } from '@/hooks/useNavigationTracking';
 import { contentService } from '@/services/content.service';
 import { Video, normalizeVideo } from '@/types/video.types'; // ✅ Use centralized types
-import { AlertCircle, X, Search } from 'lucide-react';
+import { decodeSearchQuery, sanitizeHTML } from '@/utils/search.security';
+import { AlertCircle, X, Search, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/Browse/HeroSection';
@@ -30,7 +32,11 @@ const BrowsePage = () => {
   const { user } = useAuth();
   const { navigateToUpgrade, trackNavigationEvent } = useNavigationTracking();
 
-  const searchQuery = searchParams.get('q') || '';
+  // Secure search query validation
+  const rawSearchQuery = searchParams.get('q') || '';
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchErrors, setSearchErrors] = useState<string[]>([]);
+  const [searchWarnings, setSearchWarnings] = useState<string[]>([]);
 
   const [allVideos, setAllVideos] = useState<Video[]>([]); // ✅ Use Video type
   const [filteredVideos, setFilteredVideos] = useState<Video[]>([]); // ✅ Use Video type
@@ -38,6 +44,29 @@ const BrowsePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Validate and sanitize search query from URL
+  useEffect(() => {
+    if (rawSearchQuery) {
+      const validation = decodeSearchQuery(rawSearchQuery);
+
+      if (!validation.isValid) {
+        console.warn('Invalid search query:', validation.errors);
+        setSearchErrors(validation.errors);
+        setSearchQuery('');
+        setIsSearching(false);
+      } else {
+        setSearchQuery(validation.sanitized);
+        setSearchErrors([]);
+        setSearchWarnings(validation.warnings);
+      }
+    } else {
+      setSearchQuery('');
+      setSearchErrors([]);
+      setSearchWarnings([]);
+      setIsSearching(false);
+    }
+  }, [rawSearchQuery]);
 
   // Load content from API
   useEffect(() => {
@@ -94,7 +123,7 @@ const BrowsePage = () => {
     loadContent();
   }, []);
 
-  // Filter videos based on search query
+  // Filter videos based on search query with security
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredVideos(allVideos);
@@ -103,15 +132,22 @@ const BrowsePage = () => {
     }
 
     setIsSearching(true);
-    const query = searchQuery.toLowerCase().trim();
 
-    const filtered = allVideos.filter(video => 
-      video.title.toLowerCase().includes(query) ||
-      video.description.toLowerCase().includes(query) ||
-      video.expert.toLowerCase().includes(query) ||
-      video.category.toLowerCase().includes(query) ||
-      (video.expertCredentials && video.expertCredentials.toLowerCase().includes(query))
-    );
+    // Sanitize query for searching (additional layer of security)
+    const sanitizedQuery = sanitizeHTML(searchQuery.toLowerCase().trim());
+
+    const filtered = allVideos.filter(video => {
+      // Search across multiple fields with sanitized query
+      const searchableText = [
+        video.title,
+        video.description,
+        video.expert,
+        video.category,
+        video.expertCredentials || '',
+      ].join(' ').toLowerCase();
+
+      return searchableText.includes(sanitizedQuery);
+    });
 
     setFilteredVideos(filtered);
 
@@ -212,8 +248,8 @@ const BrowsePage = () => {
           <div className="text-center text-red-600 mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
             <AlertCircle className="w-5 h-5 inline-block mr-2" />
             {error}
-            <Button 
-              onClick={() => window.location.reload()} 
+            <Button
+              onClick={() => window.location.reload()}
               variant="outline"
               className="ml-4"
             >
@@ -222,8 +258,41 @@ const BrowsePage = () => {
           </div>
         )}
 
+        {/* Search Security Errors */}
+        {searchErrors.length > 0 && (
+          <Alert variant="destructive" className="mb-6">
+            <Shield className="h-4 w-4" />
+            <AlertDescription>
+              <p className="font-semibold mb-2">Search Security Error</p>
+              {searchErrors.map((error, index) => (
+                <p key={index} className="text-sm">{error}</p>
+              ))}
+              <Button
+                onClick={handleClearSearch}
+                variant="outline"
+                size="sm"
+                className="mt-3"
+              >
+                Clear Search
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Search Warnings */}
+        {searchWarnings.length > 0 && !searchErrors.length && (
+          <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+            <AlertCircle className="h-4 w-4 text-yellow-600" />
+            <AlertDescription>
+              {searchWarnings.map((warning, index) => (
+                <p key={index} className="text-sm text-yellow-800">{warning}</p>
+              ))}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Search Results Header */}
-        {isSearching && (
+        {isSearching && searchQuery && !searchErrors.length && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -257,7 +326,7 @@ const BrowsePage = () => {
         )}
 
         {/* No Results State */}
-        {isSearching && filteredVideos.length === 0 && !loading && (
+        {isSearching && searchQuery && filteredVideos.length === 0 && !loading && !searchErrors.length && (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Search className="w-12 h-12 text-gray-400" />
@@ -278,7 +347,7 @@ const BrowsePage = () => {
         )}
 
         {/* Search Results Row */}
-        {isSearching && filteredVideos.length > 0 && (
+        {isSearching && searchQuery && filteredVideos.length > 0 && !searchErrors.length && (
           <VideoRow
             title="Search Results"
             videos={filteredVideos}
