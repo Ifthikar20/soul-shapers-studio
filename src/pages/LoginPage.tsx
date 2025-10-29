@@ -431,7 +431,7 @@ const LoginPage = () => {
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link to="/privacy" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors">
+                  <Link to="/privacy-policy" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors">
                     Privacy Policy
                   </Link>
                 </p>
