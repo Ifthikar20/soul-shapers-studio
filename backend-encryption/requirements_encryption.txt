@@ -1,0 +1,15 @@
+# ==============================================
+# Encryption Dependencies for Better & Bliss Backend
+# ==============================================
+
+# Cryptography library for AES-256-GCM encryption
+cryptography>=41.0.0
+
+# Already included in FastAPI dependencies (no need to add):
+# - fastapi>=0.104.0
+# - starlette>=0.27.0
+# - pydantic>=2.0.0
+# - uvicorn>=0.24.0
+
+# For environment variable management (if not already using)
+python-dotenv>=1.0.0
