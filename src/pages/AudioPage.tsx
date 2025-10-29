@@ -1,5 +1,5 @@
 // src/pages/AudioPage.tsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -13,7 +13,9 @@ import {
   Crown,
   TrendingUp,
   Headphones,
-  Volume2
+  Volume2,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 // Audio content interface
@@ -651,8 +653,20 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: {
 const AudioPage = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const ITEMS_PER_PAGE = 12;
   const categories = ['All', 'Meditation', 'Sleep', 'Breathwork', 'Self-Care', 'Focus', 'Self-Esteem'];
+
+  // Reset to page 1 when category changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
 
   const handlePlay = useCallback((audio: AudioContent) => {
     const canListen = audio.accessTier === 'free' || audio.isFirstEpisode;
@@ -673,6 +687,59 @@ const AudioPage = () => {
   const filteredAudio = audioContent.filter(audio => {
     return selectedCategory === 'All' || audio.category === selectedCategory;
   });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredAudio.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentAudio = filteredAudio.slice(startIndex, endIndex);
+
+  // Page navigation handlers
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -717,14 +784,14 @@ const AudioPage = () => {
         {/* Results Count */}
         <div className="mb-6 text-center">
           <p className="text-gray-600">
-            Showing <span className="font-semibold text-purple-600">{filteredAudio.length}</span> audio session{filteredAudio.length !== 1 ? 's' : ''}
+            Showing <span className="font-semibold text-purple-600">{startIndex + 1}-{Math.min(endIndex, filteredAudio.length)}</span> of <span className="font-semibold text-purple-600">{filteredAudio.length}</span> audio session{filteredAudio.length !== 1 ? 's' : ''}
             {selectedCategory !== 'All' && <span> in <span className="font-semibold">{selectedCategory}</span></span>}
           </p>
         </div>
 
         {/* Audio Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredAudio.map((audio) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          {currentAudio.map((audio) => (
             <AudioCard
               key={audio.id}
               audio={audio}
@@ -739,7 +806,66 @@ const AudioPage = () => {
           <div className="text-center py-12">
             <Headphones className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-600 mb-2">No audio sessions found</h3>
-            <p className="text-gray-500">Try adjusting your search or filter criteria.</p>
+            <p className="text-gray-500">Try selecting a different category.</p>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex flex-col items-center gap-4 mt-12 mb-8">
+            {/* Page info */}
+            <p className="text-sm text-gray-600">
+              Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span>
+            </p>
+
+            {/* Pagination buttons */}
+            <div className="flex items-center gap-2">
+              {/* Previous button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                className="px-3"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+
+              {/* Page numbers */}
+              <div className="flex gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <React.Fragment key={index}>
+                    {page === '...' ? (
+                      <span className="px-3 py-2 text-gray-400">...</span>
+                    ) : (
+                      <Button
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => goToPage(page as number)}
+                        className={`min-w-[40px] ${
+                          currentPage === page
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
+                            : ''
+                        }`}
+                      >
+                        {page}
+                      </Button>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+
+              {/* Next button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className="px-3"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
