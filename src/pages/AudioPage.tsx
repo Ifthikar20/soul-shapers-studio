@@ -1,22 +1,10 @@
-// src/pages/AudioPage.tsx
-import React, { useState, useCallback, useEffect } from 'react';
+// src/pages/AudioPage.tsx - Carousel Layout with Category Sections
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Play,
-  Clock,
-  User,
-  Crown,
-  TrendingUp,
-  Headphones,
-  Volume2,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+import AudioRow from '@/components/Audio/AudioRow';
+import { Headphones, Sparkles } from 'lucide-react';
 
 // Audio content interface
 interface AudioContent {
@@ -530,147 +518,24 @@ const audioContent: AudioContent[] = [
   }
 ];
 
-// Audio Card Component
-const AudioCard = ({ audio, onPlay, onUpgrade }: {
-  audio: AudioContent;
-  onPlay: (audio: AudioContent) => void;
-  onUpgrade: (audio: AudioContent) => void;
-}) => {
-  const navigate = useNavigate();
-  const canListen = audio.accessTier === 'free' || audio.isFirstEpisode;
-
-  const handleCardClick = () => {
-    if (canListen) {
-      navigate(`/audio/${audio.id}`);
-    } else {
-      onUpgrade(audio);
-    }
-  };
-
-  return (
-    <Card className="cursor-pointer group overflow-hidden hover:shadow-md transition-all duration-200" onClick={handleCardClick}>
-      <div className="relative">
-        <img
-          src={audio.thumbnail}
-          alt={audio.title}
-          className="w-full h-40 object-contain bg-white"
-        />
-
-        {/* Play Overlay on Hover */}
-        <div
-          className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer"
-        >
-          <div className="rounded-full p-2 bg-white/90 shadow-lg">
-            {canListen ? (
-              <Play className="w-6 h-6 text-purple-600 fill-current" />
-            ) : (
-              <Crown className="w-6 h-6 text-orange-500" />
-            )}
-          </div>
-        </div>
-        
-        {/* Single Badge - Priority: Premium > New > Trending */}
-        <div className="absolute top-2 right-2">
-          {audio.accessTier === 'premium' && !audio.isFirstEpisode ? (
-            <Badge className="bg-orange-500 text-white text-xs px-2 py-0.5">
-              <Crown className="w-2.5 h-2.5 mr-0.5" />
-              Premium
-            </Badge>
-          ) : audio.isNew ? (
-            <Badge className="bg-green-500 text-white text-xs px-2 py-0.5">
-              New
-            </Badge>
-          ) : audio.isTrending ? (
-            <Badge variant="secondary" className="text-xs px-2 py-0.5">
-              <TrendingUp className="w-2.5 h-2.5 mr-0.5" />
-              Hot
-            </Badge>
-          ) : null}
-        </div>
-        
-        {/* Duration */}
-        <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-0.5 rounded text-xs flex items-center">
-          <Volume2 className="w-2.5 h-2.5 mr-1" />
-          {audio.duration}
-        </div>
-      </div>
-      
-      <CardContent className="p-4">
-        {/* Category */}
-        <Badge variant="outline" className="text-xs mb-2 w-fit">
-          {audio.category}
-        </Badge>
-        
-        {/* Title */}
-        <h3 className="font-semibold text-base text-foreground mb-2 line-clamp-2 leading-tight">
-          {audio.title}
-        </h3>
-        
-        {/* Expert */}
-        <div className="flex items-center text-muted-foreground text-sm mb-3">
-          <User className="w-4 h-4 mr-2 flex-shrink-0" />
-          <span className="truncate">{audio.expert}</span>
-        </div>
-
-        {/* Stats and Action */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center text-sm text-muted-foreground">
-            <span>{audio.listens} listens</span>
-          </div>
-
-          {!canListen ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onUpgrade(audio);
-              }}
-              className="text-orange-600 border-orange-200 hover:bg-orange-50 text-sm px-3 py-1.5 h-8 flex-shrink-0"
-            >
-              Upgrade
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/audio/${audio.id}`);
-              }}
-              className="text-purple-600 hover:bg-purple-50 text-sm px-3 py-1.5 h-8 flex-shrink-0"
-            >
-              Listen
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
 // Main Audio Page Component
 const AudioPage = () => {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const ITEMS_PER_PAGE = 12;
-  const categories = ['All', 'Meditation', 'Sleep', 'Breathwork', 'Self-Care', 'Focus', 'Self-Esteem'];
+  // Group audio by category
+  const audioByCategory = audioContent.reduce((acc, audio) => {
+    if (!acc[audio.category]) {
+      acc[audio.category] = [];
+    }
+    acc[audio.category].push(audio);
+    return acc;
+  }, {} as Record<string, AudioContent[]>);
 
-  // Reset to page 1 when category changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory]);
-
-  // Scroll to top when page changes
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentPage]);
+  // Category order for display
+  const categoryOrder = ['Meditation', 'Sleep', 'Breathwork', 'Self-Care', 'Focus', 'Self-Esteem'];
 
   const handlePlay = useCallback((audio: AudioContent) => {
     const canListen = audio.accessTier === 'free' || audio.isFirstEpisode;
-
     if (canListen) {
       navigate(`/audio/${audio.id}`);
     } else {
@@ -683,191 +548,67 @@ const AudioPage = () => {
     navigate('/upgrade');
   }, [navigate]);
 
-  // Filter audio content by category only
-  const filteredAudio = audioContent.filter(audio => {
-    return selectedCategory === 'All' || audio.category === selectedCategory;
-  });
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredAudio.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentAudio = filteredAudio.slice(startIndex, endIndex);
-
-  // Page navigation handlers
-  const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-  };
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  // Generate page numbers to display
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxPagesToShow = 5;
-
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) pages.push(i);
-        pages.push('...');
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1);
-        pages.push('...');
-        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push('...');
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
-        pages.push('...');
-        pages.push(totalPages);
-      }
-    }
-
-    return pages;
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Header />
-      
-      {/* Page Header */}
-      <div className="bg-gradient-to-br from-purple-600 to-indigo-700 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full mb-6">
-            <Headphones className="w-6 h-6" />
-            <span className="font-semibold">Audio Wellness Library</span>
+
+      {/* Hero Header */}
+      <div className="bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-700 text-white py-20 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-300 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md px-6 py-3 rounded-full mb-8 border border-white/20">
+              <Headphones className="w-6 h-6" />
+              <span className="font-semibold tracking-wide">Audio Wellness Library</span>
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              Guided Audio
+              <span className="block bg-gradient-to-r from-yellow-200 to-pink-200 bg-clip-text text-transparent">
+                For Your Wellness
+              </span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-purple-100 max-w-3xl mx-auto leading-relaxed">
+              Expert-led meditation, sleep stories, and wellness practices to support your mental health journey.
+            </p>
+
+            <div className="flex items-center justify-center gap-6 mt-8">
+              <div className="flex items-center gap-2 text-purple-100">
+                <Sparkles className="w-5 h-5" />
+                <span className="text-sm font-medium">28 Sessions Available</span>
+              </div>
+              <div className="w-1 h-1 bg-purple-300 rounded-full"></div>
+              <div className="flex items-center gap-2 text-purple-100">
+                <Sparkles className="w-5 h-5" />
+                <span className="text-sm font-medium">6 Categories</span>
+              </div>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Guided Audio Sessions
-          </h1>
-          <p className="text-xl text-purple-100 max-w-2xl mx-auto">
-            Expert-led meditation, sleep stories, and wellness practices to support your mental health journey.
-          </p>
         </div>
       </div>
 
-      {/* Category Filters */}
-      <div className="container mx-auto px-4 py-8">
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap gap-3 mb-8 justify-center">
-          {categories.map((category) => (
-            <Button
+      {/* Audio Carousel Sections */}
+      <div className="container mx-auto py-12">
+        {categoryOrder.map((category) => {
+          const audios = audioByCategory[category] || [];
+          if (audios.length === 0) return null;
+
+          return (
+            <AudioRow
               key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              onClick={() => setSelectedCategory(category)}
-              className={`whitespace-nowrap px-6 py-2 rounded-full transition-all ${
-                selectedCategory === category
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg'
-                  : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'
-              }`}
-            >
-              {category}
-            </Button>
-          ))}
-        </div>
-
-        {/* Results Count */}
-        <div className="mb-6 text-center">
-          <p className="text-gray-600">
-            Showing <span className="font-semibold text-purple-600">{startIndex + 1}-{Math.min(endIndex, filteredAudio.length)}</span> of <span className="font-semibold text-purple-600">{filteredAudio.length}</span> audio session{filteredAudio.length !== 1 ? 's' : ''}
-            {selectedCategory !== 'All' && <span> in <span className="font-semibold">{selectedCategory}</span></span>}
-          </p>
-        </div>
-
-        {/* Audio Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-          {currentAudio.map((audio) => (
-            <AudioCard
-              key={audio.id}
-              audio={audio}
+              title={category}
+              audioItems={audios}
               onPlay={handlePlay}
               onUpgrade={handleUpgrade}
             />
-          ))}
-        </div>
-
-        {/* No Results */}
-        {filteredAudio.length === 0 && (
-          <div className="text-center py-12">
-            <Headphones className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No audio sessions found</h3>
-            <p className="text-gray-500">Try selecting a different category.</p>
-          </div>
-        )}
-
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="flex flex-col items-center gap-4 mt-12 mb-8">
-            {/* Page info */}
-            <p className="text-sm text-gray-600">
-              Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span>
-            </p>
-
-            {/* Pagination buttons */}
-            <div className="flex items-center gap-2">
-              {/* Previous button */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={goToPreviousPage}
-                disabled={currentPage === 1}
-                className="px-3"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-
-              {/* Page numbers */}
-              <div className="flex gap-1">
-                {getPageNumbers().map((page, index) => (
-                  <React.Fragment key={index}>
-                    {page === '...' ? (
-                      <span className="px-3 py-2 text-gray-400">...</span>
-                    ) : (
-                      <Button
-                        variant={currentPage === page ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => goToPage(page as number)}
-                        className={`min-w-[40px] ${
-                          currentPage === page
-                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
-                            : ''
-                        }`}
-                      >
-                        {page}
-                      </Button>
-                    )}
-                  </React.Fragment>
-                ))}
-              </div>
-
-              {/* Next button */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={goToNextPage}
-                disabled={currentPage === totalPages}
-                className="px-3"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        )}
+          );
+        })}
       </div>
 
       <Footer />
