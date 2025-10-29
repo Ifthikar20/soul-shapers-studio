@@ -13,10 +13,8 @@ import {
   Crown,
   TrendingUp,
   Headphones,
-  Volume2,
-  Search
+  Volume2
 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 
 // Audio content interface
 interface AudioContent {
@@ -49,7 +47,7 @@ import plant9 from "@/assets/plant9.png";
 import plant10 from "@/assets/plant10.png";
 import plant11 from "@/assets/plant11.png";
 
-// Extended mock audio data for a full page
+// Extended mock audio data - 28 items total
 const audioContent: AudioContent[] = [
   {
     id: 1,
@@ -161,7 +159,7 @@ const audioContent: AudioContent[] = [
     expertCredentials: "Trauma Specialist, EMDR Certified",
     expertAvatar: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=100&h=100&fit=crop&crop=face",
     duration: "22:15",
-    category: "Healing",
+    category: "Meditation",
     listens: "14.2k",
     thumbnail: plant10,
     isNew: true,
@@ -178,7 +176,7 @@ const audioContent: AudioContent[] = [
     expertCredentials: "Positive Psychology Expert, PhD",
     expertAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
     duration: "16:45",
-    category: "Gratitude",
+    category: "Meditation",
     listens: "18.9k",
     thumbnail: plant11,
     isNew: false,
@@ -187,6 +185,346 @@ const audioContent: AudioContent[] = [
     fullDescription: "Research-based gratitude practices to enhance life satisfaction and emotional well-being.",
     audioUrl: "#",
     accessTier: 'free'
+  },
+  {
+    id: 9,
+    title: "Evening Wind-Down Meditation",
+    expert: "Dr. Jennifer Lee",
+    expertCredentials: "Meditation Instructor",
+    expertAvatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop&crop=face",
+    duration: "20:15",
+    category: "Meditation",
+    listens: "31.2k",
+    thumbnail: plant4,
+    isNew: true,
+    isTrending: true,
+    description: "Release the day's tension and prepare for restful sleep.",
+    fullDescription: "A calming evening meditation to help you transition from day to night.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 10,
+    title: "Power Nap Guided Rest",
+    expert: "Dr. Robert Wilson",
+    expertCredentials: "Sleep Researcher, PhD",
+    expertAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+    duration: "20:00",
+    category: "Sleep",
+    listens: "28.5k",
+    thumbnail: plant5,
+    isNew: false,
+    isTrending: false,
+    description: "Maximize your energy with a scientifically-optimized power nap.",
+    fullDescription: "Perfect 20-minute guided rest for midday rejuvenation.",
+    audioUrl: "#",
+    accessTier: 'premium'
+  },
+  {
+    id: 11,
+    title: "Box Breathing for Athletes",
+    expert: "Coach Marcus Thompson",
+    expertCredentials: "Performance Coach",
+    expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    duration: "10:30",
+    category: "Breathwork",
+    listens: "16.8k",
+    thumbnail: plant7,
+    isNew: true,
+    isTrending: true,
+    description: "Elite breathing techniques for peak performance.",
+    fullDescription: "Military-grade breathing exercises adapted for athletic excellence.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 12,
+    title: "Morning Self-Care Ritual",
+    expert: "Dr. Sophia Martinez",
+    expertCredentials: "Wellness Coach",
+    expertAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+    duration: "18:20",
+    category: "Self-Care",
+    listens: "24.6k",
+    thumbnail: plant8,
+    isNew: false,
+    isTrending: true,
+    description: "Start your day with intention and self-love.",
+    fullDescription: "A comprehensive morning routine for mental and emotional wellness.",
+    audioUrl: "#",
+    accessTier: 'premium'
+  },
+  {
+    id: 13,
+    title: "Study Focus Enhancement",
+    expert: "Dr. Kevin Huang",
+    expertCredentials: "Educational Psychologist",
+    expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    duration: "45:00",
+    category: "Focus",
+    listens: "21.3k",
+    thumbnail: plant9,
+    isNew: true,
+    isTrending: false,
+    description: "Extended focus session for deep work and studying.",
+    fullDescription: "Scientifically designed audio to enhance learning and retention.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 14,
+    title: "Inner Strength Affirmations",
+    expert: "Dr. Patricia Brown",
+    expertCredentials: "Motivational Psychologist",
+    expertAvatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop&crop=face",
+    duration: "12:15",
+    category: "Self-Esteem",
+    listens: "27.4k",
+    thumbnail: plant10,
+    isNew: false,
+    isTrending: true,
+    description: "Cultivate resilience and inner power.",
+    fullDescription: "Powerful affirmations to build mental strength and confidence.",
+    audioUrl: "#",
+    accessTier: 'premium'
+  },
+  {
+    id: 15,
+    title: "Body Scan Meditation",
+    expert: "Dr. Thomas Anderson",
+    expertCredentials: "Mindfulness Expert",
+    expertAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+    duration: "25:30",
+    category: "Meditation",
+    listens: "19.7k",
+    thumbnail: plant11,
+    isNew: true,
+    isTrending: false,
+    description: "Connect with your body through mindful awareness.",
+    fullDescription: "Progressive body scan for deep relaxation and presence.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 16,
+    title: "Insomnia Relief Program",
+    expert: "Dr. Catherine White",
+    expertCredentials: "Sleep Medicine Specialist",
+    expertAvatar: "https://images.unsplash.com/photo-1594824388853-d0b8ccbfbb3d?w=100&h=100&fit=crop&crop=face",
+    duration: "35:20",
+    category: "Sleep",
+    listens: "33.1k",
+    thumbnail: plant4,
+    isNew: false,
+    isTrending: true,
+    description: "Evidence-based techniques for overcoming insomnia.",
+    fullDescription: "Comprehensive sleep therapy session for chronic sleep issues.",
+    audioUrl: "#",
+    accessTier: 'premium'
+  },
+  {
+    id: 17,
+    title: "Wim Hof Breathing Method",
+    expert: "Coach Isabella Garcia",
+    expertCredentials: "Certified Wim Hof Instructor",
+    expertAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+    duration: "15:45",
+    category: "Breathwork",
+    listens: "29.8k",
+    thumbnail: plant5,
+    isNew: true,
+    isTrending: true,
+    description: "Master the powerful Wim Hof breathing technique.",
+    fullDescription: "Guided session to boost immunity and mental clarity.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 18,
+    title: "Self-Love Journey",
+    expert: "Dr. Michelle Turner",
+    expertCredentials: "Self-Compassion Researcher",
+    expertAvatar: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=100&h=100&fit=crop&crop=face",
+    duration: "22:40",
+    category: "Self-Care",
+    listens: "26.2k",
+    thumbnail: plant7,
+    isNew: false,
+    isTrending: false,
+    description: "Deep dive into unconditional self-acceptance.",
+    fullDescription: "Transformative practice for developing genuine self-love.",
+    audioUrl: "#",
+    accessTier: 'premium'
+  },
+  {
+    id: 19,
+    title: "Creative Flow State",
+    expert: "Dr. Daniel Foster",
+    expertCredentials: "Creativity Coach, PhD",
+    expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    duration: "30:00",
+    category: "Focus",
+    listens: "17.9k",
+    thumbnail: plant8,
+    isNew: true,
+    isTrending: false,
+    description: "Enter a state of effortless creativity.",
+    fullDescription: "Unlock your creative potential with this flow-inducing audio.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 20,
+    title: "Overcoming Self-Doubt",
+    expert: "Dr. Rebecca Stone",
+    expertCredentials: "Cognitive Behavioral Therapist",
+    expertAvatar: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=100&h=100&fit=crop&crop=face",
+    duration: "19:25",
+    category: "Self-Esteem",
+    listens: "23.7k",
+    thumbnail: plant9,
+    isNew: false,
+    isTrending: true,
+    description: "Break free from limiting self-beliefs.",
+    fullDescription: "CBT-based techniques to overcome imposter syndrome and self-doubt.",
+    audioUrl: "#",
+    accessTier: 'premium'
+  },
+  {
+    id: 21,
+    title: "Loving-Kindness Meditation",
+    expert: "Dr. Yuki Tanaka",
+    expertCredentials: "Buddhist Psychology Expert",
+    expertAvatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop&crop=face",
+    duration: "17:30",
+    category: "Meditation",
+    listens: "20.4k",
+    thumbnail: plant10,
+    isNew: true,
+    isTrending: false,
+    description: "Cultivate compassion for yourself and others.",
+    fullDescription: "Traditional metta meditation for developing universal love.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 22,
+    title: "Dreams & Sleep Quality",
+    expert: "Dr. Oliver Bennett",
+    expertCredentials: "Dream Researcher",
+    expertAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+    duration: "28:15",
+    category: "Sleep",
+    listens: "15.6k",
+    thumbnail: plant11,
+    isNew: false,
+    isTrending: false,
+    description: "Enhance your sleep quality and dream recall.",
+    fullDescription: "Guided techniques for lucid dreaming and better rest.",
+    audioUrl: "#",
+    accessTier: 'premium'
+  },
+  {
+    id: 23,
+    title: "Pranayama for Beginners",
+    expert: "Yogi Arjun Patel",
+    expertCredentials: "Yoga Breathwork Master",
+    expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    duration: "13:20",
+    category: "Breathwork",
+    listens: "22.8k",
+    thumbnail: plant4,
+    isNew: true,
+    isTrending: true,
+    description: "Ancient yogic breathing for modern wellness.",
+    fullDescription: "Introduction to classical pranayama techniques.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 24,
+    title: "Boundary Setting Practice",
+    expert: "Dr. Laura Mitchell",
+    expertCredentials: "Relationship Therapist",
+    expertAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+    duration: "21:10",
+    category: "Self-Care",
+    listens: "25.9k",
+    thumbnail: plant5,
+    isNew: false,
+    isTrending: true,
+    description: "Learn to set healthy boundaries with confidence.",
+    fullDescription: "Essential skills for protecting your energy and wellbeing.",
+    audioUrl: "#",
+    accessTier: 'premium'
+  },
+  {
+    id: 25,
+    title: "Deep Work Session",
+    expert: "Dr. Samuel Chen",
+    expertCredentials: "Productivity Researcher",
+    expertAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+    duration: "60:00",
+    category: "Focus",
+    listens: "18.3k",
+    thumbnail: plant7,
+    isNew: true,
+    isTrending: false,
+    description: "One hour of distraction-free focus enhancement.",
+    fullDescription: "Extended deep work session for maximum productivity.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 26,
+    title: "Worthy & Enough",
+    expert: "Dr. Natalie Cooper",
+    expertCredentials: "Self-Worth Specialist",
+    expertAvatar: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=100&h=100&fit=crop&crop=face",
+    duration: "16:55",
+    category: "Self-Esteem",
+    listens: "30.2k",
+    thumbnail: plant8,
+    isNew: false,
+    isTrending: true,
+    description: "Affirm your inherent worthiness.",
+    fullDescription: "Powerful practice to recognize you are already enough.",
+    audioUrl: "#",
+    accessTier: 'premium'
+  },
+  {
+    id: 27,
+    title: "Mindful Walking Meditation",
+    expert: "Dr. Grace Williams",
+    expertCredentials: "Movement Meditation Teacher",
+    expertAvatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop&crop=face",
+    duration: "14:40",
+    category: "Meditation",
+    listens: "19.1k",
+    thumbnail: plant9,
+    isNew: true,
+    isTrending: false,
+    description: "Bring mindfulness to your daily walks.",
+    fullDescription: "Turn ordinary walking into a meditative practice.",
+    audioUrl: "#",
+    accessTier: 'free'
+  },
+  {
+    id: 28,
+    title: "Sleep Anxiety Relief",
+    expert: "Dr. Benjamin Taylor",
+    expertCredentials: "Anxiety & Sleep Specialist",
+    expertAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    duration: "26:35",
+    category: "Sleep",
+    listens: "32.4k",
+    thumbnail: plant10,
+    isNew: false,
+    isTrending: true,
+    description: "Calm nighttime anxiety and racing thoughts.",
+    fullDescription: "Specialized techniques for anxiety that interferes with sleep.",
+    audioUrl: "#",
+    accessTier: 'premium'
   }
 ];
 
@@ -312,7 +650,6 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: {
 // Main Audio Page Component
 const AudioPage = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   const categories = ['All', 'Meditation', 'Sleep', 'Breathwork', 'Self-Care', 'Focus', 'Self-Esteem'];
@@ -332,12 +669,9 @@ const AudioPage = () => {
     navigate('/upgrade');
   }, [navigate]);
 
-  // Filter audio content
+  // Filter audio content by category only
   const filteredAudio = audioContent.filter(audio => {
-    const matchesSearch = audio.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         audio.expert.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || audio.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return selectedCategory === 'All' || audio.category === selectedCategory;
   });
 
   return (
@@ -360,33 +694,32 @@ const AudioPage = () => {
         </div>
       </div>
 
-      {/* Filters and Search */}
+      {/* Category Filters */}
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          {/* Search */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              placeholder="Search audio sessions..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-12"
-            />
-          </div>
-          
-          {/* Category Filter */}
-          <div className="flex gap-2 overflow-x-auto">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category)}
-                className="whitespace-nowrap"
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap gap-3 mb-8 justify-center">
+          {categories.map((category) => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? "default" : "outline"}
+              onClick={() => setSelectedCategory(category)}
+              className={`whitespace-nowrap px-6 py-2 rounded-full transition-all ${
+                selectedCategory === category
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg'
+                  : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300'
+              }`}
+            >
+              {category}
+            </Button>
+          ))}
+        </div>
+
+        {/* Results Count */}
+        <div className="mb-6 text-center">
+          <p className="text-gray-600">
+            Showing <span className="font-semibold text-purple-600">{filteredAudio.length}</span> audio session{filteredAudio.length !== 1 ? 's' : ''}
+            {selectedCategory !== 'All' && <span> in <span className="font-semibold">{selectedCategory}</span></span>}
+          </p>
         </div>
 
         {/* Audio Grid */}
