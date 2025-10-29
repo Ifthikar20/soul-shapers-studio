@@ -1,9 +1,9 @@
-// src/pages/SingleAudioPage.tsx - PRODUCTION VERSION (No Fallbacks)
+// src/pages/SingleAudioPage.tsx - PRODUCTION VERSION with HLS Streaming
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Moon, Sun, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AudioPlayer } from '@/components/AudioPlayer';
+import HLSAudioPlayer from '@/components/HLSAudioPlayer';
 import { AudioDetails } from '@/components/AudioDetails';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { audioStreamingService, SecureAudioResponse } from '@/services/audio.service';
@@ -130,15 +130,15 @@ const SingleAudioPage = () => {
     return {
       id: parseInt(id || '1'),
       title: apiData.title,
-      expert: "Mental Health Professional",
-      expertCredentials: "Licensed Therapist",
+      expert: apiData.expert_name || "Expert",
+      expertCredentials: apiData.expert_credentials || "",
       duration: `${minutes}:${seconds.toString().padStart(2, '0')}`,
       durationSeconds: apiData.duration_seconds,
-      category: "Mindfulness",
+      category: apiData.category || "Wellness",
       thumbnail: apiData.thumbnail_url || '',
-      description: "Evidence-based audio for mental wellness",
-      fullDescription: "Professional mental health content designed to support your wellness journey.",
-      accessTier: 'free',
+      description: apiData.description || "Professional wellness content",
+      fullDescription: apiData.full_description || apiData.description || "Professional wellness content designed to support your journey.",
+      accessTier: apiData.access_tier || 'free',
       audioUrl: apiData.audio_url,
       sessionId: apiData.content_id.toString(),
       expiresAt: apiData.expires_at,
@@ -514,15 +514,20 @@ const SingleAudioPage = () => {
             </div>
           )}
 
-          {/* Audio Player Component */}
+          {/* HLS Audio Player Component */}
           <div className={isDarkMode ? 'dark' : ''}>
-            <AudioPlayer
-              audio={displayAudio}
+            <HLSAudioPlayer
+              src={displayAudio.audioUrl}
+              audioTitle={displayAudio.title}
+              expertName={displayAudio.expert}
               onPlay={handlePlay}
               onPause={handlePause}
               onSeek={handleSeek}
               onComplete={handleComplete}
-              onError={handleError}
+              onError={(error) => {
+                const errorMsg = error?.message || 'Playback error';
+                handleError('PLAYBACK_ERROR', errorMsg);
+              }}
             />
 
             {/* Audio Content/Transcript Component */}

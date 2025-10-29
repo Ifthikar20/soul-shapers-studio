@@ -375,7 +375,7 @@ const LoginForm = ({ redirectTo }: LoginFormProps) => {
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/privacy" className="text-indigo-600 hover:text-indigo-500 font-medium">
+            <Link to="/privacy-policy" className="text-indigo-600 hover:text-indigo-500 font-medium">
               Privacy Policy
             </Link>.
             <br />

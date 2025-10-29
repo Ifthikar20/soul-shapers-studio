@@ -14,6 +14,12 @@ export interface SecureAudioResponse {
   is_secure: boolean;
   cdn_enabled: boolean;
   thumbnail_url?: string;
+  expert_name?: string;
+  expert_credentials?: string;
+  category?: string;
+  description?: string;
+  full_description?: string;
+  access_tier?: 'free' | 'premium';
   security_info: {
     token_required: boolean;
     url_expires: string;
