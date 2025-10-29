@@ -36,22 +36,32 @@ export const API_SECURITY_CONFIG = {
   ENABLE_RESPONSE_VALIDATION: true,
 
   // Sensitive endpoints that should always be encrypted
+  // Note: Auth endpoints excluded due to CORS preflight issues
+  // They use HTTPS + httpOnly cookies for security instead
   SENSITIVE_ENDPOINTS: [
-    '/auth/login',
-    '/auth/register',
-    '/auth/reset-password',
     '/payment',
     '/subscription',
     '/profile',
     '/user/settings',
+    '/wallet',
+    '/billing',
   ],
 
-  // Public endpoints that don't need encryption
+  // Public endpoints that don't need encryption or extra security headers
   PUBLIC_ENDPOINTS: [
     '/health',
     '/public',
     '/newsletter/subscribe',
     '/categories',
+    '/auth/login',
+    '/auth/register',
+    '/auth/reset-password',
+    '/auth/verify-email',
+    '/auth/forgot-password',
+    '/auth/me',
+    '/auth/refresh',
+    '/auth/logout',
+    '/auth/google',
   ],
 };
 
@@ -147,22 +157,27 @@ export async function securityRequestInterceptor(
       throw new Error('HTTPS is required for API requests in production');
     }
 
-    // Add security headers
-    const securityHeaders = createSecurityHeaders();
-    config.headers = {
-      ...config.headers,
-      ...securityHeaders,
-    } as any;
+    // Skip extra security headers for public endpoints to avoid CORS preflight
+    // Public endpoints (like auth) rely on HTTPS + httpOnly cookies instead
+    let requestId = '';
+    if (!isPublicEndpoint(url)) {
+      // Add security headers
+      const securityHeaders = createSecurityHeaders();
+      config.headers = {
+        ...config.headers,
+        ...securityHeaders,
+      } as any;
 
-    // Add request ID for tracking
-    const requestId = generateSecureToken(16);
-    config.headers['X-Request-ID'] = requestId;
+      // Add request ID for tracking
+      requestId = generateSecureToken(16);
+      config.headers['X-Request-ID'] = requestId;
+    }
 
     // Log request (masked)
     SecurityEventLogger.log('REQUEST', 'Outgoing API request', {
       method: config.method,
       url: fullURL,
-      requestId,
+      requestId: requestId || 'none',
     });
 
     // Encrypt request body for sensitive endpoints
