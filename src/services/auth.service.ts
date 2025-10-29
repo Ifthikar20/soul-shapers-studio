@@ -2,6 +2,7 @@
 // src/services/auth.service.ts
 import axios from 'axios';
 import type { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
+import { applySecurityInterceptors } from '../utils/api.security';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.betterandbliss.com';
 // Rest of your code remains the same
@@ -41,7 +42,10 @@ class AuthService {
       },
       timeout: 10000, // 10 second timeout
     });
-    
+
+    // Apply security interceptors for encryption and security headers
+    applySecurityInterceptors(this.api);
+
     // Request interceptor for CSRF token
     this.api.interceptors.request.use(
       (config) => {
