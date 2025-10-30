@@ -1,7 +1,7 @@
 // src/pages/SingleAudioPage.tsx - PRODUCTION VERSION with HLS Streaming
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Moon, Sun, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, AlertCircle, Loader2, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import HLSAudioPlayer from '@/components/HLSAudioPlayer';
 import { AudioDetails } from '@/components/AudioDetails';
@@ -476,6 +476,19 @@ const SingleAudioPage = () => {
       className={`min-h-screen ${themeClasses.background} transition-colors duration-300`}
       style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
     >
+      {/* Close Button */}
+      <div className="absolute top-6 left-6 z-10">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate('/audio')}
+          className={`${themeClasses.buttonBg} ${themeClasses.text} rounded-full shadow-lg`}
+          title="Close"
+        >
+          <X className="w-5 h-5" />
+        </Button>
+      </div>
+
       {/* Dark Mode Toggle */}
       <div className="absolute top-6 right-6 z-10">
         <Button
@@ -489,20 +502,8 @@ const SingleAudioPage = () => {
         </Button>
       </div>
 
-      {/* Back Button */}
-      <div className="container mx-auto px-6 pt-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/audio')}
-          className={`mb-6 ${themeClasses.buttonBg} ${themeClasses.text}`}
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Audio Library
-        </Button>
-      </div>
-
       {/* Main Content */}
-      <div className="container mx-auto px-6 pb-12">
+      <div className="container mx-auto px-6 pt-20 pb-12">
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Security Info Badge (Optional) */}
