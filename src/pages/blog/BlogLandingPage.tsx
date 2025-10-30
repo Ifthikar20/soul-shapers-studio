@@ -200,7 +200,7 @@ const BlogLandingPage = () => {
               className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Blog
+              Back to Read
             </button>
           </div>
         </nav>
