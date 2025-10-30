@@ -1,744 +1,472 @@
-// src/pages/SingleAudioPage.tsx - PRODUCTION VERSION with HLS Streaming
-import React, { useState, useEffect, useRef } from 'react';
+// src/pages/SingleAudioPage.tsx - Beautiful Plant Image Design
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Moon, Sun, AlertCircle, Loader2, RefreshCw, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import HLSAudioPlayer from '@/components/HLSAudioPlayer';
-import { AudioDetails } from '@/components/AudioDetails';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { audioStreamingService, SecureAudioResponse } from '@/services/audio.service';
+import { Play, Pause, X, ChevronDown, ChevronUp, Volume2 } from 'lucide-react';
 
-// ============================================
-// TYPE DEFINITIONS
-// ============================================
+// Import plant images
+import plant4 from '@/assets/plant4.png';
+import plant5 from '@/assets/plant5.png';
+import plant7 from '@/assets/plant7.png';
+import plant8 from '@/assets/plant8.png';
+import plant9 from '@/assets/plant9.png';
+import plant10 from '@/assets/plant10.png';
 
-interface DisplayAudio {
-  id: number;
-  title: string;
-  expert: string;
-  expertCredentials: string;
-  duration: string;
-  durationSeconds: number;
-  category: string;
-  thumbnail: string;
-  description: string;
-  fullDescription: string;
-  accessTier: 'free' | 'premium';
-  audioUrl: string;
-  sessionId: string;
-  expiresAt: string;
-  isSecure: boolean;
-  cdnEnabled: boolean;
-}
+// Plant images array for rotating through
+const plantImages = [plant4, plant5, plant7, plant8, plant9, plant10];
 
-interface ErrorState {
-  type: 'AUTH_ERROR' | 'ACCESS_DENIED' | 'NOT_FOUND' | 'NETWORK_ERROR' | 'TOKEN_EXPIRED' | 'SERVER_ERROR';
-  message: string;
-  canRetry: boolean;
-}
-
-// ============================================
-// DUMMY DATA FOR DEVELOPMENT
-// ============================================
-
-const DUMMY_AUDIO_DATA: Record<string, DisplayAudio> = {
+// Dummy audio data
+const AUDIO_SESSIONS = {
   '1': {
-    id: 1,
+    id: '1',
     title: 'Introduction to Mindful Breathing',
-    expert: 'Dr. Sarah Johnson',
-    expertCredentials: 'Clinical Psychologist',
+    description: 'Learn the foundational practice of mindful breathing. Perfect for starting your meditation journey. This guided session will help you develop awareness of your breath and cultivate inner calm.',
     duration: '5:00',
-    durationSeconds: 300,
+    expert: 'Dr. Sarah Johnson',
+    role: 'Clinical Psychologist',
     category: 'Meditation',
-    thumbnail: '',
-    description: 'Learn the foundational practice of mindful breathing.',
-    fullDescription: 'Learn the foundational practice of mindful breathing. Perfect for starting your meditation journey. This guided session will help you develop awareness of your breath and cultivate inner calm.',
-    accessTier: 'free',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    sessionId: '1',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    isSecure: false,
-    cdnEnabled: false,
+    image: plant4,
+    transcript: `Welcome to this mindful breathing practice.
+
+Find a comfortable seated position, with your spine gently upright and your shoulders relaxed.
+
+Begin by taking a few deep breaths, noticing the sensation of air entering and leaving your body.
+
+There's no need to change your breath - simply observe it as it is, natural and effortless.
+
+Notice the gentle rise and fall of your chest and belly with each breath.
+
+If your mind wanders, that's perfectly normal. Simply guide your attention back to your breath.
+
+Continue this practice for the next few minutes, breathing naturally and staying present.`
   },
   '2': {
-    id: 2,
+    id: '2',
     title: 'Body Awareness Scan',
-    expert: 'Dr. Sarah Johnson',
-    expertCredentials: 'Clinical Psychologist',
+    description: 'Release tension and connect with your physical sensations through gentle body scanning. This practice helps you develop deeper body awareness and release stored tension.',
     duration: '7:00',
-    durationSeconds: 420,
+    expert: 'Dr. Sarah Johnson',
+    role: 'Clinical Psychologist',
     category: 'Relaxation',
-    thumbnail: '',
-    description: 'Release tension and connect with your physical sensations.',
-    fullDescription: 'Release tension and connect with your physical sensations through gentle body scanning. This practice helps you develop deeper body awareness and release stored tension.',
-    accessTier: 'free',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    sessionId: '2',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    isSecure: false,
-    cdnEnabled: false,
+    image: plant5,
+    transcript: `Welcome to this body awareness scan.
+
+Find a comfortable position, either sitting or lying down.
+
+We'll begin by bringing attention to your feet. Notice any sensations - warmth, coolness, tingling, or pressure.
+
+Gradually move your awareness up through your legs, noticing each part of your body.
+
+Release any tension you find, allowing each part to relax completely.
+
+Continue scanning through your torso, arms, and up to the crown of your head.
+
+Take a moment to appreciate your body and all it does for you.`
   },
   '3': {
-    id: 3,
+    id: '3',
     title: 'Midday Reset',
-    expert: 'Dr. Sarah Johnson',
-    expertCredentials: 'Clinical Psychologist',
+    description: 'A quick practice to refresh your mind during busy workdays. Perfect for a midday reset to restore focus and energy.',
     duration: '3:00',
-    durationSeconds: 180,
+    expert: 'Dr. Sarah Johnson',
+    role: 'Clinical Psychologist',
     category: 'Quick Practice',
-    thumbnail: '',
-    description: 'A quick practice to refresh your mind during busy workdays.',
-    fullDescription: 'A quick practice to refresh your mind during busy workdays. Perfect for a midday reset to restore focus and energy.',
-    accessTier: 'free',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    sessionId: '3',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    isSecure: false,
-    cdnEnabled: false,
+    image: plant7,
+    transcript: `Let's take a quick midday reset.
+
+Close your eyes and take three deep breaths.
+
+Release the stress of the morning and prepare for the afternoon ahead.
+
+Notice how you feel right now - physically and mentally.
+
+Set an intention for the rest of your day.
+
+You're doing great. Let's continue.`
   },
   '4': {
-    id: 4,
+    id: '4',
     title: 'Understanding Your Anxiety',
-    expert: 'Dr. Emily Rodriguez',
-    expertCredentials: 'Anxiety Specialist',
+    description: 'Learn the science behind anxiety and how meditation can help. This comprehensive session explores the neuroscience of anxiety and provides practical tools for managing anxious thoughts and feelings.',
     duration: '10:00',
-    durationSeconds: 600,
+    expert: 'Dr. Emily Rodriguez',
+    role: 'Anxiety Specialist',
     category: 'Anxiety Relief',
-    thumbnail: '',
-    description: 'Learn the science behind anxiety and how meditation can help.',
-    fullDescription: 'Learn the science behind anxiety and how meditation can help. This comprehensive session explores the neuroscience of anxiety and provides practical tools for managing anxious thoughts and feelings.',
-    accessTier: 'free',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-    sessionId: '4',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    isSecure: false,
-    cdnEnabled: false,
+    image: plant8,
+    transcript: `Welcome to understanding your anxiety.
+
+Anxiety is a natural human response, designed to keep us safe.
+
+However, sometimes this protective mechanism can become overactive.
+
+In this session, we'll explore what happens in your brain when you feel anxious.
+
+You'll learn techniques to work with anxiety rather than against it.
+
+Remember, you're not broken - your nervous system is simply trying to protect you.
+
+Let's begin by acknowledging any anxiety you're feeling right now, without judgment.`
   },
   '5': {
-    id: 5,
+    id: '5',
     title: 'Grounding Technique',
-    expert: 'Dr. Emily Rodriguez',
-    expertCredentials: 'Anxiety Specialist',
+    description: 'Anchor yourself in the present moment when anxiety strikes. Learn powerful grounding techniques to bring yourself back to center during moments of overwhelm.',
     duration: '8:00',
-    durationSeconds: 480,
+    expert: 'Dr. Emily Rodriguez',
+    role: 'Anxiety Specialist',
     category: 'Quick Relief',
-    thumbnail: '',
-    description: 'Anchor yourself in the present moment when anxiety strikes.',
-    fullDescription: 'Anchor yourself in the present moment when anxiety strikes. Learn powerful grounding techniques to bring yourself back to center during moments of overwhelm.',
-    accessTier: 'free',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
-    sessionId: '5',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    isSecure: false,
-    cdnEnabled: false,
+    image: plant9,
+    transcript: `Let's practice a powerful grounding technique.
+
+This exercise uses your five senses to anchor you in the present moment.
+
+Name five things you can see around you.
+
+Four things you can touch or feel.
+
+Three things you can hear.
+
+Two things you can smell.
+
+One thing you can taste.
+
+Notice how you feel more present and grounded in this moment.`
   },
   '6': {
-    id: 6,
+    id: '6',
     title: 'Breath for Calm',
-    expert: 'Dr. Emily Rodriguez',
-    expertCredentials: 'Anxiety Specialist',
+    description: 'Master breathing patterns that activate your relaxation response. Discover specific breathing techniques proven to calm the nervous system and reduce anxiety.',
     duration: '7:00',
-    durationSeconds: 420,
+    expert: 'Dr. Emily Rodriguez',
+    role: 'Anxiety Specialist',
     category: 'Breathwork',
-    thumbnail: '',
-    description: 'Master breathing patterns that activate your relaxation response.',
-    fullDescription: 'Master breathing patterns that activate your relaxation response. Discover specific breathing techniques proven to calm the nervous system and reduce anxiety.',
-    accessTier: 'free',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
-    sessionId: '6',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    isSecure: false,
-    cdnEnabled: false,
+    image: plant10,
+    transcript: `Welcome to calming breathwork.
+
+We'll practice a simple but powerful breathing technique.
+
+Breathe in slowly through your nose for a count of four.
+
+Hold for a count of four.
+
+Breathe out through your mouth for a count of six.
+
+The longer exhale activates your body's relaxation response.
+
+Continue this pattern, finding your natural rhythm.`
   },
   '7': {
-    id: 7,
+    id: '7',
     title: 'Working with Worried Thoughts',
-    expert: 'Dr. Emily Rodriguez',
-    expertCredentials: 'Anxiety Specialist',
+    description: 'Develop a healthier relationship with anxious thinking patterns. Learn cognitive techniques to observe, challenge, and reframe worry-based thoughts.',
     duration: '12:00',
-    durationSeconds: 720,
+    expert: 'Dr. Emily Rodriguez',
+    role: 'Anxiety Specialist',
     category: 'Advanced',
-    thumbnail: '',
-    description: 'Develop a healthier relationship with anxious thinking patterns.',
-    fullDescription: 'Develop a healthier relationship with anxious thinking patterns. Learn cognitive techniques to observe, challenge, and reframe worry-based thoughts.',
-    accessTier: 'premium',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
-    sessionId: '7',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    isSecure: false,
-    cdnEnabled: false,
+    image: plant4,
+    transcript: `Working with worried thoughts.
+
+Thoughts are not facts - they're mental events that come and go.
+
+Notice your thoughts without getting caught up in them.
+
+Imagine them as clouds passing in the sky.
+
+You can observe them without needing to engage or believe them.
+
+Practice this gentle distance from your thoughts.`
   },
   '8': {
-    id: 8,
+    id: '8',
     title: 'Body Relaxation for Anxiety',
-    expert: 'Dr. Emily Rodriguez',
-    expertCredentials: 'Anxiety Specialist',
+    description: 'Release physical tension associated with anxious states. This somatic practice helps you identify and release the physical manifestations of anxiety stored in your body.',
     duration: '9:00',
-    durationSeconds: 540,
+    expert: 'Dr. Emily Rodriguez',
+    role: 'Anxiety Specialist',
     category: 'Somatic',
-    thumbnail: '',
-    description: 'Release physical tension associated with anxious states.',
-    fullDescription: 'Release physical tension associated with anxious states. This somatic practice helps you identify and release the physical manifestations of anxiety stored in your body.',
-    accessTier: 'premium',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
-    sessionId: '8',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    isSecure: false,
-    cdnEnabled: false,
+    image: plant5,
+    transcript: `Body relaxation for anxiety.
+
+Anxiety often manifests physically in our bodies.
+
+Let's scan for areas of tension - jaw, shoulders, stomach.
+
+Breathe into these areas with compassion.
+
+As you exhale, imagine releasing the tension.
+
+Your body is safe. You are safe.
+
+Continue breathing and releasing.`
   },
   '9': {
-    id: 9,
+    id: '9',
     title: 'Long-Term Anxiety Management',
-    expert: 'Dr. Emily Rodriguez',
-    expertCredentials: 'Anxiety Specialist',
+    description: 'Build resilience and create sustainable practices for ongoing peace. This comprehensive session brings together all the techniques you\'ve learned to create a long-term anxiety management plan.',
     duration: '15:00',
-    durationSeconds: 900,
+    expert: 'Dr. Emily Rodriguez',
+    role: 'Anxiety Specialist',
     category: 'Mastery',
-    thumbnail: '',
-    description: 'Build resilience and create sustainable practices for ongoing peace.',
-    fullDescription: 'Build resilience and create sustainable practices for ongoing peace. This comprehensive session brings together all the techniques you\'ve learned to create a long-term anxiety management plan.',
-    accessTier: 'premium',
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3',
-    sessionId: '9',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    isSecure: false,
-    cdnEnabled: false,
-  },
+    image: plant7,
+    transcript: `Long-term anxiety management.
+
+Managing anxiety is a journey, not a destination.
+
+You've learned many tools - breathwork, grounding, mindfulness.
+
+The key is consistent practice, even when you feel good.
+
+Build these practices into your daily routine.
+
+Remember to be patient and compassionate with yourself.
+
+You're building new neural pathways, and that takes time.
+
+Trust the process and celebrate small victories.`
+  }
 };
-
-// ============================================
-// CONTENT SLUG MAPPING
-// ============================================
-
-const SLUG_MAP: Record<string, string> = {
-  '1': 'guided-meditation-anxiety-relief',
-  '2': 'self-compassion-practice',
-};
-
-// ============================================
-// MAIN COMPONENT
-// ============================================
 
 const SingleAudioPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  // UI State
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [showTranscript, setShowTranscript] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Data State
-  const [audioData, setAudioData] = useState<SecureAudioResponse | null>(null);
-  const [displayAudio, setDisplayAudio] = useState<DisplayAudio | null>(null);
-
-  // Loading & Error State
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<ErrorState | null>(null);
-  const [retrying, setRetrying] = useState(false);
-
-  // Playback tracking refs
-  const playbackStartTime = useRef<number>(0);
-  const lastPosition = useRef<number>(0);
-  const hasLoggedPlay = useRef<boolean>(false);
-
-  // Get content slug from page ID
-  const contentSlug = SLUG_MAP[id || '1'] || 'guided-meditation-anxiety-relief';
-
-  // ============================================
-  // FETCH AUDIO STREAM
-  // ============================================
-
-  const fetchAudioStream = async (isRetry = false) => {
-    try {
-      if (isRetry) {
-        setRetrying(true);
-      } else {
-        setLoading(true);
-      }
-
-      setError(null);
-
-      console.log(`🎵 Using dummy audio data for ID: ${id}`);
-
-      // DEVELOPMENT MODE: Use dummy data instead of API call
-      const dummyAudio = DUMMY_AUDIO_DATA[id || '1'];
-
-      if (!dummyAudio) {
-        throw new Error('Audio not found');
-      }
-
-      // Simulate network delay for realism
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      console.log('✅ Dummy audio loaded:', {
-        title: dummyAudio.title,
-        duration: dummyAudio.durationSeconds,
-        secure: dummyAudio.isSecure,
-        cdn: dummyAudio.cdnEnabled
-      });
-
-      setDisplayAudio(dummyAudio);
-
-      // COMMENTED OUT: Production API call
-      // const streamData = await audioStreamingService.getSecureAudioStream(contentSlug);
-      // setAudioData(streamData);
-      // const transformedAudio = transformToDisplay(streamData);
-      // setDisplayAudio(transformedAudio);
-      // checkUrlExpiration(streamData.expires_at);
-
-    } catch (err: any) {
-      console.error('❌ Failed to load audio:', err);
-
-      const errorState = parseError(err);
-      setError(errorState);
-
-    } finally {
-      setLoading(false);
-      setRetrying(false);
-    }
-  };
-
-  // ============================================
-  // DATA TRANSFORMATION
-  // ============================================
-
-  const transformToDisplay = (apiData: SecureAudioResponse): DisplayAudio => {
-    const minutes = Math.floor(apiData.duration_seconds / 60);
-    const seconds = apiData.duration_seconds % 60;
-
-    return {
-      id: parseInt(id || '1'),
-      title: apiData.title,
-      expert: apiData.expert_name || "Expert",
-      expertCredentials: apiData.expert_credentials || "",
-      duration: `${minutes}:${seconds.toString().padStart(2, '0')}`,
-      durationSeconds: apiData.duration_seconds,
-      category: apiData.category || "Wellness",
-      thumbnail: apiData.thumbnail_url || '',
-      description: apiData.description || "Professional wellness content",
-      fullDescription: apiData.full_description || apiData.description || "Professional wellness content designed to support your journey.",
-      accessTier: apiData.access_tier || 'free',
-      audioUrl: apiData.audio_url,
-      sessionId: apiData.content_id.toString(),
-      expiresAt: apiData.expires_at,
-      isSecure: apiData.is_secure,
-      cdnEnabled: apiData.cdn_enabled,
-    };
-  };
-
-  // ============================================
-  // ERROR HANDLING
-  // ============================================
-
-  const parseError = (err: any): ErrorState => {
-    if (err.response) {
-      const status = err.response.status;
-      const detail = err.response.data?.detail || err.message;
-
-      switch (status) {
-        case 401:
-          return {
-            type: 'AUTH_ERROR',
-            message: 'Please log in to access this content',
-            canRetry: false
-          };
-
-        case 403:
-          return {
-            type: 'ACCESS_DENIED',
-            message: detail || 'Premium subscription required',
-            canRetry: false
-          };
-
-        case 404:
-          return {
-            type: 'NOT_FOUND',
-            message: 'Audio content not found',
-            canRetry: false
-          };
-
-        case 410:
-          return {
-            type: 'TOKEN_EXPIRED',
-            message: 'Stream URL expired',
-            canRetry: true
-          };
-
-        case 500:
-        case 502:
-        case 503:
-          return {
-            type: 'SERVER_ERROR',
-            message: 'Server error. Please try again.',
-            canRetry: true
-          };
-
-        default:
-          return {
-            type: 'NETWORK_ERROR',
-            message: 'Connection error. Check your internet.',
-            canRetry: true
-          };
-      }
-    }
-
-    if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-      return {
-        type: 'NETWORK_ERROR',
-        message: 'Request timeout. Please try again.',
-        canRetry: true
-      };
-    }
-
-    return {
-      type: 'NETWORK_ERROR',
-      message: err.message || 'An unexpected error occurred',
-      canRetry: true
-    };
-  };
-
-  const checkUrlExpiration = (expiresAt: string) => {
-    const expirationTime = new Date(expiresAt).getTime();
-    const currentTime = Date.now();
-    const timeRemaining = expirationTime - currentTime;
-    const fiveMinutes = 5 * 60 * 1000;
-
-    if (timeRemaining < fiveMinutes && timeRemaining > 0) {
-      console.warn('⚠️ URL expires soon (< 5 min)');
-    } else if (timeRemaining <= 0) {
-      console.error('❌ URL already expired');
-    }
-  };
-
-  // ============================================
-  // PLAYBACK HANDLERS
-  // ============================================
-
-  const handlePlay = () => {
-    setShowTranscript(true);
-
-    if (!hasLoggedPlay.current) {
-      playbackStartTime.current = Date.now();
-      hasLoggedPlay.current = true;
-      console.log('📊 Play event at position 0');
-    }
-  };
-
-  const handlePause = (currentTime: number) => {
-    lastPosition.current = currentTime;
-    console.log('📊 Pause event at position:', currentTime);
-  };
-
-  const handleSeek = (fromPosition: number, toPosition: number) => {
-    console.log('📊 Seek event from', fromPosition, 'to', toPosition);
-  };
-
-  const handleComplete = () => {
-    const durationWatched = Math.floor((Date.now() - playbackStartTime.current) / 1000);
-    console.log('📊 Complete event, duration watched:', durationWatched);
-  };
-
-  const handleError = (errorCode: string, errorMessage: string) => {
-    console.error('📊 Playback error:', errorCode, errorMessage);
-  };
-
-  // ============================================
-  // LIFECYCLE
-  // ============================================
+  const audioData = AUDIO_SESSIONS[id || '1'];
 
   useEffect(() => {
-    fetchAudioStream();
-
-    return () => {
-      if (hasLoggedPlay.current) {
-        const durationWatched = Math.floor((Date.now() - playbackStartTime.current) / 1000);
-        console.log('📊 Session end, total duration:', durationWatched);
-      }
-    };
+    // Reset audio when ID changes
+    setIsPlaying(false);
+    setCurrentTime(0);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
   }, [id]);
 
-  // ============================================
-  // UI HELPERS
-  // ============================================
+  if (!audioData) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Audio Not Found</h1>
+          <button
+            onClick={() => navigate('/audio')}
+            className="text-purple-600 hover:text-purple-700 font-semibold"
+          >
+            Back to Library
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-
-  const handleRetry = () => fetchAudioStream(true);
-
-  const handleLogin = () => navigate('/login');
-
-  const handleSubscribe = () => navigate('/subscribe');
-
-  const themeClasses = {
-    background: isDarkMode ? '' : 'bg-gray-50',
-    text: isDarkMode ? 'text-white' : 'text-gray-900',
-    mutedText: isDarkMode ? 'text-gray-300' : 'text-gray-600',
-    buttonBg: isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100',
-    cardBg: isDarkMode ? 'bg-gray-800' : 'bg-white',
+  const togglePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
   };
 
-  // ============================================
-  // RENDER: LOADING STATE
-  // ============================================
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
 
-  if (loading) {
-    return (
-      <div
-        className={`min-h-screen ${themeClasses.background} transition-colors duration-300 flex items-center justify-center`}
-        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
-      >
-        <div className="text-center space-y-4">
-          <Loader2 className={`w-12 h-12 ${themeClasses.text} animate-spin mx-auto`} />
-          <p className={themeClasses.text}>Loading secure audio stream...</p>
-          <p className="text-xs text-gray-500">Establishing encrypted connection...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
 
-  // ============================================
-  // RENDER: ERROR STATES
-  // ============================================
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
 
-  // Authentication Required
-  if (error?.type === 'AUTH_ERROR') {
-    return (
-      <div
-        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
-        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
-      >
-        <div className="max-w-md w-full mx-4">
-          <Alert variant="destructive">
-            <AlertCircle className="h-5 w-5" />
-            <AlertTitle className="text-lg font-semibold mb-2">Authentication Required</AlertTitle>
-            <AlertDescription>
-              <p className="mb-4">{error.message}</p>
-              <div className="flex gap-3">
-                <Button onClick={handleLogin} className="flex-1">
-                  Log In
-                </Button>
-                <Button onClick={() => navigate('/audio')} variant="outline" className="flex-1">
-                  Go Back
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
-        </div>
-      </div>
-    );
-  }
-
-  // Access Denied
-  if (error?.type === 'ACCESS_DENIED') {
-    return (
-      <div
-        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
-        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
-      >
-        <div className="max-w-md w-full mx-4">
-          <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-900/20">
-            <AlertCircle className="h-5 w-5 text-amber-600" />
-            <AlertTitle className="text-lg font-semibold mb-2 text-amber-900 dark:text-amber-100">
-              Premium Content
-            </AlertTitle>
-            <AlertDescription className="text-amber-800 dark:text-amber-200">
-              <p className="mb-4">{error.message}</p>
-              <div className="flex gap-3">
-                <Button onClick={handleSubscribe} className="flex-1 bg-amber-600 hover:bg-amber-700">
-                  Upgrade to Premium
-                </Button>
-                <Button onClick={() => navigate('/audio')} variant="outline" className="flex-1">
-                  Browse Free Content
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
-        </div>
-      </div>
-    );
-  }
-
-  // Not Found
-  if (error?.type === 'NOT_FOUND') {
-    return (
-      <div
-        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
-        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
-      >
-        <div className="text-center">
-          <AlertCircle className={`w-16 h-16 ${themeClasses.mutedText} mx-auto mb-4`} />
-          <h1 className={`text-2xl font-bold ${themeClasses.text} mb-2`}>Audio Not Found</h1>
-          <p className={`${themeClasses.mutedText} mb-6`}>{error.message}</p>
-          <Button onClick={() => navigate('/audio')} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Audio Library
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Network/Retry Errors
-  if (error?.canRetry) {
-    return (
-      <div
-        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
-        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
-      >
-        <div className="max-w-md w-full mx-4">
-          <Alert>
-            <AlertCircle className="h-5 w-5" />
-            <AlertTitle className="text-lg font-semibold mb-2">Connection Error</AlertTitle>
-            <AlertDescription>
-              <p className="mb-4">{error.message}</p>
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleRetry}
-                  disabled={retrying}
-                  className="flex-1"
-                >
-                  {retrying ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Retrying...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Retry
-                    </>
-                  )}
-                </Button>
-                <Button onClick={() => navigate('/audio')} variant="outline" className="flex-1">
-                  Go Back
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
-        </div>
-      </div>
-    );
-  }
-
-  // No audio data loaded
-  if (!displayAudio) {
-    return (
-      <div
-        className={`min-h-screen ${themeClasses.background} flex items-center justify-center`}
-        style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
-      >
-        <div className="text-center">
-          <AlertCircle className={`w-16 h-16 ${themeClasses.mutedText} mx-auto mb-4`} />
-          <h1 className={`text-2xl font-bold ${themeClasses.text} mb-2`}>Unable to Load Audio</h1>
-          <p className={`${themeClasses.mutedText} mb-6`}>Something went wrong loading the audio content.</p>
-          <div className="flex gap-3 justify-center">
-            <Button onClick={handleRetry} variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Try Again
-            </Button>
-            <Button onClick={() => navigate('/audio')} variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Go Back
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ============================================
-  // RENDER: MAIN CONTENT (SUCCESS STATE)
-  // ============================================
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
-    <div
-      className={`min-h-screen ${themeClasses.background} transition-colors duration-300`}
-      style={isDarkMode ? { backgroundColor: '#0F0D0E' } : {}}
-    >
+    <div className="min-h-screen bg-gray-50">
       {/* Close Button */}
-      <div className="absolute top-6 left-6 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
+      <div className="absolute top-6 left-6 z-20">
+        <button
           onClick={() => navigate('/audio')}
-          className={`${themeClasses.buttonBg} ${themeClasses.text} rounded-full shadow-lg`}
+          className="w-12 h-12 rounded-full bg-white hover:bg-gray-100 shadow-lg flex items-center justify-center transition-colors"
           title="Close"
         >
-          <X className="w-5 h-5" />
-        </Button>
-      </div>
-
-      {/* Dark Mode Toggle */}
-      <div className="absolute top-6 right-6 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleDarkMode}
-          className={`${themeClasses.buttonBg} ${themeClasses.text} rounded-full shadow-lg`}
-          title={isDarkMode ? 'Light Mode' : 'Dark Mode'}
-        >
-          {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-        </Button>
+          <X className="w-5 h-5 text-gray-700" />
+        </button>
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 pt-20 pb-12">
-        <div className="max-w-4xl mx-auto space-y-6">
+      <div className="container mx-auto px-6 py-20">
+        <div className="max-w-7xl mx-auto">
 
-          {/* Security Info Badge (Optional) */}
-          {displayAudio.isSecure && (
-            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Secure encrypted stream</span>
-              {displayAudio.cdnEnabled && <span>• CDN enabled</span>}
+          {/* Two Column Layout */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
+
+            {/* Left Side - Plant Image with Play Button */}
+            <div className="relative h-[600px] rounded-2xl overflow-hidden shadow-2xl bg-white group">
+              <img
+                src={audioData.image}
+                alt={audioData.title}
+                className="w-full h-full object-contain"
+              />
+
+              {/* Play Button Overlay */}
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <button
+                  onClick={togglePlayPause}
+                  className="w-24 h-24 rounded-full bg-white/95 hover:bg-white transition-all shadow-2xl flex items-center justify-center group/play"
+                >
+                  {isPlaying ? (
+                    <Pause className="w-10 h-10 text-purple-600 fill-purple-600 group-hover/play:scale-110 transition-transform" />
+                  ) : (
+                    <Play className="w-10 h-10 text-purple-600 ml-1 fill-purple-600 group-hover/play:scale-110 transition-transform" />
+                  )}
+                </button>
+              </div>
+
+              {/* Duration Badge */}
+              <div className="absolute bottom-6 left-6 bg-black/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
+                {audioData.duration}
+              </div>
+
+              {/* Category Badge */}
+              <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm text-gray-900 px-4 py-2 rounded-full text-sm font-medium">
+                {audioData.category}
+              </div>
             </div>
-          )}
 
-          {/* HLS Audio Player Component */}
-          <div className={isDarkMode ? 'dark' : ''}>
-            <HLSAudioPlayer
-              src={displayAudio.audioUrl}
-              audioTitle={displayAudio.title}
-              expertName={displayAudio.expert}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              onSeek={handleSeek}
-              onComplete={handleComplete}
-              onError={(error) => {
-                const errorMsg = error?.message || 'Playback error';
-                handleError('PLAYBACK_ERROR', errorMsg);
-              }}
-            />
+            {/* Right Side - Audio Details */}
+            <div className="bg-white p-12 rounded-2xl shadow-lg">
 
-            {/* Audio Content/Transcript Component */}
-            <AudioDetails
-              audio={displayAudio}
-              showTranscript={showTranscript}
-            />
+              {/* Audio Title */}
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                {audioData.title}
+              </h1>
+
+              {/* Description */}
+              <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                {audioData.description}
+              </p>
+
+              {/* Divider */}
+              <div className="h-px bg-gray-200 mb-8" />
+
+              {/* Expert Info */}
+              <div className="mb-8">
+                <p className="text-sm text-gray-500 mb-1">Guided by</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {audioData.expert}
+                </p>
+                <p className="text-gray-600 text-lg">
+                  {audioData.role}
+                </p>
+              </div>
+
+              {/* Audio Player */}
+              <div className="bg-gray-50 p-6 rounded-xl">
+                <div className="flex items-center gap-4 mb-4">
+                  <button
+                    onClick={togglePlayPause}
+                    className="w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-700 transition-colors flex items-center justify-center shadow-lg"
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-6 h-6 text-white fill-white" />
+                    ) : (
+                      <Play className="w-6 h-6 text-white ml-0.5 fill-white" />
+                    )}
+                  </button>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                      <span>{formatTime(currentTime)}</span>
+                      <span>{formatTime(duration)}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max={duration || 0}
+                      value={currentTime}
+                      onChange={handleSeek}
+                      className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600"
+                    />
+                  </div>
+                  <Volume2 className="w-5 h-5 text-gray-600" />
+                </div>
+              </div>
+            </div>
+
           </div>
 
-          {/* Expiration Warning (if < 5 minutes remaining) */}
-          {(() => {
-            const expiresAt = new Date(displayAudio.expiresAt).getTime();
-            const now = Date.now();
-            const remaining = expiresAt - now;
-            const fiveMinutes = 5 * 60 * 1000;
+          {/* Transcript Section */}
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <button
+              onClick={() => setShowTranscript(!showTranscript)}
+              className="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                  {showTranscript ? (
+                    <ChevronUp className="w-5 h-5 text-purple-600" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-purple-600" />
+                  )}
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Transcript</h2>
+              </div>
+              <span className="text-sm text-gray-500">
+                {showTranscript ? 'Hide' : 'Show'}
+              </span>
+            </button>
 
-            if (remaining < fiveMinutes && remaining > 0) {
-              return (
-                <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-900/20">
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
-                  <AlertDescription className="text-amber-800 dark:text-amber-200">
-                    Stream URL expires soon. Refresh if playback stops.
-                  </AlertDescription>
-                </Alert>
-              );
-            }
-            return null;
-          })()}
+            {showTranscript && (
+              <div className="px-6 pb-6">
+                <div className="h-px bg-gray-200 mb-6" />
+                <div className="prose prose-lg max-w-none">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    {audioData.transcript}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
 
         </div>
       </div>
+
+      {/* Hidden Audio Element */}
+      <audio
+        ref={audioRef}
+        src={audioData.audioUrl}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={() => setIsPlaying(false)}
+      />
     </div>
   );
 };
