@@ -148,7 +148,8 @@ const Header = ({ onShowAuth }: HeaderProps) => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    // Force a full page reload to clear all state
+    window.location.href = '/';
   };
 
   const getUserInitials = (name: string) => {

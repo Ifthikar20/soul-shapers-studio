@@ -12,6 +12,7 @@ import NewsletterOnlyPage from "./pages/NewsletterOnlyPage";
 // Lazy load ALL other components to prevent unnecessary loading
 const AuthProvider = lazy(() => import("@/contexts/AuthContext").then(module => ({ default: module.AuthProvider })));
 const ProtectedRoute = lazy(() => import("@/components/ProtectedRoute").then(module => ({ default: module.ProtectedRoute })));
+const PublicOnlyRoute = lazy(() => import("@/components/PublicOnlyRoute").then(module => ({ default: module.PublicOnlyRoute })));
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -28,6 +29,7 @@ const AudioPage = lazy(() => import("./pages/AudioPage"));
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
 const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const SupportPage = lazy(() => import("./pages/SupportPage"));
 
 // Lazy load components
 const UnderConstructionPage = lazy(() => import("./components/UnderConstructionPage"));
@@ -93,25 +95,50 @@ const App = () => {
           <Suspense fallback={<LoadingSpinner />}>
             <AuthProvider>
               <Routes>
+                {/* Landing Page - Public Only (redirects authenticated users to /browse) */}
+                <Route
+                  path="/"
+                  element={
+                    <PublicOnlyRoute>
+                      <Index />
+                    </PublicOnlyRoute>
+                  }
+                />
+
                 {/* Public Routes */}
-                <Route path="/" element={<Index />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/support" element={<SupportPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
                 <Route path="/upgrade" element={<UpgradePage />} />
                 <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
-
-                {/* Audio Routes - Public */}
-                <Route path="/audio" element={<AudioPage />} />
-                <Route path="/audio/:id" element={<SingleAudioPage />} />
 
                 {/* Blog Routes - Public */}
                 <Route path="/blog" element={<BlogLandingPage />} />
                 <Route path="/blog/post/:slug" element={<BlogPostPage />} />
                 <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
 
+                {/* PROTECTED: Audio Routes - Requires Authentication */}
                 <Route
-                  path="/watch/:id"  // ✅ CHANGED from :shortId to :id
+                  path="/audio"
+                  element={
+                    <ProtectedRoute>
+                      <AudioPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/audio/:id"
+                  element={
+                    <ProtectedRoute>
+                      <SingleAudioPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* PROTECTED: Watch Route - Requires Authentication */}
+                <Route
+                  path="/watch/:id"
                   element={
                     <ProtectedRoute>
                       <WatchPage />

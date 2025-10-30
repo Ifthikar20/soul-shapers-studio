@@ -18,13 +18,13 @@ import {
   ArrowLeft,
   AlertCircle,
   Loader2,
-  Github,
+  Apple,
   Chrome,
   Shield,
   Heart,
   Brain
 } from "lucide-react";
-import betterBlissLogo from "@/assets/betterandblisslogo.png";
+import gfLogo from "@/assets/gf-logo.svg";
 import { authService } from "@/services/auth.service";
 
 const LoginPage = () => {
@@ -132,8 +132,10 @@ const LoginPage = () => {
     authService.loginWithGoogle();
   };
 
-  const handleGithubLogin = () => {
-    console.log("GitHub login not implemented yet");
+  const handleAppleLogin = () => {
+    setIsLoading(true);
+    console.log('🍎 Apple login initiated');
+    authService.loginWithApple();
   };
 
   // Clear errors when switching modes
@@ -166,16 +168,11 @@ const LoginPage = () => {
             <CardHeader className="text-center space-y-3 lg:space-y-4 pb-4 lg:pb-6">
               {/* Logo */}
               <div className="mx-auto">
-                <div className="relative bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-900/50 p-2 lg:p-3 rounded-2xl border border-purple-200/50 dark:border-purple-700/50 hover:scale-105 transition-transform duration-200">
-                  <img
-                    src={betterBlissLogo}
-                    alt="Better & Bliss"
-                    className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl"
-                  />
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 lg:w-6 lg:h-6 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800">
-                    <Brain className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-white" />
-                  </div>
-                </div>
+                <img
+                  src={gfLogo}
+                  alt="gf."
+                  className="w-16 h-16 lg:w-20 lg:h-20 mx-auto hover:scale-105 transition-transform duration-200"
+                />
               </div>
 
               <div className="space-y-1 lg:space-y-2">
@@ -217,12 +214,12 @@ const LoginPage = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={handleGithubLogin}
+                  onClick={handleAppleLogin}
                   disabled={isLoading}
                   className="w-full h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:bg-gray-50 dark:hover:bg-gray-950/20 transition-colors"
                 >
-                  <Github className="w-4 h-4 mr-2" />
-                  Continue with GitHub
+                  <Apple className="w-4 h-4 mr-2" />
+                  Continue with Apple
                 </Button>
               </div>
 
@@ -452,7 +449,7 @@ const LoginPage = () => {
       </div>
 
       {/* Right Side - Background Image with Quotes Overlay */}
-      <div 
+      <div
         className="flex-1 relative overflow-hidden hidden xl:flex"
         style={{
           backgroundImage: 'url(/src/assets/login-page-canvas.jpg)',
@@ -461,6 +458,9 @@ const LoginPage = () => {
           backgroundRepeat: 'no-repeat'
         }}
       >
+        {/* Cloudy/Blended Left Edge */}
+        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-50 dark:from-slate-900 via-slate-50/70 dark:via-slate-900/70 to-transparent z-10"></div>
+
         {/* Dark Overlay for Better Text Readability */}
         <div className="absolute inset-0 bg-black/20"></div>
 
