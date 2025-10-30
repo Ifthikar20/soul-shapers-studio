@@ -38,6 +38,175 @@ interface ErrorState {
 }
 
 // ============================================
+// DUMMY DATA FOR DEVELOPMENT
+// ============================================
+
+const DUMMY_AUDIO_DATA: Record<string, DisplayAudio> = {
+  '1': {
+    id: 1,
+    title: 'Introduction to Mindful Breathing',
+    expert: 'Dr. Sarah Johnson',
+    expertCredentials: 'Clinical Psychologist',
+    duration: '5:00',
+    durationSeconds: 300,
+    category: 'Meditation',
+    thumbnail: '',
+    description: 'Learn the foundational practice of mindful breathing.',
+    fullDescription: 'Learn the foundational practice of mindful breathing. Perfect for starting your meditation journey. This guided session will help you develop awareness of your breath and cultivate inner calm.',
+    accessTier: 'free',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    sessionId: '1',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isSecure: false,
+    cdnEnabled: false,
+  },
+  '2': {
+    id: 2,
+    title: 'Body Awareness Scan',
+    expert: 'Dr. Sarah Johnson',
+    expertCredentials: 'Clinical Psychologist',
+    duration: '7:00',
+    durationSeconds: 420,
+    category: 'Relaxation',
+    thumbnail: '',
+    description: 'Release tension and connect with your physical sensations.',
+    fullDescription: 'Release tension and connect with your physical sensations through gentle body scanning. This practice helps you develop deeper body awareness and release stored tension.',
+    accessTier: 'free',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    sessionId: '2',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isSecure: false,
+    cdnEnabled: false,
+  },
+  '3': {
+    id: 3,
+    title: 'Midday Reset',
+    expert: 'Dr. Sarah Johnson',
+    expertCredentials: 'Clinical Psychologist',
+    duration: '3:00',
+    durationSeconds: 180,
+    category: 'Quick Practice',
+    thumbnail: '',
+    description: 'A quick practice to refresh your mind during busy workdays.',
+    fullDescription: 'A quick practice to refresh your mind during busy workdays. Perfect for a midday reset to restore focus and energy.',
+    accessTier: 'free',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    sessionId: '3',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isSecure: false,
+    cdnEnabled: false,
+  },
+  '4': {
+    id: 4,
+    title: 'Understanding Your Anxiety',
+    expert: 'Dr. Emily Rodriguez',
+    expertCredentials: 'Anxiety Specialist',
+    duration: '10:00',
+    durationSeconds: 600,
+    category: 'Anxiety Relief',
+    thumbnail: '',
+    description: 'Learn the science behind anxiety and how meditation can help.',
+    fullDescription: 'Learn the science behind anxiety and how meditation can help. This comprehensive session explores the neuroscience of anxiety and provides practical tools for managing anxious thoughts and feelings.',
+    accessTier: 'free',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    sessionId: '4',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isSecure: false,
+    cdnEnabled: false,
+  },
+  '5': {
+    id: 5,
+    title: 'Grounding Technique',
+    expert: 'Dr. Emily Rodriguez',
+    expertCredentials: 'Anxiety Specialist',
+    duration: '8:00',
+    durationSeconds: 480,
+    category: 'Quick Relief',
+    thumbnail: '',
+    description: 'Anchor yourself in the present moment when anxiety strikes.',
+    fullDescription: 'Anchor yourself in the present moment when anxiety strikes. Learn powerful grounding techniques to bring yourself back to center during moments of overwhelm.',
+    accessTier: 'free',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+    sessionId: '5',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isSecure: false,
+    cdnEnabled: false,
+  },
+  '6': {
+    id: 6,
+    title: 'Breath for Calm',
+    expert: 'Dr. Emily Rodriguez',
+    expertCredentials: 'Anxiety Specialist',
+    duration: '7:00',
+    durationSeconds: 420,
+    category: 'Breathwork',
+    thumbnail: '',
+    description: 'Master breathing patterns that activate your relaxation response.',
+    fullDescription: 'Master breathing patterns that activate your relaxation response. Discover specific breathing techniques proven to calm the nervous system and reduce anxiety.',
+    accessTier: 'free',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+    sessionId: '6',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isSecure: false,
+    cdnEnabled: false,
+  },
+  '7': {
+    id: 7,
+    title: 'Working with Worried Thoughts',
+    expert: 'Dr. Emily Rodriguez',
+    expertCredentials: 'Anxiety Specialist',
+    duration: '12:00',
+    durationSeconds: 720,
+    category: 'Advanced',
+    thumbnail: '',
+    description: 'Develop a healthier relationship with anxious thinking patterns.',
+    fullDescription: 'Develop a healthier relationship with anxious thinking patterns. Learn cognitive techniques to observe, challenge, and reframe worry-based thoughts.',
+    accessTier: 'premium',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
+    sessionId: '7',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isSecure: false,
+    cdnEnabled: false,
+  },
+  '8': {
+    id: 8,
+    title: 'Body Relaxation for Anxiety',
+    expert: 'Dr. Emily Rodriguez',
+    expertCredentials: 'Anxiety Specialist',
+    duration: '9:00',
+    durationSeconds: 540,
+    category: 'Somatic',
+    thumbnail: '',
+    description: 'Release physical tension associated with anxious states.',
+    fullDescription: 'Release physical tension associated with anxious states. This somatic practice helps you identify and release the physical manifestations of anxiety stored in your body.',
+    accessTier: 'premium',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+    sessionId: '8',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isSecure: false,
+    cdnEnabled: false,
+  },
+  '9': {
+    id: 9,
+    title: 'Long-Term Anxiety Management',
+    expert: 'Dr. Emily Rodriguez',
+    expertCredentials: 'Anxiety Specialist',
+    duration: '15:00',
+    durationSeconds: 900,
+    category: 'Mastery',
+    thumbnail: '',
+    description: 'Build resilience and create sustainable practices for ongoing peace.',
+    fullDescription: 'Build resilience and create sustainable practices for ongoing peace. This comprehensive session brings together all the techniques you\'ve learned to create a long-term anxiety management plan.',
+    accessTier: 'premium',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3',
+    sessionId: '9',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    isSecure: false,
+    cdnEnabled: false,
+  },
+};
+
+// ============================================
 // CONTENT SLUG MAPPING
 // ============================================
 
@@ -89,26 +258,36 @@ const SingleAudioPage = () => {
 
       setError(null);
 
-      console.log(`🎵 Fetching secure audio stream: ${contentSlug}`);
+      console.log(`🎵 Using dummy audio data for ID: ${id}`);
 
-      const streamData = await audioStreamingService.getSecureAudioStream(contentSlug);
+      // DEVELOPMENT MODE: Use dummy data instead of API call
+      const dummyAudio = DUMMY_AUDIO_DATA[id || '1'];
 
-      console.log('✅ Stream received:', {
-        title: streamData.title,
-        duration: streamData.duration_seconds,
-        secure: streamData.is_secure,
-        cdn: streamData.cdn_enabled
+      if (!dummyAudio) {
+        throw new Error('Audio not found');
+      }
+
+      // Simulate network delay for realism
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      console.log('✅ Dummy audio loaded:', {
+        title: dummyAudio.title,
+        duration: dummyAudio.durationSeconds,
+        secure: dummyAudio.isSecure,
+        cdn: dummyAudio.cdnEnabled
       });
 
-      setAudioData(streamData);
+      setDisplayAudio(dummyAudio);
 
-      const transformedAudio = transformToDisplay(streamData);
-      setDisplayAudio(transformedAudio);
-
-      checkUrlExpiration(streamData.expires_at);
+      // COMMENTED OUT: Production API call
+      // const streamData = await audioStreamingService.getSecureAudioStream(contentSlug);
+      // setAudioData(streamData);
+      // const transformedAudio = transformToDisplay(streamData);
+      // setDisplayAudio(transformedAudio);
+      // checkUrlExpiration(streamData.expires_at);
 
     } catch (err: any) {
-      console.error('❌ Stream fetch failed:', err);
+      console.error('❌ Failed to load audio:', err);
 
       const errorState = parseError(err);
       setError(errorState);
@@ -271,12 +450,12 @@ const SingleAudioPage = () => {
     fetchAudioStream();
 
     return () => {
-      if (hasLoggedPlay.current && audioData) {
+      if (hasLoggedPlay.current) {
         const durationWatched = Math.floor((Date.now() - playbackStartTime.current) / 1000);
         console.log('📊 Session end, total duration:', durationWatched);
       }
     };
-  }, [contentSlug]);
+  }, [id]);
 
   // ============================================
   // UI HELPERS
