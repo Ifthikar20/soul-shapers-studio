@@ -12,6 +12,7 @@ import NewsletterOnlyPage from "./pages/NewsletterOnlyPage";
 // Lazy load ALL other components to prevent unnecessary loading
 const AuthProvider = lazy(() => import("@/contexts/AuthContext").then(module => ({ default: module.AuthProvider })));
 const ProtectedRoute = lazy(() => import("@/components/ProtectedRoute").then(module => ({ default: module.ProtectedRoute })));
+const PublicOnlyRoute = lazy(() => import("@/components/PublicOnlyRoute").then(module => ({ default: module.PublicOnlyRoute })));
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -94,8 +95,17 @@ const App = () => {
           <Suspense fallback={<LoadingSpinner />}>
             <AuthProvider>
               <Routes>
+                {/* Landing Page - Public Only (redirects authenticated users to /browse) */}
+                <Route
+                  path="/"
+                  element={
+                    <PublicOnlyRoute>
+                      <Index />
+                    </PublicOnlyRoute>
+                  }
+                />
+
                 {/* Public Routes */}
-                <Route path="/" element={<Index />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                 <Route path="/support" element={<SupportPage />} />
