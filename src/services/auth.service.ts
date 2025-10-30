@@ -182,6 +182,27 @@ this.api.interceptors.response.use(
     // For Apple login, redirect to your backend OAuth endpoint
     window.location.href = `${import.meta.env.VITE_API_URL}/auth/apple`;
   }
+
+  async logout(): Promise<void> {
+    try {
+      // Call backend logout endpoint to clear server-side session/cookies
+      await this.api.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout API call failed:', error);
+      // Continue with logout even if backend call fails
+    } finally {
+      // Clear any local storage or session storage
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Clear all cookies (client-side ones)
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+    }
+  }
   
   // Additional methods for your app
   async forgotPassword(email: string): Promise<void> {

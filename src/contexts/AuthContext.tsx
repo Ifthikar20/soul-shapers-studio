@@ -102,14 +102,19 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   const logout = useCallback(async () => {
     try {
+      // Call backend logout to clear session/cookies
       await authService.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Continue with logout even if backend call fails
+    } finally {
+      // Always clear user state regardless of backend response
       setUser(null);
+      setIsInitialized(false); // Reset initialization state
       toast({
         title: "Logged out",
         description: "You've been successfully logged out.",
       });
-    } catch (error) {
-      console.error('Logout error:', error);
     }
   }, [toast]);
 
