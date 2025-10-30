@@ -113,17 +113,32 @@ const App = () => {
                 <Route path="/upgrade" element={<UpgradePage />} />
                 <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
 
-                {/* Audio Routes - Public */}
-                <Route path="/audio" element={<AudioPage />} />
-                <Route path="/audio/:id" element={<SingleAudioPage />} />
-
                 {/* Blog Routes - Public */}
                 <Route path="/blog" element={<BlogLandingPage />} />
                 <Route path="/blog/post/:slug" element={<BlogPostPage />} />
                 <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
 
+                {/* PROTECTED: Audio Routes - Requires Authentication */}
                 <Route
-                  path="/watch/:id"  // ✅ CHANGED from :shortId to :id
+                  path="/audio"
+                  element={
+                    <ProtectedRoute>
+                      <AudioPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/audio/:id"
+                  element={
+                    <ProtectedRoute>
+                      <SingleAudioPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* PROTECTED: Watch Route - Requires Authentication */}
+                <Route
+                  path="/watch/:id"
                   element={
                     <ProtectedRoute>
                       <WatchPage />
