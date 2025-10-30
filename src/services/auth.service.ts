@@ -1,8 +1,18 @@
 // src/services/auth.service.ts
-// src/services/auth.service.ts
 import axios from 'axios';
 import type { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import { applySecurityInterceptors } from '../utils/api.security';
+import {
+  sanitizeInput,
+  validateEmail,
+  validatePassword,
+  loginRateLimiter,
+  SecureCookies,
+  validateOAuthRedirect,
+  preventTimingAttack,
+  clearSensitiveData,
+  logAuthEvent,
+} from '../utils/auth.security';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'https://api.betterandbliss.com';
 // Rest of your code remains the same
@@ -125,41 +135,119 @@ this.api.interceptors.response.use(
   }
   
   async login(email: string, password: string): Promise<LoginResponse> {
-    try {
-      const response = await this.api.post('/auth/login', { email, password });
-      return response.data;
-    } catch (error) {
-      throw new Error(this.handleError(error as AxiosError<ApiError>));
+    // Sanitize and validate inputs
+    const sanitizedEmail = sanitizeInput(email);
+
+    // Validate email format
+    const emailValidation = validateEmail(sanitizedEmail);
+    if (!emailValidation.valid) {
+      logAuthEvent('LOGIN_FAILURE', { reason: 'Invalid email format' });
+      throw new Error(emailValidation.error);
     }
+
+    // Check rate limiting
+    const rateLimitCheck = loginRateLimiter.checkAttempt(sanitizedEmail);
+    if (!rateLimitCheck.allowed) {
+      const blockedUntil = rateLimitCheck.blockedUntil;
+      const message = blockedUntil
+        ? `Too many login attempts. Please try again after ${blockedUntil.toLocaleTimeString()}`
+        : 'Too many login attempts. Please try again later.';
+
+      logAuthEvent('LOGIN_FAILURE', { reason: 'Rate limit exceeded', email: sanitizedEmail });
+      throw new Error(message);
+    }
+
+    // Log login attempt
+    logAuthEvent('LOGIN_ATTEMPT', { email: sanitizedEmail });
+
+    // Prevent timing attacks by ensuring consistent response time
+    return await preventTimingAttack(async () => {
+      try {
+        const response = await this.api.post('/auth/login', {
+          email: sanitizedEmail,
+          password
+        });
+
+        // Record successful login
+        loginRateLimiter.recordSuccessfulAttempt(sanitizedEmail);
+        logAuthEvent('LOGIN_SUCCESS', { email: sanitizedEmail });
+
+        return response.data;
+      } catch (error) {
+        // Record failed attempt for rate limiting
+        loginRateLimiter.recordFailedAttempt(sanitizedEmail);
+        logAuthEvent('LOGIN_FAILURE', {
+          email: sanitizedEmail,
+          reason: this.handleError(error as AxiosError<ApiError>)
+        });
+
+        throw new Error(this.handleError(error as AxiosError<ApiError>));
+      }
+    }, 300); // Minimum 300ms to prevent timing attacks
   }
   
   
   async register(email: string, password: string, full_name: string) {
+    // Sanitize inputs
+    const sanitizedEmail = sanitizeInput(email);
+    const sanitizedName = sanitizeInput(full_name);
+
+    // Validate email
+    const emailValidation = validateEmail(sanitizedEmail);
+    if (!emailValidation.valid) {
+      logAuthEvent('LOGIN_FAILURE', { reason: 'Invalid email format' });
+      throw new Error(emailValidation.error);
+    }
+
+    // Validate password strength
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      logAuthEvent('LOGIN_FAILURE', { reason: 'Weak password' });
+      throw new Error(passwordValidation.error);
+    }
+
+    // Validate name
+    if (!sanitizedName || sanitizedName.length < 2) {
+      throw new Error('Name must be at least 2 characters');
+    }
+
+    if (sanitizedName.length > 100) {
+      throw new Error('Name is too long');
+    }
+
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email, password, full_name }),
+        body: JSON.stringify({
+          email: sanitizedEmail,
+          password,
+          full_name: sanitizedName
+        }),
       });
-  
+
       const data = await response.json();
-      
+
       // Handle confirmation requirement (even if status is 200)
       if (data.requires_confirmation || data.detail?.requires_confirmation) {
+        logAuthEvent('LOGIN_SUCCESS', { email: sanitizedEmail, requiresConfirmation: true });
         return {
           success: true,
           needsConfirmation: true,
           message: data.message || data.detail?.message || 'Please confirm your email'
         };
       }
-      
+
       if (!response.ok) {
+        logAuthEvent('LOGIN_FAILURE', { email: sanitizedEmail, reason: data.detail });
         throw new Error(data.detail || 'Registration failed');
       }
-      
+
+      logAuthEvent('LOGIN_SUCCESS', { email: sanitizedEmail });
       return data;
     } catch (error) {
+      logAuthEvent('LOGIN_FAILURE', { email: sanitizedEmail, error: error instanceof Error ? error.message : 'Unknown' });
       throw error;
     }
   }
@@ -174,33 +262,59 @@ this.api.interceptors.response.use(
   }
   
   async loginWithGoogle(): Promise<void> {
+    const redirectUrl = `${import.meta.env.VITE_API_URL}/auth/google`;
+
+    // Validate OAuth redirect for security
+    const validation = validateOAuthRedirect(redirectUrl);
+    if (!validation.valid) {
+      logAuthEvent('OAUTH_REDIRECT', { provider: 'google', error: validation.error });
+      throw new Error(validation.error || 'Invalid OAuth redirect');
+    }
+
+    logAuthEvent('OAUTH_REDIRECT', { provider: 'google', url: redirectUrl });
+
     // For Google login, redirect to your backend OAuth endpoint
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+    window.location.href = redirectUrl;
   }
 
   async loginWithApple(): Promise<void> {
+    const redirectUrl = `${import.meta.env.VITE_API_URL}/auth/apple`;
+
+    // Validate OAuth redirect for security
+    const validation = validateOAuthRedirect(redirectUrl);
+    if (!validation.valid) {
+      logAuthEvent('OAUTH_REDIRECT', { provider: 'apple', error: validation.error });
+      throw new Error(validation.error || 'Invalid OAuth redirect');
+    }
+
+    logAuthEvent('OAUTH_REDIRECT', { provider: 'apple', url: redirectUrl });
+
     // For Apple login, redirect to your backend OAuth endpoint
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/apple`;
+    window.location.href = redirectUrl;
   }
 
   async logout(): Promise<void> {
+    logAuthEvent('LOGOUT', { timestamp: new Date().toISOString() });
+
     try {
       // Call backend logout endpoint to clear server-side session/cookies
       await this.api.post('/auth/logout');
     } catch (error) {
       console.error('Logout API call failed:', error);
+      logAuthEvent('LOGOUT', { error: 'Backend logout failed', continue: true });
       // Continue with logout even if backend call fails
     } finally {
-      // Clear any local storage or session storage
+      // Clear sensitive data from password fields
+      clearSensitiveData();
+
+      // Clear authentication cookies only (not all cookies)
+      SecureCookies.clearAuthCookies();
+
+      // Clear local and session storage
       localStorage.clear();
       sessionStorage.clear();
 
-      // Clear all cookies (client-side ones)
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-      });
+      logAuthEvent('LOGOUT', { status: 'completed', storage: 'cleared', cookies: 'cleared' });
     }
   }
   

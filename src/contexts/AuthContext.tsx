@@ -1,7 +1,8 @@
 // src/contexts/AuthContext.tsx
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
 import { authService } from '@/services/auth.service';
 import { useToast } from '@/hooks/use-toast';
+import { logAuthEvent, clearSensitiveData } from '@/utils/auth.security';
 
 interface User {
   id: string;
@@ -31,6 +32,12 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [loading, setLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
+  const sessionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const activityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Session timeout configuration (30 minutes of inactivity)
+  const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+  const ACTIVITY_CHECK_INTERVAL_MS = 60 * 1000; // Check every minute
 
   // Use useCallback to prevent recreation on every render
   const checkAuthStatus = useCallback(async () => {
@@ -100,17 +107,104 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     }
   }, [toast]);
 
+  // Handle session expiry
+  const handleSessionExpiry = useCallback(async () => {
+    logAuthEvent('SESSION_EXPIRED', { reason: 'Inactivity timeout' });
+
+    // Clear session timeout
+    if (sessionTimeoutRef.current) {
+      clearTimeout(sessionTimeoutRef.current);
+      sessionTimeoutRef.current = null;
+    }
+
+    // Clear user state
+    setUser(null);
+    setIsInitialized(false);
+
+    // Clear sensitive data
+    clearSensitiveData();
+
+    // Show notification
+    toast({
+      title: "Session Expired",
+      description: "Your session has expired due to inactivity. Please log in again.",
+      variant: "destructive",
+    });
+
+    // Call backend logout
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Session expiry logout failed:', error);
+    }
+  }, [toast]);
+
+  // Reset session timeout on user activity
+  const resetSessionTimeout = useCallback(() => {
+    if (sessionTimeoutRef.current) {
+      clearTimeout(sessionTimeoutRef.current);
+    }
+
+    // Set new timeout
+    sessionTimeoutRef.current = setTimeout(() => {
+      if (user) {
+        handleSessionExpiry();
+      }
+    }, SESSION_TIMEOUT_MS);
+  }, [user, SESSION_TIMEOUT_MS, handleSessionExpiry]);
+
+  // Track user activity
+  useEffect(() => {
+    if (!user) return;
+
+    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+
+    const handleActivity = () => {
+      resetSessionTimeout();
+    };
+
+    // Add activity listeners
+    activityEvents.forEach(event => {
+      window.addEventListener(event, handleActivity);
+    });
+
+    // Start session timeout
+    resetSessionTimeout();
+
+    // Cleanup
+    return () => {
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, handleActivity);
+      });
+
+      if (sessionTimeoutRef.current) {
+        clearTimeout(sessionTimeoutRef.current);
+      }
+    };
+  }, [user, resetSessionTimeout]);
+
   const logout = useCallback(async () => {
     try {
       // Call backend logout to clear session/cookies
       await authService.logout();
     } catch (error) {
       console.error('Logout error:', error);
+      logAuthEvent('LOGOUT', { error: 'Logout failed', details: error });
       // Continue with logout even if backend call fails
     } finally {
+      // Clear session timeout
+      if (sessionTimeoutRef.current) {
+        clearTimeout(sessionTimeoutRef.current);
+        sessionTimeoutRef.current = null;
+      }
+
       // Always clear user state regardless of backend response
       setUser(null);
       setIsInitialized(false); // Reset initialization state
+
+      // Clear sensitive data
+      clearSensitiveData();
+
       toast({
         title: "Logged out",
         description: "You've been successfully logged out.",
