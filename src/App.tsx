@@ -28,6 +28,7 @@ const AudioPage = lazy(() => import("./pages/AudioPage"));
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
 const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const SupportPage = lazy(() => import("./pages/SupportPage"));
 
 // Lazy load components
 const UnderConstructionPage = lazy(() => import("./components/UnderConstructionPage"));
@@ -97,6 +98,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/support" element={<SupportPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
                 <Route path="/upgrade" element={<UpgradePage />} />
                 <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
