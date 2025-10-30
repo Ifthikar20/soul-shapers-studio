@@ -26,6 +26,7 @@ const BlogLandingPage = lazy(() => import('./pages/blog/BlogLandingPage'));
 const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
 const BlogCategoryPage = lazy(() => import('./pages/blog/BlogCategoryPage'));
 const AudioPage = lazy(() => import("./pages/AudioPage"));
+const AudioLibraryPage = lazy(() => import("./pages/AudioLibraryPage"));
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
 const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
@@ -124,6 +125,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <AudioPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/audio/library/:collectionId"
+                  element={
+                    <ProtectedRoute>
+                      <AudioLibraryPage />
                     </ProtectedRoute>
                   }
                 />
