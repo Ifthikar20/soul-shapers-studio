@@ -177,6 +177,11 @@ this.api.interceptors.response.use(
     // For Google login, redirect to your backend OAuth endpoint
     window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   }
+
+  async loginWithApple(): Promise<void> {
+    // For Apple login, redirect to your backend OAuth endpoint
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/apple`;
+  }
   
   // Additional methods for your app
   async forgotPassword(email: string): Promise<void> {

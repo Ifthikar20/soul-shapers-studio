@@ -18,7 +18,7 @@ import {
   ArrowLeft,
   AlertCircle,
   Loader2,
-  Github,
+  Apple,
   Chrome,
   Shield,
   Heart,
@@ -132,8 +132,10 @@ const LoginPage = () => {
     authService.loginWithGoogle();
   };
 
-  const handleGithubLogin = () => {
-    console.log("GitHub login not implemented yet");
+  const handleAppleLogin = () => {
+    setIsLoading(true);
+    console.log('🍎 Apple login initiated');
+    authService.loginWithApple();
   };
 
   // Clear errors when switching modes
@@ -212,12 +214,12 @@ const LoginPage = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={handleGithubLogin}
+                  onClick={handleAppleLogin}
                   disabled={isLoading}
                   className="w-full h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:bg-gray-50 dark:hover:bg-gray-950/20 transition-colors"
                 >
-                  <Github className="w-4 h-4 mr-2" />
-                  Continue with GitHub
+                  <Apple className="w-4 h-4 mr-2" />
+                  Continue with Apple
                 </Button>
               </div>
 
