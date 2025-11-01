@@ -100,7 +100,7 @@ const BlogCategoryPage = () => {
       {/* Navigation */}
       <nav className="border-b border-gray-200 py-4">
         <div className="max-w-7xl mx-auto px-4">
-          <Link to="/blog" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+          <Link to="/read" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to All Posts
           </Link>
@@ -125,7 +125,7 @@ const BlogCategoryPage = () => {
       {/* Category Navigation */}
       <div className="max-w-7xl mx-auto px-4 mb-8">
         <div className="flex flex-wrap gap-2 justify-center">
-          <Link to="/blog">
+          <Link to="/read">
             <Badge variant="outline" className="hover:bg-gray-100 cursor-pointer">
               All Posts
             </Badge>
@@ -134,7 +134,7 @@ const BlogCategoryPage = () => {
             const catSlug = cat.toLowerCase().replace(/\s+/g, '-');
             const isActive = catSlug === category;
             return (
-              <Link key={cat} to={`/blog/category/${catSlug}`}>
+              <Link key={cat} to={`/read/category/${catSlug}`}>
                 <Badge 
                   variant={isActive ? "default" : "outline"} 
                   className="hover:bg-gray-100 cursor-pointer"
@@ -153,7 +153,7 @@ const BlogCategoryPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post) => (
               <article key={post.id} className="group cursor-pointer">
-                <Link to={`/blog/post/${post.slug}`} className="block">
+                <Link to={`/read/post/${post.slug}`} className="block">
                   {/* Image */}
                   <div className="relative overflow-hidden rounded-lg mb-4 aspect-[4/3]">
                     <img
@@ -204,7 +204,7 @@ const BlogCategoryPage = () => {
             <p className="text-gray-600 mb-8">
               There are no posts in the "{displayCategory}" category yet.
             </p>
-            <Link to="/blog">
+            <Link to="/read">
               <Badge variant="outline" className="hover:bg-gray-100 cursor-pointer px-4 py-2">
                 Browse All Posts
               </Badge>

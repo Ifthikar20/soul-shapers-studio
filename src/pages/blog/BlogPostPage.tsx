@@ -95,7 +95,7 @@ const BlogPostPage = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Post Not Found</h1>
-          <Button>← Back to Blog</Button>
+          <Button>← Back to Read</Button>
         </div>
       </div>
     );
@@ -108,7 +108,7 @@ const BlogPostPage = () => {
         <div className="max-w-4xl mx-auto px-4">
           <div className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 cursor-pointer">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Blog
+            Back to Read
           </div>
         </div>
       </nav>

@@ -22,8 +22,9 @@ const BrowsePage = lazy(() => import("./pages/BrowsePage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const UpgradePage = lazy(() => import("./pages/UpgradePage"));
 const UnauthorizedPage = lazy(() => import("./pages/UnauthorizedPage"));
-const BlogLandingPage = lazy(() => import('./pages/blog/BlogLandingPage'));
-const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
+const ReadLandingPage = lazy(() => import('./pages/blog/BlogLandingPage'));
+const ReadPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
+const ReadCategoryPage = lazy(() => import('./pages/blog/BlogCategoryPage'));
 const AudioPage = lazy(() => import("./pages/AudioPage"));
 const AudioLibraryPage = lazy(() => import("./pages/AudioLibraryPage"));
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
@@ -113,9 +114,10 @@ const App = () => {
                 <Route path="/upgrade" element={<UpgradePage />} />
                 <Route path="/upgrade/:upgradeId" element={<UpgradePage />} />
 
-                {/* Blog Routes - Public */}
-                <Route path="/blog" element={<BlogLandingPage />} />
-                <Route path="/blog/post/:slug" element={<BlogPostPage />} />
+                {/* Read Routes - Public */}
+                <Route path="/read" element={<ReadLandingPage />} />
+                <Route path="/read/post/:slug" element={<ReadPostPage />} />
+                <Route path="/read/category/:category" element={<ReadCategoryPage />} />
 
                 {/* PROTECTED: Audio Routes - Requires Authentication */}
                 <Route
