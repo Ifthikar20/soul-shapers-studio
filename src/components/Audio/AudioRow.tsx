@@ -38,7 +38,7 @@ const AudioRow = ({ title, audioItems, onPlay, onUpgrade }: AudioRowProps) => {
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = 340; // Card width + gap
+      const scrollAmount = 400; // Updated for w-96 cards (384px + gap)
       const newScrollLeft = direction === 'left'
         ? scrollRef.current.scrollLeft - scrollAmount
         : scrollRef.current.scrollLeft + scrollAmount;
@@ -67,13 +67,13 @@ const AudioRow = ({ title, audioItems, onPlay, onUpgrade }: AudioRowProps) => {
   if (audioItems.length === 0) return null;
 
   return (
-    <div className="relative group/row mb-12 py-8">
+    <div className="relative group/row mb-12">
       {/* Section Header */}
       <div className="px-6 mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           <span className="text-purple-600">#</span>{title.toLowerCase()}
         </h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
           {audioItems.length} session{audioItems.length !== 1 ? 's' : ''} available
         </p>
       </div>
@@ -104,10 +104,10 @@ const AudioRow = ({ title, audioItems, onPlay, onUpgrade }: AudioRowProps) => {
         {/* Scrollable Content */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto overflow-y-visible px-6 pb-4 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex gap-4 overflow-x-auto px-6 pb-4 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {audioItems.map((audio) => (
-            <div key={audio.id} className="flex-none w-80">
+            <div key={audio.id} className="flex-none w-96">
               <AudioCard
                 audio={audio}
                 onPlay={onPlay}

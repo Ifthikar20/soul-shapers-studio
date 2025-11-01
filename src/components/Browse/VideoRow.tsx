@@ -20,7 +20,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = 340; // Updated for wider Netflix-style cards
+      const scrollAmount = 400; // Updated for w-96 cards (384px + gap)
       const newScrollLeft = direction === 'left'
         ? scrollRef.current.scrollLeft - scrollAmount
         : scrollRef.current.scrollLeft + scrollAmount;
@@ -49,7 +49,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
   if (videos.length === 0 && !loading) return null;
 
   return (
-    <div className="relative group/row mb-10 py-8">
+    <div className="relative group/row mb-10">
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 px-6">{title}</h2>
 
       <div className="relative">
@@ -72,15 +72,15 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
           </button>
         )}
 
-        {/* Scrollable content with overflow visible for hover effects */}
+        {/* Scrollable content */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto overflow-y-visible px-6 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex gap-4 overflow-x-auto px-6 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {loading ? (
             // Loading skeletons
             Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="flex-none w-80">
+              <div key={index} className="flex-none w-96">
                 <VideoCardSkeleton />
               </div>
             ))
@@ -88,7 +88,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
             videos
               .filter(video => video.id != null && typeof video.id === 'string') // ✅ Filter valid UUIDs
               .map((video, index) => (
-                <div key={`video-${video.id}-${index}`} className="flex-none w-80">
+                <div key={`video-${video.id}-${index}`} className="flex-none w-96">
                   <HybridVideoCard
                     video={video}
                     onPlay={onPlay}

@@ -105,7 +105,7 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: AudioCardProps) => {
             )}
           </div>
 
-          {/* Bottom Section - Title and Category */}
+          {/* Bottom Section - Title, Category, Author & Listens */}
           <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
             <Badge
               variant="secondary"
@@ -113,17 +113,31 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: AudioCardProps) => {
             >
               {audio.category}
             </Badge>
-            <h3 className="font-bold text-white text-base line-clamp-2 leading-tight drop-shadow-2xl">
+            <h3 className="font-bold text-white text-base line-clamp-2 leading-tight drop-shadow-2xl mb-2">
               {audio.title}
             </h3>
+            {/* Author & Listens - Always visible */}
+            <div className="flex items-center gap-2 text-white/80 text-xs">
+              <span className="font-medium">{audio.expert}</span>
+              <span className="text-white/50">•</span>
+              <span>{audio.listens}</span>
+            </div>
           </div>
         </div>
       </Card>
 
       {/* Amazon Prime-style Hover Modal */}
       {isHovered && (
-        <div className="absolute top-0 left-0 w-full z-50 animate-in fade-in zoom-in-95 duration-200">
-          <Card className="overflow-hidden border-0 rounded-2xl shadow-2xl bg-card transform scale-110 origin-center">
+        <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center">
+          <div className="pointer-events-auto animate-in fade-in zoom-in-95 duration-200" style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '400px',
+            maxWidth: '90vw'
+          }}>
+          <Card className="overflow-hidden border-0 rounded-2xl shadow-2xl bg-card">
             {/* Image Section */}
             <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-purple-900 to-indigo-900">
               <img
@@ -240,6 +254,7 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: AudioCardProps) => {
               </div>
             </div>
           </Card>
+          </div>
         </div>
       )}
     </div>
