@@ -179,16 +179,16 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   const getHeaderClasses = () => {
     return `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       isScrolled
-        ? 'bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm'
+        ? 'bg-white/95 backdrop-blur-md border-b border-gray-200/20 shadow-sm dark:bg-black dark:border-gray-800'
         : 'bg-transparent'
     }`;
   };
 
   const getTextClasses = (variant: 'primary' | 'secondary' = 'primary') => {
     if (variant === 'secondary') {
-      return isScrolled ? 'text-muted-foreground' : 'text-black/70';
+      return isScrolled ? 'text-gray-600 dark:text-gray-400' : 'text-black/70 dark:text-white/70';
     }
-    return isScrolled ? 'text-foreground hover:text-primary' : 'text-black hover:text-black/80';
+    return isScrolled ? 'text-gray-900 hover:text-primary dark:text-white dark:hover:text-primary' : 'text-black hover:text-black/80 dark:text-white dark:hover:text-white/80';
   };
 
   const LogoSection = () => {
@@ -232,8 +232,8 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             disabled={isRateLimited}
             className={`pl-12 pr-4 h-12 text-base rounded-full transition-all duration-300 focus:ring-2 focus:ring-primary/30 shadow-md ${
               isScrolled
-                ? 'bg-background/90 border-2 border-primary/40 text-foreground placeholder:text-muted-foreground/70'
-                : 'bg-white/20 border-2 border-white/40 text-black placeholder:text-black/50'
+                ? 'bg-white/90 border-2 border-primary/40 text-gray-900 placeholder:text-gray-500 dark:bg-black dark:text-white dark:placeholder:text-gray-400 dark:border-gray-700'
+                : 'bg-white/20 border-2 border-white/40 text-black placeholder:text-black/50 dark:bg-black/20 dark:text-white dark:placeholder:text-white/50'
             } ${searchState.errors.length > 0 ? 'border-red-500' : ''} ${isRateLimited ? 'opacity-50 cursor-not-allowed' : ''}`}
           />
 
