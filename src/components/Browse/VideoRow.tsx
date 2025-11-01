@@ -20,7 +20,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = 320;
+      const scrollAmount = 400; // Updated for w-96 cards (384px + gap)
       const newScrollLeft = direction === 'left'
         ? scrollRef.current.scrollLeft - scrollAmount
         : scrollRef.current.scrollLeft + scrollAmount;
@@ -50,7 +50,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
 
   return (
     <div className="relative group/row mb-10">
-      <h2 className="text-xl font-bold text-gray-900 mb-6 px-6">{title}</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 px-6">{title}</h2>
 
       <div className="relative">
         {/* Scroll buttons */}
@@ -80,7 +80,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
           {loading ? (
             // Loading skeletons
             Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="flex-none w-72">
+              <div key={index} className="flex-none w-96">
                 <VideoCardSkeleton />
               </div>
             ))
@@ -88,7 +88,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
             videos
               .filter(video => video.id != null && typeof video.id === 'string') // ✅ Filter valid UUIDs
               .map((video, index) => (
-                <div key={`video-${video.id}-${index}`} className="flex-none w-72">
+                <div key={`video-${video.id}-${index}`} className="flex-none w-96">
                   <HybridVideoCard
                     video={video}
                     onPlay={onPlay}
