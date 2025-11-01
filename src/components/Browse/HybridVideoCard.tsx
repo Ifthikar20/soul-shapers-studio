@@ -32,8 +32,8 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       const rect = cardRef.current.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const modalWidth = 440;
-      const modalHeight = 580; // Approximate modal height with new styling
+      const modalWidth = 400;
+      const modalHeight = 540; // Approximate modal height
 
       // Determine horizontal position with smart centering
       let left = rect.left - (modalWidth - rect.width) / 2;
@@ -46,7 +46,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       }
 
       // Determine vertical position
-      let top = rect.top - 60; // Slightly above the card
+      let top = rect.top - 50; // Slightly above the card
       if (top + modalHeight > viewportHeight - 30) {
         // Would overflow bottom
         top = Math.max(30, viewportHeight - modalHeight - 30);
@@ -57,10 +57,10 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
 
       setModalPosition({ top, left });
 
-      // Delay showing modal for smoother, more intentional experience
+      // Delay showing modal
       hoverTimeoutRef.current = setTimeout(() => {
         setShowModal(true);
-      }, 350);
+      }, 300);
     } else {
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
@@ -83,14 +83,11 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       onMouseLeave={() => setIsHovered(false)}
     >
       <Card
-        className={`cursor-pointer overflow-hidden border-0 rounded-xl transition-all duration-700 bg-transparent ${
+        className={`cursor-pointer overflow-hidden border-0 rounded-xl transition-all duration-300 ease-out bg-transparent ${
           showModal
-            ? 'opacity-0 scale-90 blur-sm'
-            : 'opacity-100 scale-100 blur-0'
+            ? 'opacity-0 scale-95'
+            : 'opacity-100 scale-100'
         }`}
-        style={{
-          transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-        }}
         onClick={() => canWatch ? onPlay(video) : onUpgrade(video)}
       >
         <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-gray-900">
@@ -155,54 +152,31 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
         </div>
       </Card>
 
-      {/* Premium Professional Hover Modal */}
+      {/* Clean Hover Modal */}
       {showModal && (
         <div
           className="fixed z-50 pointer-events-auto"
           style={{
             top: `${modalPosition.top}px`,
             left: `${modalPosition.left}px`,
-            width: '440px',
+            width: '400px',
             maxWidth: '90vw',
-            animation: 'modalEntrance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            animation: 'modalEntrance 0.25s ease-out',
           }}
         >
-          <Card className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 group/modal relative">
-            {/* Enhanced shadow layers */}
-            <div className="absolute inset-0 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]" />
-            <div className="absolute inset-0 rounded-2xl ring-1 ring-black/5 dark:ring-white/5" />
-
+          <Card className="overflow-hidden rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
             <style>{`
               @keyframes modalEntrance {
                 0% {
                   opacity: 0;
-                  transform: translateY(-20px) scale(0.92);
-                  filter: blur(4px);
-                }
-                50% {
-                  opacity: 0.8;
-                  filter: blur(2px);
+                  transform: translateY(-10px) scale(0.95);
                 }
                 100% {
                   opacity: 1;
                   transform: translateY(0) scale(1);
-                  filter: blur(0);
-                }
-              }
-
-              @keyframes contentFadeIn {
-                0% {
-                  opacity: 0;
-                  transform: translateY(10px);
-                }
-                100% {
-                  opacity: 1;
-                  transform: translateY(0);
                 }
               }
             `}</style>
-
-            <div className="relative z-10">
             {/* Image Section */}
             <div className="relative aspect-video w-full overflow-hidden bg-gray-900">
               <img
@@ -212,108 +186,85 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-              {/* Premium Play Button Overlay */}
+              {/* Play Button Overlay */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div
-                  className="relative"
-                  style={{ animation: 'contentFadeIn 0.5s ease-out 0.2s both' }}
+                <Button
+                  size="lg"
+                  className="rounded-full h-16 w-16 p-0 bg-white hover:bg-white text-black shadow-lg transition-all duration-200 hover:scale-110 active:scale-95"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    canWatch ? onPlay(video) : onUpgrade(video);
+                  }}
                 >
-                  {/* Glowing ring effect */}
-                  <div className="absolute inset-0 rounded-full bg-white/20 blur-xl scale-150 animate-pulse" />
-
-                  <Button
-                    size="lg"
-                    className="relative rounded-full h-20 w-20 p-0 bg-white hover:bg-white text-black shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] active:scale-95"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      canWatch ? onPlay(video) : onUpgrade(video);
-                    }}
-                  >
-                    {!canWatch ? (
-                      <Crown className="w-8 h-8" />
-                    ) : (
-                      <Play className="w-8 h-8 fill-current ml-1" />
-                    )}
-                  </Button>
-                </div>
+                  {!canWatch ? (
+                    <Crown className="w-7 h-7" />
+                  ) : (
+                    <Play className="w-7 h-7 fill-current ml-1" />
+                  )}
+                </Button>
               </div>
 
               {/* Duration Badge */}
-              <div
-                className="absolute bottom-4 right-4 bg-black/95 backdrop-blur-md text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg border border-white/10"
-                style={{ animation: 'contentFadeIn 0.5s ease-out 0.15s both' }}
-              >
+              <div className="absolute bottom-3 right-3 bg-black/90 backdrop-blur-sm text-white px-2.5 py-1 rounded-md text-sm font-semibold">
                 {video.duration}
               </div>
             </div>
 
-            {/* Premium Info Section */}
-            <div
-              className="p-6 space-y-4 bg-white dark:bg-gray-900"
-              style={{ animation: 'contentFadeIn 0.5s ease-out 0.25s both' }}
-            >
+            {/* Info Section */}
+            <div className="p-5 space-y-3.5 bg-white dark:bg-gray-900">
               {/* Title Section */}
-              <div className="flex items-start justify-between gap-4">
-                <h3 className="font-bold text-lg leading-snug line-clamp-2 flex-1 text-gray-900 dark:text-white tracking-tight">
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-bold text-xl leading-tight line-clamp-2 flex-1 text-gray-900 dark:text-white">
                   {video.title}
                 </h3>
                 {!canWatch && (
-                  <Badge className="bg-gradient-to-br from-amber-500 via-orange-500 to-orange-600 text-white text-xs px-3 py-1 flex-shrink-0 font-bold shadow-lg">
-                    <Crown className="w-3.5 h-3.5 mr-1.5" />
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm px-2.5 py-1 flex-shrink-0 font-semibold">
+                    <Crown className="w-4 h-4 mr-1" />
                     PRO
                   </Badge>
                 )}
               </div>
 
-              {/* Divider */}
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
-
-              {/* Stats Row with Premium Styling */}
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/30">
-                  <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+              {/* Stats Row */}
+              <div className="flex items-center gap-3 text-base">
+                <div className="flex items-center gap-1.5 text-yellow-500">
+                  <Star className="w-5 h-5 fill-current" />
                   <span className="font-bold text-gray-900 dark:text-white">{video.rating}</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 font-medium">
-                  <div className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600" />
-                  <span>{video.views}</span>
-                </div>
-                <Badge variant="outline" className="text-xs px-2.5 py-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold">
+                <span className="text-gray-400 dark:text-gray-600">•</span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{video.views}</span>
+                <span className="text-gray-400 dark:text-gray-600">•</span>
+                <Badge variant="outline" className="text-sm px-2 py-0.5 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">
                   {video.category}
                 </Badge>
               </div>
 
               {/* Expert Section */}
-              <div className="flex items-center gap-2.5 text-sm">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-md">
-                  <User className="w-4 h-4 text-white" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Expert</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">{video.expert}</span>
-                </div>
+              <div className="flex items-center gap-2.5 text-base">
+                <User className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                <span className="font-medium text-gray-700 dark:text-gray-300">{video.expert}</span>
               </div>
 
               {/* Description */}
               {video.description && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed">
+                <p className="text-base text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
                   {video.description}
                 </p>
               )}
 
-              {/* Premium Action Buttons */}
-              <div className="flex gap-3 pt-3">
+              {/* Action Buttons */}
+              <div className="flex gap-2.5 pt-2">
                 {!canWatch ? (
                   <Button
                     size="lg"
                     variant="default"
-                    className="flex-1 h-12 font-bold text-base rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-orange-600 hover:from-amber-600 hover:via-orange-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                    className="flex-1 h-11 font-semibold text-base rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 transition-colors duration-200"
                     onClick={(e) => {
                       e.stopPropagation();
                       onUpgrade(video);
                     }}
                   >
-                    <Crown className="w-5 h-5 mr-2" />
+                    <Crown className="w-4 h-4 mr-2" />
                     Upgrade to Watch
                   </Button>
                 ) : (
@@ -321,27 +272,26 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
                     <Button
                       size="lg"
                       variant="default"
-                      className="flex-1 h-12 font-bold text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                      className="flex-1 h-11 font-semibold text-base rounded-lg transition-colors duration-200"
                       onClick={(e) => {
                         e.stopPropagation();
                         onPlay(video);
                       }}
                     >
-                      <Play className="w-5 h-5 mr-2 fill-current" />
+                      <Play className="w-4 h-4 mr-2 fill-current" />
                       Watch Now
                     </Button>
                     <Button
                       size="lg"
                       variant="outline"
-                      className="h-12 w-12 p-0 rounded-xl border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 hover:scale-110 active:scale-95 hover:border-gray-400 dark:hover:border-gray-500"
+                      className="h-11 w-11 p-0 rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <ThumbsUp className="w-5 h-5" />
+                      <ThumbsUp className="w-4 h-4" />
                     </Button>
                   </>
                 )}
               </div>
-            </div>
             </div>
           </Card>
         </div>
