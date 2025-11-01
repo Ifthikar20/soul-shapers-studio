@@ -1,14 +1,13 @@
-// src/components/Audio/AudioCard.tsx
+// src/components/Audio/AudioCard.tsx - Netflix-style horizontal card
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Play,
-  User,
   Crown,
   TrendingUp,
-  Volume2
+  Volume2,
+  Info
 } from 'lucide-react';
 
 interface AudioContent {
@@ -52,103 +51,106 @@ const AudioCard = ({ audio, onPlay, onUpgrade }: AudioCardProps) => {
 
   return (
     <Card
-      className="cursor-pointer group overflow-hidden hover:shadow-xl transition-all duration-300 border-gray-200 hover:border-purple-300"
+      className="cursor-pointer group overflow-hidden border-0 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:z-10"
       onClick={handleCardClick}
     >
-      <div className="relative">
+      <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-purple-900 to-indigo-900">
+        {/* Main Image */}
         <img
           src={audio.thumbnail}
           alt={audio.title}
-          className="w-full h-44 object-contain bg-white group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover transition-opacity duration-300"
         />
 
-        {/* Play Overlay on Hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <div className="rounded-full p-3 bg-white shadow-2xl transform scale-90 group-hover:scale-100 transition-transform duration-300">
+        {/* Gradient Overlay - Always visible at bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+
+        {/* Top Badges */}
+        <div className="absolute top-2 left-2 flex gap-1.5 z-10">
+          {audio.isNew && (
+            <Badge className="bg-green-600 text-white text-[10px] px-1.5 py-0.5 font-semibold">
+              NEW
+            </Badge>
+          )}
+          {audio.isTrending && (
+            <Badge className="bg-purple-600 text-white text-[10px] px-1.5 py-0.5 font-semibold flex items-center gap-1">
+              <TrendingUp className="w-2.5 h-2.5" />
+              TRENDING
+            </Badge>
+          )}
+        </div>
+
+        {/* Premium Badge - Top Right */}
+        {!canListen && (
+          <div className="absolute top-2 right-2 z-10">
+            <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] px-1.5 py-0.5 font-semibold">
+              <Crown className="w-2.5 h-2.5 mr-0.5" />
+              PRO
+            </Badge>
+          </div>
+        )}
+
+        {/* Audio indicator badge */}
+        <div className="absolute top-2 right-2 z-10">
+          {canListen && (
+            <Badge className="bg-purple-600/90 text-white text-[10px] px-1.5 py-0.5 font-semibold flex items-center gap-1">
+              <Volume2 className="w-2.5 h-2.5" />
+            </Badge>
+          )}
+        </div>
+
+        {/* Center Play Button - Appears on Hover */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <div className="rounded-full p-4 bg-white/95 shadow-2xl transform scale-90 group-hover:scale-100 transition-transform duration-300">
             {canListen ? (
-              <Play className="w-8 h-8 text-purple-600 fill-current" />
+              <Play className="w-6 h-6 text-purple-600 fill-current" />
             ) : (
-              <Crown className="w-8 h-8 text-orange-500" />
+              <Crown className="w-6 h-6 text-orange-500" />
             )}
           </div>
         </div>
 
-        {/* Badge - Priority: Premium > New > Trending */}
-        <div className="absolute top-3 right-3">
-          {audio.accessTier === 'premium' && !audio.isFirstEpisode ? (
-            <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs px-2.5 py-1 shadow-lg">
-              <Crown className="w-3 h-3 mr-1" />
-              Premium
-            </Badge>
-          ) : audio.isNew ? (
-            <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xs px-2.5 py-1 shadow-lg">
-              New
-            </Badge>
-          ) : audio.isTrending ? (
-            <Badge className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs px-2.5 py-1 shadow-lg">
-              <TrendingUp className="w-3 h-3 mr-1" />
-              Trending
-            </Badge>
-          ) : null}
+        {/* Bottom Info - Slides up slightly on hover */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-0 group-hover:-translate-y-1 transition-transform duration-300">
+          <div className="space-y-1.5">
+            {/* Title */}
+            <h3 className="font-bold text-white text-sm line-clamp-1 drop-shadow-lg">
+              {audio.title}
+            </h3>
+
+            {/* Info Row - Only visible on hover */}
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex items-center gap-1.5 text-xs text-white/90">
+                <Volume2 className="w-3 h-3 text-purple-400" />
+                <span className="font-medium">{audio.duration}</span>
+              </div>
+              <span className="text-white/60 text-xs">•</span>
+              <span className="text-white/90 text-xs">{audio.listens}</span>
+            </div>
+
+            {/* Category & Expert - Only visible on hover */}
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-white/40 text-white bg-white/10">
+                {audio.category}
+              </Badge>
+              <span className="text-white/80 text-xs truncate">{audio.expert}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Duration */}
-        <div className="absolute bottom-3 right-3 bg-black/80 text-white px-3 py-1 rounded-full text-xs flex items-center backdrop-blur-sm">
-          <Volume2 className="w-3 h-3 mr-1" />
-          {audio.duration}
+        {/* Info Button - Bottom Right on Hover */}
+        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button
+            className="rounded-full p-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/audio/${audio.id}`);
+            }}
+          >
+            <Info className="w-4 h-4 text-white" />
+          </button>
         </div>
       </div>
-
-      <CardContent className="p-4">
-        {/* Category Badge */}
-        <Badge variant="outline" className="text-xs mb-2 border-purple-200 text-purple-700">
-          {audio.category}
-        </Badge>
-
-        {/* Title */}
-        <h3 className="font-semibold text-base text-foreground mb-2 line-clamp-2 leading-tight group-hover:text-purple-600 transition-colors">
-          {audio.title}
-        </h3>
-
-        {/* Expert */}
-        <div className="flex items-center text-muted-foreground text-sm mb-3">
-          <User className="w-4 h-4 mr-2 flex-shrink-0 text-purple-500" />
-          <span className="truncate">{audio.expert}</span>
-        </div>
-
-        {/* Stats and Action */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center text-sm text-muted-foreground">
-            <span>{audio.listens} listens</span>
-          </div>
-
-          {!canListen ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onUpgrade(audio);
-              }}
-              className="text-orange-600 border-orange-200 hover:bg-orange-50 text-sm px-3 py-1.5 h-8 flex-shrink-0"
-            >
-              Upgrade
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/audio/${audio.id}`);
-              }}
-              className="text-purple-600 hover:bg-purple-50 text-sm px-3 py-1.5 h-8 flex-shrink-0"
-            >
-              Listen
-            </Button>
-          )}
-        </div>
-      </CardContent>
     </Card>
   );
 };

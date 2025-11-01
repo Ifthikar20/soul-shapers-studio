@@ -1,11 +1,9 @@
-// src/components/Browse/HybridVideoCard.tsx
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+// src/components/Browse/HybridVideoCard.tsx - Netflix-style horizontal card
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { useVideoAccess } from '@/hooks/useVideoAccess';
 import {
-  Play, Clock, Star, Crown, TrendingUp
+  Play, Star, Crown, TrendingUp, Info
 } from 'lucide-react';
 import { VideoContent } from '@/types/video.types';
 
@@ -15,157 +13,107 @@ interface HybridVideoCardProps {
   onUpgrade: (video: VideoContent) => void;
 }
 
-const getContentTypeBadge = (contentType: string) => {
-  // Implementation for getContentTypeBadge
-  return null; // Replace with actual implementation
-};
-
 const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
   const { canWatchVideo } = useVideoAccess();
-  
+
   // Use accessTier to determine if video is accessible
   const canWatch = video.accessTier === 'free' || canWatchVideo(video);
 
   return (
     <Card
-      className="group cursor-pointer overflow-hidden border-0 bg-white/95 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 rounded-2xl"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="cursor-pointer group overflow-hidden border-0 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:z-10"
       onClick={() => canWatch ? onPlay(video) : onUpgrade(video)}
     >
-      {/* Thumbnail */}
-      <div className="relative overflow-hidden h-44">
+      <div className="relative aspect-video w-full overflow-hidden bg-gray-900">
+        {/* Main Image */}
         <img
           src={video.thumbnail}
           alt={video.title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="w-full h-full object-cover transition-opacity duration-300"
         />
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+        {/* Gradient Overlay - Always visible at bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
 
-        {/* Blur transition between image and content */}
-        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white/95 via-white/60 to-transparent backdrop-blur-[2px]" />
-
-        {/* Play overlay */}
-        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-          <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-transform duration-300 ${
-            canWatch ? 'bg-white' : 'bg-gradient-to-r from-orange-500 to-amber-500'
-          }`}>
-            {canWatch ? (
-              <Play className="w-5 h-5 text-black ml-0.5 fill-current" />
-            ) : (
-              <Crown className="w-5 h-5 text-white" />
-            )}
-          </div>
-        </div>
-
-        {/* Top badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
+        {/* Top Badges */}
+        <div className="absolute top-2 left-2 flex gap-1.5 z-10">
           {video.isNew && (
-            <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-semibold px-2 py-1">
+            <Badge className="bg-red-600 text-white text-[10px] px-1.5 py-0.5 font-semibold">
               NEW
             </Badge>
           )}
           {video.isTrending && (
-            <Badge className="bg-gradient-to-r from-red-500 to-pink-600 text-white text-xs font-semibold px-2 py-1 flex items-center gap-1">
-              <TrendingUp className="w-2 h-2" />
-              Trending
-            </Badge>
-          )}
-      {getContentTypeBadge('video')}
-        </div>
-
-        {/* Duration & Access */}
-        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-          <div className="bg-black/80 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-md flex items-center gap-1">
-            <Clock className="w-2 h-2" />
-            {video.duration}
-          </div>
-          {!canWatch && (
-            <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-semibold px-2 py-1">
-              <Crown className="w-2 h-2 mr-1" />
-              Premium
+            <Badge className="bg-orange-500 text-white text-[10px] px-1.5 py-0.5 font-semibold flex items-center gap-1">
+              <TrendingUp className="w-2.5 h-2.5" />
+              TOP 10
             </Badge>
           )}
         </div>
-      </div>
 
-      {/* Content */}
-      <CardContent className="p-5 space-y-4">
-        {/* Category */}
-        <div className="flex items-center justify-between mb-3">
-          <Badge variant="outline" className="text-primary border-primary/30 bg-primary/5 text-xs font-medium">
-            {video.category}
-          </Badge>
-        </div>
-
-        {/* Title */}
-        <h3 className="font-bold text-base text-gray-900 line-clamp-2 group-hover:text-primary transition-colors duration-300 leading-tight">
-          {video.title}
-        </h3>
-
-        {/* Expert info */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
-            <img
-              src={video.expertAvatar}
-              alt={video.expert}
-              className="w-full h-full object-cover"
-            />
+        {/* Premium Badge - Top Right */}
+        {!canWatch && (
+          <div className="absolute top-2 right-2 z-10">
+            <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] px-1.5 py-0.5 font-semibold">
+              <Crown className="w-2.5 h-2.5 mr-0.5" />
+              PRO
+            </Badge>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="font-medium text-sm text-gray-900 truncate">{video.expert}</div>
-            <div className="text-xs text-gray-600 truncate">{video.expertCredentials}</div>
-          </div>
-        </div>
+        )}
 
-        {/* Description */}
-        <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-          {video.description}
-        </p>
-
-        {/* Stats & Action */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-          <div className="flex items-center gap-3 text-sm text-gray-600">
-            <div className="flex items-center gap-1">
-              <Star className="w-3 h-3 text-amber-400 fill-current" />
-              <span className="font-medium">{video.rating}</span>
-            </div>
-            <span className="text-xs">{video.views} views</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {!canWatch ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUpgrade(video);
-                }}
-                className="text-amber-600 border-amber-300 hover:bg-amber-50 text-xs h-7 px-3"
-              >
-                <Crown className="w-2 h-2 mr-1" />
-                Upgrade
-              </Button>
+        {/* Center Play Button - Appears on Hover */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <div className="rounded-full p-4 bg-white/95 shadow-2xl transform scale-90 group-hover:scale-100 transition-transform duration-300">
+            {canWatch ? (
+              <Play className="w-6 h-6 text-black fill-current" />
             ) : (
-              <Button
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPlay(video);
-                }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity bg-primary hover:bg-primary/90 text-xs h-7 px-3"
-              >
-                <Play className="w-2 h-2 mr-1" />
-                View Details
-              </Button>
+              <Crown className="w-6 h-6 text-orange-500" />
             )}
           </div>
         </div>
-      </CardContent>
+
+        {/* Bottom Info - Slides up slightly on hover */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-0 group-hover:-translate-y-1 transition-transform duration-300">
+          <div className="space-y-1.5">
+            {/* Title */}
+            <h3 className="font-bold text-white text-sm line-clamp-1 drop-shadow-lg">
+              {video.title}
+            </h3>
+
+            {/* Info Row - Only visible on hover */}
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex items-center gap-1.5 text-xs text-white/90">
+                <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                <span className="font-medium">{video.rating}</span>
+              </div>
+              <span className="text-white/60 text-xs">•</span>
+              <span className="text-white/90 text-xs">{video.duration}</span>
+              <span className="text-white/60 text-xs">•</span>
+              <span className="text-white/90 text-xs">{video.views}</span>
+            </div>
+
+            {/* Category & Expert - Only visible on hover */}
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-white/40 text-white bg-white/10">
+                {video.category}
+              </Badge>
+              <span className="text-white/80 text-xs truncate">{video.expert}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Info Button - Bottom Right on Hover */}
+        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button
+            className="rounded-full p-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              canWatch ? onPlay(video) : onUpgrade(video);
+            }}
+          >
+            <Info className="w-4 h-4 text-white" />
+          </button>
+        </div>
+      </div>
     </Card>
   );
 };

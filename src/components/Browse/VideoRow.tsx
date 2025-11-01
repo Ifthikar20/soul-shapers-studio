@@ -20,7 +20,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = 320;
+      const scrollAmount = 340; // Updated for wider Netflix-style cards
       const newScrollLeft = direction === 'left'
         ? scrollRef.current.scrollLeft - scrollAmount
         : scrollRef.current.scrollLeft + scrollAmount;
@@ -80,7 +80,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
           {loading ? (
             // Loading skeletons
             Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="flex-none w-72">
+              <div key={index} className="flex-none w-80">
                 <VideoCardSkeleton />
               </div>
             ))
@@ -88,7 +88,7 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
             videos
               .filter(video => video.id != null && typeof video.id === 'string') // ✅ Filter valid UUIDs
               .map((video, index) => (
-                <div key={`video-${video.id}-${index}`} className="flex-none w-72">
+                <div key={`video-${video.id}-${index}`} className="flex-none w-80">
                   <HybridVideoCard
                     video={video}
                     onPlay={onPlay}
