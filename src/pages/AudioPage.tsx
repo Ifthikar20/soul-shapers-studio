@@ -240,12 +240,12 @@ const AudioPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-black">
       <Header />
 
       {/* Hero Section with Purple Canvas Background */}
       <div
-        className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-24 overflow-hidden dark:from-purple-800 dark:via-purple-900 dark:to-indigo-950"
+        className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-24 overflow-hidden dark:from-black dark:via-black dark:to-black"
         style={{
           backgroundImage: `url(${canvasBackground})`,
           backgroundSize: 'cover',
@@ -254,7 +254,7 @@ const AudioPage = () => {
         }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-purple-900/40 dark:bg-purple-950/60"></div>
+        <div className="absolute inset-0 bg-purple-900/40 dark:bg-black/80"></div>
 
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-3xl">
@@ -265,10 +265,10 @@ const AudioPage = () => {
 
             <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
               Find Your Perfect
-              <span className="block text-purple-200 dark:text-purple-300">Audio Collection</span>
+              <span className="block text-purple-200 dark:text-white">Audio Collection</span>
             </h1>
 
-            <p className="text-xl text-purple-100 dark:text-purple-200 leading-relaxed">
+            <p className="text-xl text-purple-100 dark:text-gray-300 leading-relaxed">
               Explore curated collections for every moment. From quick meditations to deep dives into mindfulness.
             </p>
           </div>
@@ -276,12 +276,12 @@ const AudioPage = () => {
       </div>
 
       {/* Topics Grid */}
-      <div className="container mx-auto px-6 py-16 dark:text-gray-100">
+      <div className="container mx-auto px-6 py-16 dark:text-white">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {audioTopics.map((topic) => (
             <Card
               key={topic.id}
-              className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-gray-200 hover:border-purple-300 hover:-translate-y-1 overflow-hidden dark:bg-gray-800 dark:border-gray-700 dark:hover:border-purple-500"
+              className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-gray-200 hover:border-purple-300 hover:-translate-y-1 overflow-hidden dark:bg-black dark:border-gray-800 dark:hover:border-purple-500"
               onClick={() => handleTopicClick(topic.id)}
             >
               {topic.imageUrl ? (
@@ -296,28 +296,28 @@ const AudioPage = () => {
                   </div>
 
                   {/* Gradient fade overlay from left to right */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent dark:from-gray-800 dark:via-gray-800/95 dark:to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent dark:from-black dark:via-black/95 dark:to-transparent"></div>
 
                   {/* Text content on the left */}
                   <div className="relative z-10 p-6 flex flex-col justify-center h-full min-h-[200px]">
                     <div className="max-w-[65%]">
-                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight mb-3 dark:text-gray-100 dark:group-hover:text-purple-400">
+                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight mb-3 dark:text-white dark:group-hover:text-purple-400">
                         {topic.title}
                       </h3>
                       <p className="text-gray-700 leading-relaxed text-sm dark:text-gray-300">
                         {topic.description}
                       </p>
                     </div>
-                    <ArrowRight className="absolute top-6 right-6 w-5 h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all dark:text-gray-500 dark:group-hover:text-purple-400" />
+                    <ArrowRight className="absolute top-6 right-6 w-5 h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all dark:text-gray-400 dark:group-hover:text-purple-400" />
                   </div>
                 </CardContent>
               ) : (
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight pr-2 dark:text-gray-100 dark:group-hover:text-purple-400">
+                    <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight pr-2 dark:text-white dark:group-hover:text-purple-400">
                       {topic.title}
                     </h3>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all flex-shrink-0 mt-1 dark:text-gray-500 dark:group-hover:text-purple-400" />
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all flex-shrink-0 mt-1 dark:text-gray-400 dark:group-hover:text-purple-400" />
                   </div>
                   <p className="text-gray-600 leading-relaxed dark:text-gray-300">
                     {topic.description}

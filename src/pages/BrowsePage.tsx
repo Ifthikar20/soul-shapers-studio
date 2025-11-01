@@ -215,7 +215,7 @@ const BrowsePage = () => {
   const premiumVideos = !isSearching ? allVideos.filter(v => v.accessTier === 'premium').slice(0, 12) : [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-black">
       <Header />
 
       {!isSearching && (
@@ -227,7 +227,7 @@ const BrowsePage = () => {
         />
       )}
 
-      <main className="flex-1 container mx-auto py-10 dark:text-gray-100">
+      <main className="flex-1 container mx-auto py-10 dark:text-white">
         {/* Error State */}
         {error && (
           <div className="text-center text-red-600 mb-6 bg-red-50 border border-red-200 rounded-lg p-4">

@@ -62,18 +62,18 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-gray-900">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-black">
       <Header />
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2 dark:text-gray-100">Settings</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2 dark:text-white">Settings</h1>
           <p className="text-gray-600 dark:text-gray-400">Manage your account settings and preferences</p>
         </div>
 
         {/* Notifications Settings */}
-        <Card className="mb-6 dark:bg-gray-800 dark:border-gray-700">
+        <Card className="mb-6 dark:bg-black dark:border-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="w-5 h-5" />
@@ -147,7 +147,7 @@ const SettingsPage = () => {
         </Card>
 
         {/* Privacy Settings */}
-        <Card className="mb-6 dark:bg-gray-800 dark:border-gray-700">
+        <Card className="mb-6 dark:bg-black dark:border-gray-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="w-5 h-5" />
@@ -204,7 +204,7 @@ const SettingsPage = () => {
         </Card>
 
         {/* Danger Zone */}
-        <Card className="border-red-200 dark:bg-gray-800 dark:border-red-900">
+        <Card className="border-red-200 dark:bg-black dark:border-red-900">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-600">
               <AlertTriangle className="w-5 h-5" />

@@ -55,18 +55,18 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-gray-900">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-black">
       <Header />
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2 dark:text-gray-100">Profile</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2 dark:text-white">Profile</h1>
           <p className="text-gray-600 dark:text-gray-400">Manage your account information</p>
         </div>
 
         {/* Profile Card */}
-        <Card className="mb-6 dark:bg-gray-800 dark:border-gray-700">
+        <Card className="mb-6 dark:bg-black dark:border-gray-800">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">

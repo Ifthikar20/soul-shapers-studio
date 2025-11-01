@@ -118,12 +118,18 @@ const Header = ({ onShowAuth }: HeaderProps) => {
 
   // Apply theme to document
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+    // Only apply dark mode if user is authenticated
+    if (isAuthenticated) {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     } else {
+      // Always remove dark mode for unauthenticated users
       document.documentElement.classList.remove('dark');
     }
-  }, [isDarkMode]);
+  }, [isDarkMode, isAuthenticated]);
 
   const handleToggleTheme = () => {
     const newMode = !isDarkMode;
