@@ -18,7 +18,8 @@ import {
   MessageCircle,
   Users,
   X,
-  SlidersHorizontal
+  Moon,
+  Sun
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,6 +77,14 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, loading } = useAuth();
 
+  // Theme state - read from cookie on mount
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const themeCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('theme='));
+    return themeCookie?.split('=')[1] === 'dark';
+  });
+
   // Secure search hook with validation and rate limiting
   const {
     searchState,
@@ -106,6 +115,25 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Apply theme to document
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  const handleToggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+
+    // Save to cookie (expires in 1 year)
+    const expiryDate = new Date();
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+    document.cookie = `theme=${newMode ? 'dark' : 'light'}; expires=${expiryDate.toUTCString()}; path=/`;
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -379,9 +407,13 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                 Settings
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => navigate('/preferences')}>
-                <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Preferences
+              <DropdownMenuItem onClick={handleToggleTheme}>
+                {isDarkMode ? (
+                  <Sun className="mr-2 h-4 w-4" />
+                ) : (
+                  <Moon className="mr-2 h-4 w-4" />
+                )}
+                {isDarkMode ? 'Light Mode' : 'Night Mode'}
               </DropdownMenuItem>
 
               {user.subscription_tier === 'free' && (
@@ -390,9 +422,9 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                   Upgrade to Premium
                 </DropdownMenuItem>
               )}
-              
+
               <DropdownMenuSeparator />
-              
+
               <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out

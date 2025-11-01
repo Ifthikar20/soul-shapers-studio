@@ -33,7 +33,6 @@ const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
-const PreferencesPage = lazy(() => import("./pages/PreferencesPage"));
 
 // Lazy load components
 const UnderConstructionPage = lazy(() => import("./components/UnderConstructionPage"));
@@ -172,14 +171,6 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <SettingsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/preferences"
-                  element={
-                    <ProtectedRoute>
-                      <PreferencesPage />
                     </ProtectedRoute>
                   }
                 />
