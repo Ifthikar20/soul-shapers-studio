@@ -67,7 +67,7 @@ const AudioRow = ({ title, audioItems, onPlay, onUpgrade }: AudioRowProps) => {
   if (audioItems.length === 0) return null;
 
   return (
-    <div className="relative group/row mb-12">
+    <div className="relative group/row mb-12 py-8">
       {/* Section Header */}
       <div className="px-6 mb-6">
         <h2 className="text-2xl font-bold text-gray-900">
@@ -104,7 +104,7 @@ const AudioRow = ({ title, audioItems, onPlay, onUpgrade }: AudioRowProps) => {
         {/* Scrollable Content */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto px-6 pb-4 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex gap-4 overflow-x-auto overflow-y-visible px-6 pb-4 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {audioItems.map((audio) => (
             <div key={audio.id} className="flex-none w-80">

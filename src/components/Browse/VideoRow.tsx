@@ -49,8 +49,8 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
   if (videos.length === 0 && !loading) return null;
 
   return (
-    <div className="relative group/row mb-10">
-      <h2 className="text-xl font-bold text-gray-900 mb-6 px-6">{title}</h2>
+    <div className="relative group/row mb-10 py-8">
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 px-6">{title}</h2>
 
       <div className="relative">
         {/* Scroll buttons */}
@@ -72,10 +72,10 @@ const VideoRow = ({ title, videos, loading, onPlay, onUpgrade }: VideoRowProps) 
           </button>
         )}
 
-        {/* Scrollable content */}
+        {/* Scrollable content with overflow visible for hover effects */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto px-6 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex gap-4 overflow-x-auto overflow-y-visible px-6 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {loading ? (
             // Loading skeletons
