@@ -15,16 +15,6 @@ import Footer from '@/components/Footer';
 import HeroSection from '@/components/Browse/HeroSection';
 import VideoRow from '@/components/Browse/VideoRow';
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  icon: string;
-  color: string;
-  sort_order: number;
-}
-
 const BrowsePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,7 +30,6 @@ const BrowsePage = () => {
 
   const [allVideos, setAllVideos] = useState<Video[]>([]); // ✅ Use Video type
   const [filteredVideos, setFilteredVideos] = useState<Video[]>([]); // ✅ Use Video type
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -77,11 +66,8 @@ const BrowsePage = () => {
 
         console.log('🔄 Loading browse content...');
 
-        // Load browse content and categories in parallel
-        const [browseData, categoriesData] = await Promise.all([
-          contentService.getBrowseContent(undefined, 50),
-          contentService.getCategories()
-        ]);
+        // Load browse content
+        const browseData = await contentService.getBrowseContent(undefined, 50);
 
         console.log('📦 Browse data received:', {
           contentCount: browseData.content?.length || 0,
@@ -109,7 +95,6 @@ const BrowsePage = () => {
         });
 
         setAllVideos(videos);
-        setCategories(categoriesData.categories || []);
         console.log('✅ Content loaded successfully');
         
       } catch (err) {

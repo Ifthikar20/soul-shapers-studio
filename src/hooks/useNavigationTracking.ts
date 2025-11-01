@@ -234,24 +234,6 @@ export const useNavigationTracking = () => {
   };
 
   /**
-   * Navigate to category filter
-   */
-  const navigateToCategory = (category: string, source: string = 'category_filter') => {
-    const categoryUrl = generateTrackingUrl('/browse', {
-      source: source,
-      currentPage: location.pathname,
-    });
-
-    trackNavigationEvent('Category Filter', {
-      from: location.pathname,
-      category: category,
-      source: source,
-    });
-
-    navigate(categoryUrl);
-  };
-
-  /**
    * Navigate back with tracking
    */
   const navigateBack = (source: string = 'back_button') => {
@@ -267,14 +249,13 @@ export const useNavigationTracking = () => {
     // Core tracking
     trackNavigationEvent,
     getNavigationContextFromUrl,
-    
+
     // Navigation with tracking
     navigateWithTracking,
     navigateToVideo,
     navigateToProfile,
     navigateToUpgrade,
     navigateToSearch,
-    navigateToCategory,
     navigateBack,
   };
 };
