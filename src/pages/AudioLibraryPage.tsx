@@ -334,7 +334,7 @@ const AudioLibraryPage = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent"></div>
 
               {/* Text content on the left */}
-              <div className="relative z-10 absolute bottom-7 left-7 max-w-[55%]">
+              <div className="absolute bottom-7 left-7 z-10 max-w-[55%]">
                 <h1 className="text-[42px] font-extrabold mb-2.5 tracking-tight text-gray-900">
                   {collection.title}
                 </h1>
