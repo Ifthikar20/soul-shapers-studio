@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useVideoAccess } from '@/hooks/useVideoAccess';
 import {
-  Play, Crown, TrendingUp, Clock, Star, User, ThumbsUp
+  Play, Crown, TrendingUp, Clock, Star, User
 } from 'lucide-react';
 import { VideoContent } from '@/types/video.types';
 
@@ -90,7 +90,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
         }`}
         onClick={() => canWatch ? onPlay(video) : onUpgrade(video)}
       >
-        <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-gray-900">
+        <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-gray-900">
           {/* Main Image */}
           <img
             src={video.thumbnail}
@@ -164,7 +164,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
             animation: 'modalEntrance 0.25s ease-out',
           }}
         >
-          <Card className="overflow-hidden rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
+          <Card className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
             <style>{`
               @keyframes modalEntrance {
                 0% {
@@ -258,7 +258,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
                   <Button
                     size="lg"
                     variant="default"
-                    className="flex-1 h-11 font-semibold text-base rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 transition-colors duration-200"
+                    className="w-full h-11 font-semibold text-base rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 transition-colors duration-200"
                     onClick={(e) => {
                       e.stopPropagation();
                       onUpgrade(video);
@@ -268,28 +268,18 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
                     Upgrade to Watch
                   </Button>
                 ) : (
-                  <>
-                    <Button
-                      size="lg"
-                      variant="default"
-                      className="flex-1 h-11 font-semibold text-base rounded-lg transition-colors duration-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onPlay(video);
-                      }}
-                    >
-                      <Play className="w-4 h-4 mr-2 fill-current" />
-                      Watch Now
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="h-11 w-11 p-0 rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <ThumbsUp className="w-4 h-4" />
-                    </Button>
-                  </>
+                  <Button
+                    size="lg"
+                    variant="default"
+                    className="w-full h-11 font-semibold text-base rounded-xl transition-colors duration-200"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPlay(video);
+                    }}
+                  >
+                    <Play className="w-4 h-4 mr-2 fill-current" />
+                    Watch Now
+                  </Button>
                 )}
               </div>
             </div>

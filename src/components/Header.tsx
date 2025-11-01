@@ -302,7 +302,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
           <ChevronDown className="w-3 h-3 transition-transform" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-64 p-4">
+      <DropdownMenuContent align="start" sideOffset={8} className="w-64 p-4">
         <Button
           variant="ghost"
           onClick={() => navigate('/experts')}
@@ -463,17 +463,19 @@ const Header = ({ onShowAuth }: HeaderProps) => {
       <header className={getHeaderClasses()}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
-            
-            <div className="flex-shrink-0">
-              <LogoSection />
+
+            <div className="flex items-center gap-8 flex-1">
+              <div className="flex-shrink-0">
+                <LogoSection />
+              </div>
+
+              {/* Search Section - Only shown when authenticated */}
+              <div className="hidden lg:block flex-1 max-w-2xl">
+                <SearchSection />
+              </div>
             </div>
 
-            {/* Search Section - Only shown when authenticated */}
-            <div className="hidden lg:block flex-1 max-w-2xl mx-8">
-              <SearchSection />
-            </div>
-
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-shrink-0">
               <MainNavigation />
               <UserActions />
               
