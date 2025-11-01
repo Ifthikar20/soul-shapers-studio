@@ -5,6 +5,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import audioPage1 from '@/assets/audio-page-1.png';
+import audioPage2 from '@/assets/audio-page-2.png';
 
 interface AudioSession {
   id: string;
@@ -34,6 +36,7 @@ interface Collection {
   totalDuration: string;
   category: string;
   heroGradient: string;
+  heroImageUrl?: string;
   sessions: AudioSession[];
 }
 
@@ -50,6 +53,7 @@ const collections: Record<string, Collection> = {
     totalDuration: '45 min',
     category: 'Meditation',
     heroGradient: 'from-purple-600 via-purple-700 to-indigo-800',
+    heroImageUrl: audioPage1,
     sessions: [
       {
         id: '1',
@@ -178,6 +182,7 @@ const collections: Record<string, Collection> = {
     totalDuration: '52 min',
     category: 'Anxiety Relief',
     heroGradient: 'from-teal-600 via-cyan-700 to-blue-800',
+    heroImageUrl: audioPage2,
     sessions: [
       {
         id: '4',
@@ -313,18 +318,49 @@ const AudioLibraryPage = () => {
         {/* Hero Banner */}
         <section
           className="relative h-[280px] rounded-2xl overflow-hidden mb-8 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
-          style={{
-            background: 'linear-gradient(135deg, #ff5722 0%, #ff1744 25%, #e91e63 40%, #2196f3 60%, #00bcd4 80%, #ffeb3b 100%)'
-          }}
         >
-          <div className="absolute bottom-7 left-7 text-white max-w-[500px]">
-            <h1 className="text-[42px] font-extrabold mb-2.5 tracking-tight">
-              {collection.title}
-            </h1>
-            <p className="text-sm leading-relaxed opacity-95">
-              {collection.description}
-            </p>
-          </div>
+          {collection.heroImageUrl ? (
+            <>
+              {/* Background Image */}
+              <div className="absolute inset-0">
+                <img
+                  src={collection.heroImageUrl}
+                  alt={collection.title}
+                  className="w-full h-full object-cover object-right"
+                />
+              </div>
+
+              {/* Gradient fade overlay from left to right */}
+              <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent"></div>
+
+              {/* Text content on the left */}
+              <div className="relative z-10 absolute bottom-7 left-7 max-w-[55%]">
+                <h1 className="text-[42px] font-extrabold mb-2.5 tracking-tight text-gray-900">
+                  {collection.title}
+                </h1>
+                <p className="text-sm leading-relaxed text-gray-700">
+                  {collection.description}
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(135deg, #ff5722 0%, #ff1744 25%, #e91e63 40%, #2196f3 60%, #00bcd4 80%, #ffeb3b 100%)'
+                }}
+              ></div>
+              <div className="absolute bottom-7 left-7 text-white max-w-[500px]">
+                <h1 className="text-[42px] font-extrabold mb-2.5 tracking-tight">
+                  {collection.title}
+                </h1>
+                <p className="text-sm leading-relaxed opacity-95">
+                  {collection.description}
+                </p>
+              </div>
+            </>
+          )}
         </section>
 
         {/* Series Section */}
