@@ -462,9 +462,9 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     <>
       <header className={getHeaderClasses()}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between min-h-[64px] lg:h-20">
 
-            <div className="flex items-center gap-8 flex-1">
+            <div className="flex items-center gap-2 sm:gap-8 flex-1 min-w-0">
               <div className="flex-shrink-0">
                 <LogoSection />
               </div>
@@ -475,13 +475,13 @@ const Header = ({ onShowAuth }: HeaderProps) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               <MainNavigation />
               <UserActions />
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
+
+              <Button
+                variant="ghost"
+                size="icon"
                 className="lg:hidden rounded-full hover:scale-105 transition-transform"
               >
                 <Menu className="w-5 h-5" />
@@ -491,14 +491,15 @@ const Header = ({ onShowAuth }: HeaderProps) => {
 
           {/* Mobile Search - Only shown when authenticated */}
           {isAuthenticated && (
-            <div className="lg:hidden pb-4">
+            <div className="lg:hidden pb-4 pt-2">
               <SearchSection />
             </div>
           )}
         </div>
       </header>
 
-      <div className="h-16 lg:h-20"></div>
+      {/* Spacer - accounts for fixed header height including mobile search */}
+      <div className={isAuthenticated ? "h-[120px] lg:h-20" : "h-16 lg:h-20"}></div>
     </>
   );
 };
