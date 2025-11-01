@@ -6,12 +6,15 @@ import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Headphones, ArrowRight } from 'lucide-react';
 import canvasBackground from '@/assets/login-page-canvas.jpg';
+import audioPage1 from '@/assets/audio-page-1.png';
+import audioPage2 from '@/assets/audio-page-2.png';
 
 interface AudioTopic {
   id: string;
   title: string;
   description: string;
   category: string;
+  imageUrl?: string;
 }
 
 const audioTopics: AudioTopic[] = [
@@ -19,13 +22,15 @@ const audioTopics: AudioTopic[] = [
     id: 'quick-meditations',
     title: 'Quick Meditations',
     description: 'Give yourself a moment to breathe.',
-    category: 'meditation'
+    category: 'meditation',
+    imageUrl: audioPage1
   },
   {
     id: 'calming-anxiety',
     title: 'Calming Everyday Anxiety',
     description: 'Get in-the-moment support for anxious thinking.',
-    category: 'anxiety'
+    category: 'anxiety',
+    imageUrl: audioPage2
   },
   {
     id: 'mind-matters',
@@ -276,20 +281,49 @@ const AudioPage = () => {
           {audioTopics.map((topic) => (
             <Card
               key={topic.id}
-              className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-gray-200 hover:border-purple-300 hover:-translate-y-1"
+              className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-gray-200 hover:border-purple-300 hover:-translate-y-1 overflow-hidden"
               onClick={() => handleTopicClick(topic.id)}
             >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight pr-2">
-                    {topic.title}
-                  </h3>
-                  <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  {topic.description}
-                </p>
-              </CardContent>
+              {topic.imageUrl ? (
+                <CardContent className="p-0 relative h-full min-h-[200px]">
+                  {/* Image on the right */}
+                  <div className="absolute inset-0">
+                    <img
+                      src={topic.imageUrl}
+                      alt={topic.title}
+                      className="w-full h-full object-cover object-right"
+                    />
+                  </div>
+
+                  {/* Gradient fade overlay from left to right */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent"></div>
+
+                  {/* Text content on the left */}
+                  <div className="relative z-10 p-6 flex flex-col justify-center h-full min-h-[200px]">
+                    <div className="max-w-[65%]">
+                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight mb-3">
+                        {topic.title}
+                      </h3>
+                      <p className="text-gray-700 leading-relaxed text-sm">
+                        {topic.description}
+                      </p>
+                    </div>
+                    <ArrowRight className="absolute top-6 right-6 w-5 h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </CardContent>
+              ) : (
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight pr-2">
+                      {topic.title}
+                    </h3>
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">
+                    {topic.description}
+                  </p>
+                </CardContent>
+              )}
             </Card>
           ))}
         </div>
