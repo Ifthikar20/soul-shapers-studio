@@ -17,7 +17,8 @@ import {
   PenTool,
   MessageCircle,
   Users,
-  X
+  X,
+  SlidersHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -372,12 +373,17 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
-              
+
               <DropdownMenuItem onClick={() => navigate('/settings')}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
-              
+
+              <DropdownMenuItem onClick={() => navigate('/preferences')}>
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                Preferences
+              </DropdownMenuItem>
+
               {user.subscription_tier === 'free' && (
                 <DropdownMenuItem onClick={() => navigate('/upgrade')} className="text-primary">
                   <Crown className="mr-2 h-4 w-4" />
