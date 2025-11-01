@@ -1,5 +1,5 @@
 // src/components/Browse/HybridVideoCard.tsx - Amazon Prime-style card with hover modal
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,18 +18,54 @@ interface HybridVideoCardProps {
 const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => {
   const { canWatchVideo } = useVideoAccess();
   const [isHovered, setIsHovered] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Use accessTier to determine if video is accessible
   const canWatch = video.accessTier === 'free' || canWatchVideo(video);
 
+  // Calculate modal position when hovering
+  useEffect(() => {
+    if (isHovered && cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const modalWidth = 400;
+      const modalHeight = 500; // Approximate modal height
+
+      // Determine horizontal position
+      let left = rect.left;
+      if (rect.left + modalWidth > viewportWidth) {
+        // Too close to right edge, align right
+        left = rect.right - modalWidth;
+      } else if (rect.left < 0) {
+        // Too close to left edge, align left
+        left = 0;
+      }
+
+      // Determine vertical position
+      let top = rect.top - 50; // Slightly above the card
+      if (top + modalHeight > viewportHeight) {
+        // Would overflow bottom, position above or center
+        top = Math.max(10, viewportHeight - modalHeight - 10);
+      }
+      if (top < 10) {
+        top = 10; // Minimum top padding
+      }
+
+      setModalPosition({ top, left });
+    }
+  }, [isHovered]);
+
   return (
     <div
+      ref={cardRef}
       className="relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Card
-        className="cursor-pointer overflow-hidden border-0 rounded-2xl transition-all duration-300 ease-in-out bg-transparent group-hover:invisible"
+        className="cursor-pointer overflow-hidden border-0 rounded-2xl transition-all duration-300 ease-in-out bg-transparent group-hover:opacity-0"
         onClick={() => canWatch ? onPlay(video) : onUpgrade(video)}
       >
         <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-gray-900">
@@ -96,16 +132,16 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
 
       {/* Amazon Prime-style Hover Modal */}
       {isHovered && (
-        <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center">
-          <div className="pointer-events-auto animate-in fade-in zoom-in-95 duration-200" style={{
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
+        <div
+          className="fixed z-50 pointer-events-auto animate-in fade-in zoom-in-95 duration-200"
+          style={{
+            top: `${modalPosition.top}px`,
+            left: `${modalPosition.left}px`,
             width: '400px',
             maxWidth: '90vw'
-          }}>
-          <Card className="overflow-hidden border-0 rounded-2xl shadow-2xl bg-card">
+          }}
+        >
+          <Card className="overflow-hidden border-0 rounded-2xl shadow-2xl bg-card border-2 border-white/10">
             {/* Image Section */}
             <div className="relative aspect-video w-full overflow-hidden bg-gray-900">
               <img
@@ -222,7 +258,6 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
               </div>
             </div>
           </Card>
-          </div>
         </div>
       )}
     </div>
