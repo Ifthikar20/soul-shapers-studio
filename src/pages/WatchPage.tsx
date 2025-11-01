@@ -148,11 +148,11 @@ const WatchPage = () => {
   // Fetch next episodes
   const fetchRelatedContent = useCallback(async (currentVideo: Video) => {
     try {
-      // Try to fetch videos from the same category from API
+      // Try to fetch all videos from API
       let allVideos: Video[] = [];
 
       try {
-        allVideos = await contentService.getVideosForFrontend(currentVideo.category);
+        allVideos = await contentService.getVideosForFrontend();
       } catch (error) {
         console.log('API fetch failed, using dummy data');
       }

@@ -24,7 +24,6 @@ const UpgradePage = lazy(() => import("./pages/UpgradePage"));
 const UnauthorizedPage = lazy(() => import("./pages/UnauthorizedPage"));
 const BlogLandingPage = lazy(() => import('./pages/blog/BlogLandingPage'));
 const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
-const BlogCategoryPage = lazy(() => import('./pages/blog/BlogCategoryPage'));
 const AudioPage = lazy(() => import("./pages/AudioPage"));
 const AudioLibraryPage = lazy(() => import("./pages/AudioLibraryPage"));
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
@@ -117,7 +116,6 @@ const App = () => {
                 {/* Blog Routes - Public */}
                 <Route path="/blog" element={<BlogLandingPage />} />
                 <Route path="/blog/post/:slug" element={<BlogPostPage />} />
-                <Route path="/blog/category/:category" element={<BlogCategoryPage />} />
 
                 {/* PROTECTED: Audio Routes - Requires Authentication */}
                 <Route

@@ -16,12 +16,7 @@ import {
   BookOpen,
   PenTool,
   MessageCircle,
-  Brain,
-  Leaf,
-  Heart,
   Users,
-  Star,
-  Target,
   X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,15 +38,6 @@ interface HeaderProps {
 }
 
 const NAVIGATION_CONFIG = {
-  categories: [
-    { id: 'mental-health', name: 'Mental Health', icon: Brain },
-    { id: 'mindfulness', name: 'Mindfulness', icon: Leaf },
-    { id: 'emotional-wellness', name: 'Emotional Wellness', icon: Heart },
-    { id: 'relationships', name: 'Relationships', icon: Users },
-    { id: 'personal-growth', name: 'Personal Growth', icon: Star },
-    { id: 'breaking-habits', name: 'Breaking Habits', icon: Target }
-  ],
-  
   expertSpecialties: [
     'Clinical Psychologists',
     'Mindfulness Instructors', 
@@ -273,35 +259,6 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     );
   };
 
-  const CategoriesDropdown = () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className={`font-medium text-base flex items-center gap-1 transition-all hover:scale-105 ${getTextClasses()}`}>
-          Categories
-          <ChevronDown className="w-3 h-3 transition-transform" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80 p-4">
-        <div className="grid grid-cols-2 gap-2">
-          {NAVIGATION_CONFIG.categories.map((category) => {
-            const IconComponent = category.icon;
-            return (
-              <Button
-                key={category.id}
-                variant="ghost"
-                onClick={() => navigate(`/browse?category=${category.id}`)}
-                className="flex items-center gap-2 p-3 h-auto justify-start hover:bg-accent"
-              >
-                <IconComponent className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">{category.name}</span>
-              </Button>
-            );
-          })}
-        </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-
   const ExpertsDropdown = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -356,10 +313,9 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             {item.label}
           </Button>
         ))}
-        
+
         {isAuthenticated && (
           <>
-            <CategoriesDropdown />
             <ExpertsDropdown />
           </>
         )}
