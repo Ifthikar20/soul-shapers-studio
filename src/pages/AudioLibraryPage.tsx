@@ -5,6 +5,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import audioPage1 from '@/assets/audio-page-1.png';
+import audioPage2 from '@/assets/audio-page-2.png';
 
 interface AudioSession {
   id: string;
@@ -34,6 +36,7 @@ interface Collection {
   totalDuration: string;
   category: string;
   heroGradient: string;
+  heroImageUrl?: string;
   sessions: AudioSession[];
 }
 
@@ -50,6 +53,7 @@ const collections: Record<string, Collection> = {
     totalDuration: '45 min',
     category: 'Meditation',
     heroGradient: 'from-purple-600 via-purple-700 to-indigo-800',
+    heroImageUrl: audioPage1,
     sessions: [
       {
         id: '1',
@@ -178,6 +182,7 @@ const collections: Record<string, Collection> = {
     totalDuration: '52 min',
     category: 'Anxiety Relief',
     heroGradient: 'from-teal-600 via-cyan-700 to-blue-800',
+    heroImageUrl: audioPage2,
     sessions: [
       {
         id: '4',
@@ -304,27 +309,58 @@ const AudioLibraryPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-black">
       <Header />
 
       {/* Main Container */}
-      <div className="max-w-[1100px] mx-auto px-5 py-6">
+      <div className="max-w-[1100px] mx-auto px-5 py-6 dark:text-white">
 
         {/* Hero Banner */}
         <section
           className="relative h-[280px] rounded-2xl overflow-hidden mb-8 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
-          style={{
-            background: 'linear-gradient(135deg, #ff5722 0%, #ff1744 25%, #e91e63 40%, #2196f3 60%, #00bcd4 80%, #ffeb3b 100%)'
-          }}
         >
-          <div className="absolute bottom-7 left-7 text-white max-w-[500px]">
-            <h1 className="text-[42px] font-extrabold mb-2.5 tracking-tight">
-              {collection.title}
-            </h1>
-            <p className="text-sm leading-relaxed opacity-95">
-              {collection.description}
-            </p>
-          </div>
+          {collection.heroImageUrl ? (
+            <>
+              {/* Background Image */}
+              <div className="absolute inset-0">
+                <img
+                  src={collection.heroImageUrl}
+                  alt={collection.title}
+                  className="w-full h-full object-cover object-right"
+                />
+              </div>
+
+              {/* Gradient fade overlay from left to right */}
+              <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent dark:from-black dark:via-black/95 dark:to-transparent"></div>
+
+              {/* Text content on the left */}
+              <div className="absolute bottom-7 left-7 z-10 max-w-[55%]">
+                <h1 className="text-[42px] font-extrabold mb-2.5 tracking-tight text-gray-900 dark:text-white">
+                  {collection.title}
+                </h1>
+                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                  {collection.description}
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(135deg, #ff5722 0%, #ff1744 25%, #e91e63 40%, #2196f3 60%, #00bcd4 80%, #ffeb3b 100%)'
+                }}
+              ></div>
+              <div className="absolute bottom-7 left-7 text-white max-w-[500px]">
+                <h1 className="text-[42px] font-extrabold mb-2.5 tracking-tight">
+                  {collection.title}
+                </h1>
+                <p className="text-sm leading-relaxed opacity-95">
+                  {collection.description}
+                </p>
+              </div>
+            </>
+          )}
         </section>
 
         {/* Series Section */}
@@ -338,7 +374,7 @@ const AudioLibraryPage = () => {
             {collection.sessions.map((session) => (
               <article
                 key={session.id}
-                className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)] cursor-pointer transition-all duration-200 border border-[#f3f4f6] hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] hover:border-[#e5e7eb]"
+                className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)] cursor-pointer transition-all duration-200 border border-[#f3f4f6] hover:-translate-y-1 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] hover:border-[#e5e7eb] dark:bg-black dark:border-gray-800 dark:hover:border-gray-700"
                 onClick={() => handlePlayAudio(session.id, session.isLocked)}
               >
                 {/* Card Image */}
@@ -356,13 +392,13 @@ const AudioLibraryPage = () => {
 
                 {/* Card Content */}
                 <div className="p-3.5">
-                  <h3 className="text-sm font-semibold mb-1.5 text-[#1a1a1a] leading-tight">
+                  <h3 className="text-sm font-semibold mb-1.5 text-[#1a1a1a] leading-tight dark:text-white">
                     {session.title}
                   </h3>
-                  <p className="text-xs text-[#737373] mb-2">
+                  <p className="text-xs text-[#737373] mb-2 dark:text-gray-300">
                     {session.teacher}
                   </p>
-                  <div className="flex items-center gap-2.5 text-xs text-[#737373]">
+                  <div className="flex items-center gap-2.5 text-xs text-[#737373] dark:text-gray-300">
                     <div className="flex items-center gap-1">
                       <span className="text-[#fbbf24] text-[13px]">★</span>
                       <span>{session.rating}</span>

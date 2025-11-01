@@ -17,7 +17,9 @@ import {
   PenTool,
   MessageCircle,
   Users,
-  X
+  X,
+  Moon,
+  Sun
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,6 +77,14 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, loading } = useAuth();
 
+  // Theme state - read from cookie on mount
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const themeCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('theme='));
+    return themeCookie?.split('=')[1] === 'dark';
+  });
+
   // Secure search hook with validation and rate limiting
   const {
     searchState,
@@ -105,6 +115,31 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Apply theme to document
+  useEffect(() => {
+    // Only apply dark mode if user is authenticated
+    if (isAuthenticated) {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } else {
+      // Always remove dark mode for unauthenticated users
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode, isAuthenticated]);
+
+  const handleToggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+
+    // Save to cookie (expires in 1 year)
+    const expiryDate = new Date();
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+    document.cookie = `theme=${newMode ? 'dark' : 'light'}; expires=${expiryDate.toUTCString()}; path=/`;
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,16 +185,16 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   const getHeaderClasses = () => {
     return `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       isScrolled
-        ? 'bg-background/95 backdrop-blur-md border-b border-border/20 shadow-sm'
+        ? 'bg-white/95 backdrop-blur-md border-b border-gray-200/20 shadow-sm dark:bg-black dark:border-gray-800'
         : 'bg-transparent'
     }`;
   };
 
   const getTextClasses = (variant: 'primary' | 'secondary' = 'primary') => {
     if (variant === 'secondary') {
-      return isScrolled ? 'text-muted-foreground' : 'text-black/70';
+      return isScrolled ? 'text-gray-600 dark:text-gray-400' : 'text-black/70 dark:text-white/70';
     }
-    return isScrolled ? 'text-foreground hover:text-primary' : 'text-black hover:text-black/80';
+    return isScrolled ? 'text-gray-900 hover:text-primary dark:text-white dark:hover:text-primary' : 'text-black hover:text-black/80 dark:text-white dark:hover:text-white/80';
   };
 
   const LogoSection = () => {
@@ -203,8 +238,8 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             disabled={isRateLimited}
             className={`pl-12 pr-4 h-12 text-base rounded-full transition-all duration-300 focus:ring-2 focus:ring-primary/30 shadow-md ${
               isScrolled
-                ? 'bg-background/90 border-2 border-primary/40 text-foreground placeholder:text-muted-foreground/70'
-                : 'bg-white/20 border-2 border-white/40 text-black placeholder:text-black/50'
+                ? 'bg-white/90 border-2 border-primary/40 text-gray-900 placeholder:text-gray-500 dark:bg-black dark:text-white dark:placeholder:text-gray-400 dark:border-gray-700'
+                : 'bg-white/20 border-2 border-white/40 text-black placeholder:text-black/50 dark:bg-black/20 dark:text-white dark:placeholder:text-white/50'
             } ${searchState.errors.length > 0 ? 'border-red-500' : ''} ${isRateLimited ? 'opacity-50 cursor-not-allowed' : ''}`}
           />
 
@@ -372,21 +407,30 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
-              
+
               <DropdownMenuItem onClick={() => navigate('/settings')}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
-              
+
+              <DropdownMenuItem onClick={handleToggleTheme}>
+                {isDarkMode ? (
+                  <Sun className="mr-2 h-4 w-4" />
+                ) : (
+                  <Moon className="mr-2 h-4 w-4" />
+                )}
+                {isDarkMode ? 'Light Mode' : 'Night Mode'}
+              </DropdownMenuItem>
+
               {user.subscription_tier === 'free' && (
                 <DropdownMenuItem onClick={() => navigate('/upgrade')} className="text-primary">
                   <Crown className="mr-2 h-4 w-4" />
                   Upgrade to Premium
                 </DropdownMenuItem>
               )}
-              
+
               <DropdownMenuSeparator />
-              
+
               <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
