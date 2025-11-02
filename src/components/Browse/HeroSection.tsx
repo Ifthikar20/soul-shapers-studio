@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useVideoAccess } from '@/hooks/useVideoAccess';
 import { Video } from '@/types/video.types'; // ✅ FIXED: Use centralized type
 import {
-  Play, Star, Clock, Award, Info
+  Play, Star, Clock, Award, Info, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -13,9 +13,22 @@ interface HeroSectionProps {
   loading: boolean;
   onPlay?: (video: Video) => void; // ✅ FIXED
   onMoreInfo?: (video: Video) => void; // ✅ FIXED
+  onPrevSlide?: () => void;
+  onNextSlide?: () => void;
+  currentIndex?: number;
+  totalSlides?: number;
 }
 
-const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSectionProps) => {
+const HeroSection = ({
+  featuredVideo,
+  loading,
+  onPlay,
+  onMoreInfo,
+  onPrevSlide,
+  onNextSlide,
+  currentIndex = 0,
+  totalSlides = 0
+}: HeroSectionProps) => {
   const { canWatchVideo } = useVideoAccess();
 
   if (loading) {
@@ -47,7 +60,7 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
 
   return (
     <div className="container mx-auto px-6 pt-12 md:pt-16 pb-8">
-      <div className="relative h-[65vh] w-full overflow-hidden rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5">
+      <div className="relative h-[65vh] w-full overflow-hidden rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5 group">
       {/* Background */}
       <div className="absolute inset-0">
         <img
@@ -131,6 +144,43 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
           </div>
         </div>
       </div>
+
+      {/* Navigation Buttons - Only show if multiple slides */}
+      {totalSlides > 1 && onPrevSlide && onNextSlide && (
+        <>
+          {/* Previous Button */}
+          <button
+            onClick={onPrevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all opacity-0 group-hover:opacity-100"
+            aria-label="Previous featured video"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+
+          {/* Next Button */}
+          <button
+            onClick={onNextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all opacity-0 group-hover:opacity-100"
+            aria-label="Next featured video"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+
+          {/* Carousel Indicators */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+            {Array.from({ length: totalSlides }).map((_, index) => (
+              <div
+                key={index}
+                className={`h-1.5 rounded-full transition-all ${
+                  index === currentIndex
+                    ? 'w-8 bg-white'
+                    : 'w-1.5 bg-white/40 hover:bg-white/60'
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
     </div>
   );
