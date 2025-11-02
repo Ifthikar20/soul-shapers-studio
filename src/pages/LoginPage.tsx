@@ -151,7 +151,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex flex-col xl:flex-row overflow-hidden">
       {/* Left Side - Login Form */}
       <div className="flex-1 flex items-center justify-center p-4 lg:p-6 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
-        <div className="w-full max-w-md py-4">
+        <div className="w-full max-w-sm py-4">
           {/* Back to Home Link */}
           <Link
             to="/"
@@ -171,17 +171,17 @@ const LoginPage = () => {
                 <img
                   src={gfLogo}
                   alt="gf."
-                  className="w-16 h-16 lg:w-20 lg:h-20 mx-auto hover:scale-105 transition-transform duration-200"
+                  className="w-14 h-14 lg:w-16 lg:h-16 mx-auto hover:scale-105 transition-transform duration-200"
                 />
               </div>
 
               <div className="space-y-1 lg:space-y-2">
-                <CardTitle className="text-xl lg:text-2xl font-bold">
+                <CardTitle className="text-lg lg:text-xl font-bold">
                   <span className="bg-gradient-to-r from-purple-700 via-indigo-700 to-violet-700 bg-clip-text text-transparent">
                     {mode === 'signin' ? 'Welcome Back' : 'Begin Your Journey'}
                   </span>
                 </CardTitle>
-                <CardDescription className="text-slate-600 dark:text-slate-400 text-sm lg:text-base">
+                <CardDescription className="text-slate-600 dark:text-slate-400 text-xs lg:text-sm">
                   {mode === 'signin'
                     ? 'Access your mental health dashboard'
                     : 'Create your account for personalized wellness'
@@ -206,7 +206,7 @@ const LoginPage = () => {
                   variant="outline"
                   onClick={handleGoogleLogin}
                   disabled={isLoading}
-                  className="w-full h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors"
+                  className="w-full h-9 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors text-sm"
                 >
                   <Chrome className="w-4 h-4 mr-2 text-blue-600" />
                   Continue with Google
@@ -216,7 +216,7 @@ const LoginPage = () => {
                   variant="outline"
                   onClick={handleAppleLogin}
                   disabled={isLoading}
-                  className="w-full h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:bg-gray-50 dark:hover:bg-gray-950/20 transition-colors"
+                  className="w-full h-9 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 font-semibold hover:bg-gray-50 dark:hover:bg-gray-950/20 transition-colors text-sm"
                 >
                   <Apple className="w-4 h-4 mr-2" />
                   Continue with Apple
@@ -247,7 +247,7 @@ const LoginPage = () => {
                         placeholder="Enter your full name"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className={`pl-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 ${validationErrors.fullName ? 'border-red-400 focus:border-red-500' : ''}`}
+                        className={`pl-10 h-9 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 text-sm ${validationErrors.fullName ? 'border-red-400 focus:border-red-500' : ''}`}
                         disabled={isLoading}
                         required
                       />
@@ -272,7 +272,7 @@ const LoginPage = () => {
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className={`pl-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 ${validationErrors.email ? 'border-red-400 focus:border-red-500' : ''}`}
+                      className={`pl-10 h-9 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 text-sm ${validationErrors.email ? 'border-red-400 focus:border-red-500' : ''}`}
                       disabled={isLoading}
                       required
                     />
@@ -306,7 +306,7 @@ const LoginPage = () => {
                       placeholder={mode === 'signin' ? "Enter your password" : "Create a strong password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className={`pl-10 pr-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 ${validationErrors.password ? 'border-red-400 focus:border-red-500' : ''}`}
+                      className={`pl-10 pr-10 h-9 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 text-sm ${validationErrors.password ? 'border-red-400 focus:border-red-500' : ''}`}
                       disabled={isLoading}
                       required
                     />
@@ -345,7 +345,7 @@ const LoginPage = () => {
                         placeholder="Confirm your password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`pl-10 pr-10 h-10 lg:h-11 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 ${validationErrors.confirmPassword ? 'border-red-400 focus:border-red-500' : ''}`}
+                        className={`pl-10 pr-10 h-9 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-purple-500 focus:ring-purple-500/20 text-sm ${validationErrors.confirmPassword ? 'border-red-400 focus:border-red-500' : ''}`}
                         disabled={isLoading}
                         required
                       />
@@ -388,7 +388,7 @@ const LoginPage = () => {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  className="w-full h-10 lg:h-12 bg-gradient-to-r from-purple-700 to-indigo-700 text-white font-bold shadow-lg border-0 hover:from-purple-800 hover:to-indigo-800 transition-colors"
+                  className="w-full h-10 bg-gradient-to-r from-purple-700 to-indigo-700 text-white font-bold shadow-lg border-0 hover:from-purple-800 hover:to-indigo-800 transition-colors text-sm"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -407,13 +407,13 @@ const LoginPage = () => {
 
               {/* Switch Mode */}
               <div className="text-center pt-2">
-                <span className="text-slate-600 dark:text-slate-400">
+                <span className="text-slate-600 dark:text-slate-400 text-sm">
                   {mode === 'signin' ? "Don't have an account? " : "Already have an account? "}
                 </span>
                 <button
                   type="button"
                   onClick={switchMode}
-                  className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors"
+                  className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors text-sm"
                   disabled={isLoading}
                 >
                   {mode === 'signin' ? 'Create one now' : 'Sign in instead'}
