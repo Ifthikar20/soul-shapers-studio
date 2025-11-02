@@ -19,7 +19,12 @@ import {
   Users,
   X,
   Moon,
-  Sun
+  Sun,
+  Brain,
+  Heart,
+  Lightbulb,
+  Smile,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,12 +46,12 @@ interface HeaderProps {
 
 const NAVIGATION_CONFIG = {
   expertSpecialties: [
-    'Clinical Psychologists',
-    'Mindfulness Instructors', 
-    'Relationship Therapists',
-    'Addiction Counselors',
-    'Trauma Specialists',
-    'Life Coaches'
+    { name: 'Clinical Psychologists', icon: Brain },
+    { name: 'Mindfulness Instructors', icon: Sparkles },
+    { name: 'Relationship Therapists', icon: Heart },
+    { name: 'Addiction Counselors', icon: Activity },
+    { name: 'Trauma Specialists', icon: Shield },
+    { name: 'Life Coaches', icon: Lightbulb }
   ],
   
   searchSuggestions: [
@@ -297,34 +302,62 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   const ExpertsDropdown = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className={`font-medium text-base flex items-center gap-1 transition-all hover:scale-105 ${getTextClasses()}`}>
-          Experts
-          <ChevronDown className="w-3 h-3 transition-transform" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" sideOffset={8} className="w-64 p-4">
         <Button
           variant="ghost"
-          onClick={() => navigate('/experts')}
-          className="flex items-center gap-2 p-2 w-full justify-start mb-2 hover:bg-accent text-foreground"
+          className={`font-medium text-base flex items-center gap-1.5 transition-all duration-200 hover:scale-105 group ${getTextClasses()}`}
         >
-          <Users className="w-4 h-4 text-primary" />
-          <span className="text-sm font-medium">All Experts</span>
+          Experts
+          <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
         </Button>
-        
-        <div className="border-t pt-2">
-          <p className="text-xs text-muted-foreground mb-2 px-2">By Specialty:</p>
-          <div className="space-y-1">
-            {NAVIGATION_CONFIG.expertSpecialties.map((specialty) => (
-              <Button
-                key={specialty}
-                variant="ghost"
-                onClick={() => navigate(`/experts?specialty=${encodeURIComponent(specialty)}`)}
-                className="w-full justify-start text-sm hover:bg-accent p-2 h-auto text-foreground"
-              >
-                {specialty}
-              </Button>
-            ))}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="start"
+        sideOffset={12}
+        className="w-72 p-3 bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl"
+      >
+        {/* Header Section */}
+        <div className="mb-3">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/experts')}
+            className="flex items-center gap-3 p-3 w-full justify-start rounded-xl hover:bg-primary/10 text-foreground group transition-all duration-200 hover:scale-[1.02]"
+          >
+            <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+            <div className="text-left">
+              <span className="text-sm font-semibold block">All Experts</span>
+              <span className="text-xs text-muted-foreground">Browse all specialists</span>
+            </div>
+          </Button>
+        </div>
+
+        <DropdownMenuSeparator className="my-2" />
+
+        {/* Specialties Grid */}
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground mb-2 px-2 uppercase tracking-wider">
+            By Specialty
+          </p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {NAVIGATION_CONFIG.expertSpecialties.map((specialty) => {
+              const Icon = specialty.icon;
+              return (
+                <Button
+                  key={specialty.name}
+                  variant="ghost"
+                  onClick={() => navigate(`/experts?specialty=${encodeURIComponent(specialty.name)}`)}
+                  className="flex flex-col items-center gap-2 p-3 h-auto hover:bg-primary/10 rounded-xl group transition-all duration-200 hover:scale-[1.02]"
+                >
+                  <div className="p-2 rounded-lg bg-muted group-hover:bg-primary/20 transition-colors">
+                    <Icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                  <span className="text-xs font-medium text-center leading-tight text-foreground">
+                    {specialty.name}
+                  </span>
+                </Button>
+              );
+            })}
           </div>
         </div>
       </DropdownMenuContent>
