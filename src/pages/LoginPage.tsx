@@ -150,12 +150,12 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex flex-col xl:flex-row overflow-hidden">
       {/* Left Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-4 lg:p-6 bg-slate-50 dark:bg-slate-900">
-        <div className="w-full max-w-md">
+      <div className="flex-1 flex items-center justify-center p-4 lg:p-6 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
+        <div className="w-full max-w-md py-4">
           {/* Back to Home Link */}
           <Link
             to="/"
-            className="inline-flex items-center text-slate-600 dark:text-slate-400 mb-4 lg:mb-8 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+            className="inline-flex items-center text-slate-600 dark:text-slate-400 mb-3 lg:mb-4 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
           >
             <div className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
               <ArrowLeft className="w-4 h-4" />
@@ -165,7 +165,7 @@ const LoginPage = () => {
 
           {/* Main Card */}
           <Card className="border border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-800">
-            <CardHeader className="text-center space-y-3 lg:space-y-4 pb-4 lg:pb-6">
+            <CardHeader className="text-center space-y-2 lg:space-y-3 pb-3 lg:pb-4">
               {/* Logo */}
               <div className="mx-auto">
                 <img
@@ -190,7 +190,7 @@ const LoginPage = () => {
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-4 lg:space-y-6">
+            <CardContent className="space-y-3 lg:space-y-4">
               {/* Error Alert */}
               {error && (
                 <Alert variant="destructive" className="border-red-200 bg-red-50 dark:bg-red-950/30">
@@ -234,10 +234,10 @@ const LoginPage = () => {
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Full Name (Sign up only) */}
                 {mode === 'signup' && (
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <Label htmlFor="fullName" className="text-slate-700 dark:text-slate-300 font-semibold">Full Name</Label>
                     <div className="relative group">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-purple-500 transition-colors" />
@@ -262,7 +262,7 @@ const LoginPage = () => {
                 )}
 
                 {/* Email */}
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-slate-700 dark:text-slate-300 font-semibold">Email Address</Label>
                   <div className="relative group">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-purple-500 transition-colors" />
@@ -286,7 +286,7 @@ const LoginPage = () => {
                 </div>
 
                 {/* Password */}
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
                     <Label htmlFor="password" className="text-slate-700 dark:text-slate-300 font-semibold">Password</Label>
                     {mode === 'signin' && (
@@ -335,7 +335,7 @@ const LoginPage = () => {
 
                 {/* Confirm Password (Sign up only) */}
                 {mode === 'signup' && (
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <Label htmlFor="confirmPassword" className="text-slate-700 dark:text-slate-300 font-semibold">Confirm Password</Label>
                     <div className="relative group">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-purple-500 transition-colors" />
@@ -406,7 +406,7 @@ const LoginPage = () => {
               </form>
 
               {/* Switch Mode */}
-              <div className="text-center pt-4">
+              <div className="text-center pt-2">
                 <span className="text-slate-600 dark:text-slate-400">
                   {mode === 'signin' ? "Don't have an account? " : "Already have an account? "}
                 </span>
@@ -422,7 +422,7 @@ const LoginPage = () => {
 
               {/* Terms and Privacy (Sign up only) */}
               {mode === 'signup' && (
-                <p className="text-xs text-center text-slate-500 dark:text-slate-400 leading-relaxed pt-2">
+                <p className="text-xs text-center text-slate-500 dark:text-slate-400 leading-relaxed pt-1">
                   By creating an account, you agree to our{' '}
                   <Link to="/terms" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors">
                     Terms of Service
@@ -435,7 +435,7 @@ const LoginPage = () => {
               )}
 
               {/* Additional Info */}
-              <div className="text-center pt-2">
+              <div className="text-center pt-1">
                 <p className="text-xs text-slate-600 dark:text-slate-400">
                   Need help?{' '}
                   <Link to="/support" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 transition-colors">
