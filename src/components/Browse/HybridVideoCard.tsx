@@ -81,16 +81,19 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
   // Lock body scroll when modal is visible
   useEffect(() => {
     if (showModal) {
-      // Simply prevent body scroll without any compensation
-      // This avoids all layout shift issues
+      // Reserve space for scrollbar to prevent layout shift
+      document.documentElement.style.scrollbarGutter = 'stable';
+      // Prevent body scroll
       document.body.style.overflow = 'hidden';
     } else {
       // Restore body scroll
+      document.documentElement.style.scrollbarGutter = '';
       document.body.style.overflow = '';
     }
 
     // Cleanup on unmount
     return () => {
+      document.documentElement.style.scrollbarGutter = '';
       document.body.style.overflow = '';
     };
   }, [showModal]);
