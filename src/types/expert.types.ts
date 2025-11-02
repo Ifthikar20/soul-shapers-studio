@@ -7,17 +7,12 @@ export interface Expert {
   specialty: string;
   avatar: string;
   bio: string;
-  shortBio: string;
   expertise: string[];
   yearsOfExperience: number;
-  rating: number;
-  totalSessions?: number;
   totalVideos?: number;
   education?: string[];
   certifications?: string[];
-  languages?: string[];
-  approach?: string;
-  availability?: 'available' | 'limited' | 'unavailable';
+  linkedIn?: string;
   featured?: boolean;
 }
 
