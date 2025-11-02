@@ -30,6 +30,8 @@ const AudioLibraryPage = lazy(() => import("./pages/AudioLibraryPage"));
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
 const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
@@ -110,6 +112,8 @@ const App = () => {
 
                 {/* Public Routes */}
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                 <Route path="/support" element={<SupportPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
