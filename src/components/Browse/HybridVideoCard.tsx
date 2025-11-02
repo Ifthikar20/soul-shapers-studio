@@ -30,15 +30,33 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
   useEffect(() => {
     if (isHovered && cardRef.current) {
       const rect = cardRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
       const modalWidth = 400;
       const modalHeight = 540; // Approximate modal height
 
-      // For absolute positioning, calculate relative to parent
+      // For fixed positioning, use viewport coordinates from getBoundingClientRect
       // Center the modal horizontally over the card
-      let left = (rect.width - modalWidth) / 2;
+      let left = rect.left + (rect.width - modalWidth) / 2;
+
+      // Keep modal within viewport horizontally
+      if (left + modalWidth > viewportWidth - 20) {
+        left = viewportWidth - modalWidth - 20;
+      }
+      if (left < 20) {
+        left = 20;
+      }
 
       // Position modal slightly above the card
-      let top = -50;
+      let top = rect.top - 50;
+
+      // Keep modal within viewport vertically
+      if (top + modalHeight > viewportHeight - 20) {
+        top = viewportHeight - modalHeight - 20;
+      }
+      if (top < 20) {
+        top = 20;
+      }
 
       setModalPosition({ top, left });
 
@@ -140,7 +158,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       {/* Clean Hover Modal */}
       {showModal && (
         <div
-          className="absolute z-50 pointer-events-auto"
+          className="fixed z-50 pointer-events-auto"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           style={{
