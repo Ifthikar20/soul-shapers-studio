@@ -1,4 +1,4 @@
-// src/pages/ExpertsPage.tsx - Professional expert directory
+// src/pages/ExpertsPage.tsx - Modern expert directory
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -65,24 +65,24 @@ const ExpertsPage = () => {
       <Header />
 
       {/* Hero Section */}
-      <div className="border-b bg-card">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl font-bold mb-3 text-foreground">
-              Our Expert Team
+      <div className="border-b">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+              Meet Our Experts
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Connect with certified professionals dedicated to your mental health and personal growth.
+              Connect with licensed professionals who are here to support your journey.
             </p>
 
             {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
-                placeholder="Search by name or expertise..."
+                placeholder="Search experts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 text-base bg-background"
+                className="pl-12 h-12 text-base border-2 dark:bg-background/50"
               />
             </div>
           </div>
@@ -90,16 +90,16 @@ const ExpertsPage = () => {
       </div>
 
       {/* Filter Section */}
-      <div className="border-b bg-background">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="border-b dark:border-border/50">
+        <div className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-medium text-muted-foreground mr-2">Specialty:</span>
             <Button
               variant={selectedSpecialty === null ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setSelectedSpecialty(null)}
+              className="font-medium"
             >
-              All
+              All Specialties
             </Button>
             {specialties.map((specialty) => {
               const Icon = SPECIALTY_ICONS[specialty as keyof typeof SPECIALTY_ICONS];
@@ -109,9 +109,9 @@ const ExpertsPage = () => {
                   variant={selectedSpecialty === specialty ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setSelectedSpecialty(specialty)}
-                  className="flex items-center gap-1.5"
+                  className="flex items-center gap-2 font-medium"
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-4 h-4" />
                   {specialty}
                 </Button>
               );
@@ -123,22 +123,24 @@ const ExpertsPage = () => {
       {/* Experts Grid */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         {filteredExperts.length === 0 ? (
-          <div className="text-center py-16">
-            <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+          <div className="text-center py-20">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+              <Search className="w-8 h-8 text-muted-foreground" />
+            </div>
             <h3 className="text-lg font-semibold mb-2">No experts found</h3>
             <p className="text-muted-foreground text-sm">
-              Try adjusting your search or filters
+              Try a different search or filter
             </p>
           </div>
         ) : (
           <>
-            <div className="mb-6">
+            <div className="mb-8">
               <p className="text-sm text-muted-foreground">
-                {filteredExperts.length} expert{filteredExperts.length !== 1 ? 's' : ''}
+                Showing {filteredExperts.length} {filteredExperts.length === 1 ? 'expert' : 'experts'}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredExperts.map((expert) => {
                 const Icon = SPECIALTY_ICONS[expert.specialty as keyof typeof SPECIALTY_ICONS];
 
@@ -146,71 +148,84 @@ const ExpertsPage = () => {
                   <div
                     key={expert.id}
                     onClick={() => navigate(`/experts/${expert.id}`)}
-                    className="bg-card border rounded-lg p-6 hover:shadow-md transition-all cursor-pointer group"
+                    className="group bg-card border dark:border-border/50 rounded-xl p-6 hover:shadow-xl dark:hover:shadow-2xl dark:hover:shadow-primary/5 transition-all duration-300 cursor-pointer hover:border-primary/50"
                   >
                     {/* Expert Header */}
-                    <div className="flex items-start gap-4 mb-4">
-                      <img
-                        src={expert.avatar}
-                        alt={expert.name}
-                        className="w-16 h-16 rounded-lg border"
-                      />
+                    <div className="flex items-start gap-4 mb-5">
+                      <div className="relative">
+                        <img
+                          src={expert.avatar}
+                          alt={expert.name}
+                          className="w-20 h-20 rounded-xl border-2 dark:border-border/50 object-cover"
+                        />
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary/10 dark:bg-primary/20 border-2 border-card flex items-center justify-center">
+                          {Icon && <Icon className="w-3 h-3 text-primary" />}
+                        </div>
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-base mb-1 group-hover:text-primary transition-colors">
+                        <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors">
                           {expert.name}
                         </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-1">
+                        <p className="text-sm text-muted-foreground line-clamp-2">
                           {expert.credentials}
                         </p>
                       </div>
                     </div>
 
-                    {/* Specialty Badge */}
-                    <div className="flex items-center gap-2 mb-3">
-                      {Icon && <Icon className="w-4 h-4 text-muted-foreground" />}
-                      <span className="text-xs text-muted-foreground">{expert.specialty}</span>
+                    {/* Specialty */}
+                    <div className="mb-4">
+                      <Badge
+                        variant="secondary"
+                        className="text-xs font-medium dark:bg-muted/50"
+                      >
+                        {expert.specialty}
+                      </Badge>
                     </div>
 
                     {/* Bio */}
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    <p className="text-sm text-muted-foreground mb-5 line-clamp-3 leading-relaxed">
                       {expert.bio}
                     </p>
 
                     {/* Stats */}
-                    <div className="flex items-center gap-4 mb-4 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Briefcase className="w-3.5 h-3.5" />
-                        <span>{expert.yearsOfExperience}+ years</span>
+                    <div className="flex items-center gap-4 mb-5 pb-5 border-b dark:border-border/30">
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-8 h-8 rounded-lg bg-muted dark:bg-muted/50 flex items-center justify-center">
+                          <Briefcase className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <span className="text-foreground font-medium">{expert.yearsOfExperience} years</span>
                       </div>
                       {expert.totalVideos && (
-                        <div className="flex items-center gap-1">
-                          <Video className="w-3.5 h-3.5" />
-                          <span>{expert.totalVideos} videos</span>
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="w-8 h-8 rounded-lg bg-muted dark:bg-muted/50 flex items-center justify-center">
+                            <Video className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                          <span className="text-foreground font-medium">{expert.totalVideos} videos</span>
                         </div>
                       )}
                     </div>
 
-                    {/* Expertise Tags */}
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {expert.expertise.slice(0, 3).map((exp, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="text-xs font-normal"
-                        >
-                          {exp}
-                        </Badge>
-                      ))}
+                    {/* Expertise */}
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Expertise
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {expert.expertise.slice(0, 3).map((exp, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center px-2.5 py-1 rounded-md bg-muted/50 dark:bg-muted/30 text-xs font-medium text-foreground"
+                          >
+                            {exp}
+                          </span>
+                        ))}
+                        {expert.expertise.length > 3 && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-muted/50 dark:bg-muted/30 text-xs font-medium text-muted-foreground">
+                            +{expert.expertise.length - 3}
+                          </span>
+                        )}
+                      </div>
                     </div>
-
-                    {/* View Profile Button */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-colors"
-                    >
-                      View Profile
-                    </Button>
                   </div>
                 );
               })}
