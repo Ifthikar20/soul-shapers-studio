@@ -29,6 +29,8 @@ const AudioPage = lazy(() => import("./pages/AudioPage"));
 const AudioLibraryPage = lazy(() => import("./pages/AudioLibraryPage"));
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
+const ExpertsPage = lazy(() => import("./pages/ExpertsPage")); // ✅ NEW: Experts listing page
+const ExpertProfilePage = lazy(() => import("./pages/ExpertProfilePage")); // ✅ NEW: Expert profile page
 const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
 const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
@@ -157,6 +159,24 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <WatchPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* PROTECTED: Experts Routes - Requires Authentication */}
+                <Route
+                  path="/experts"
+                  element={
+                    <ProtectedRoute>
+                      <ExpertsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/experts/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ExpertProfilePage />
                     </ProtectedRoute>
                   }
                 />
