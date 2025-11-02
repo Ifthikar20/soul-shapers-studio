@@ -89,20 +89,26 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       // Compensate for scrollbar width to prevent page resize
       document.body.style.paddingRight = `${scrollbarWidth}px`;
 
-      // Also apply padding to header to keep it stable
+      // Apply padding to all fixed elements to keep them stable
       const header = document.querySelector('header');
       if (header) {
-        (header as HTMLElement).style.paddingRight = `${scrollbarWidth}px`;
+        const headerContainer = header.querySelector('.max-w-7xl');
+        if (headerContainer) {
+          (headerContainer as HTMLElement).style.paddingRight = `${scrollbarWidth}px`;
+        }
       }
     } else {
       // Restore body scroll
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
 
-      // Restore header padding
+      // Restore header container padding
       const header = document.querySelector('header');
       if (header) {
-        (header as HTMLElement).style.paddingRight = '';
+        const headerContainer = header.querySelector('.max-w-7xl');
+        if (headerContainer) {
+          (headerContainer as HTMLElement).style.paddingRight = '';
+        }
       }
     }
 
@@ -113,7 +119,10 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
 
       const header = document.querySelector('header');
       if (header) {
-        (header as HTMLElement).style.paddingRight = '';
+        const headerContainer = header.querySelector('.max-w-7xl');
+        if (headerContainer) {
+          (headerContainer as HTMLElement).style.paddingRight = '';
+        }
       }
     };
   }, [showModal]);
