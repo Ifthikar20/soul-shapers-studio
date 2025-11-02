@@ -32,7 +32,7 @@ const Hero = () => {
       <div className="max-w-6xl mx-auto px-6 pt-12 pb-20 md:pt-16 md:pb-32">
 
         {/* Floating Capsule - Curved Image Backdrop with Content */}
-        <div className="relative rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5 hover:shadow-[0_25px_70px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-1">
+        <div className="relative rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5">
           <img
             src={watercolor1}
             alt="Wellness journey backdrop"

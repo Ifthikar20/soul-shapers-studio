@@ -47,7 +47,7 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
 
   return (
     <div className="container mx-auto px-6 pt-12 md:pt-16 pb-8">
-      <div className="relative h-[65vh] w-full overflow-hidden rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5 hover:shadow-[0_25px_70px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-1">
+      <div className="relative h-[65vh] w-full overflow-hidden rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5">
       {/* Background */}
       <div className="absolute inset-0">
         <img
@@ -112,16 +112,16 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
 
             {/* Actions */}
             <div className="flex items-center gap-4">
-              <Button 
-                className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-3 text-base h-12 rounded-lg"
+              <Button
+                className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-3 text-base h-12 rounded-full"
                 onClick={() => onPlay?.(featuredVideo)}
               >
                 <Play className="w-5 h-5 mr-2 fill-current" />
                 {canWatch ? 'Watch Now' : 'Preview'}
               </Button>
-              <Button 
-                variant="outline" 
-                className="border-white/40 text-white hover:bg-white/10 backdrop-blur-sm px-8 py-3 text-base h-12 rounded-lg"
+              <Button
+                variant="outline"
+                className="border-white/40 text-white hover:bg-white/10 backdrop-blur-sm px-8 py-3 text-base h-12 rounded-full"
                 onClick={() => onMoreInfo?.(featuredVideo)}
               >
                 <Info className="w-5 h-5 mr-2" />
