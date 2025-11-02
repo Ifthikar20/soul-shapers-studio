@@ -35,24 +35,27 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       const modalWidth = 400;
       const modalHeight = 540; // Approximate modal height
 
-      // Determine horizontal position with smart centering
-      let left = rect.left - (modalWidth - rect.width) / 2;
-      if (left + modalWidth > viewportWidth - 30) {
-        // Too close to right edge
-        left = Math.max(30, viewportWidth - modalWidth - 30);
-      } else if (left < 30) {
-        // Too close to left edge
-        left = 30;
+      // For fixed positioning, use viewport coordinates from getBoundingClientRect
+      // Center the modal horizontally over the card
+      let left = rect.left + (rect.width - modalWidth) / 2;
+
+      // Keep modal within viewport horizontally
+      if (left + modalWidth > viewportWidth - 20) {
+        left = viewportWidth - modalWidth - 20;
+      }
+      if (left < 20) {
+        left = 20;
       }
 
-      // Determine vertical position
-      let top = rect.top - 50; // Slightly above the card
-      if (top + modalHeight > viewportHeight - 30) {
-        // Would overflow bottom
-        top = Math.max(30, viewportHeight - modalHeight - 30);
+      // Position modal slightly above the card
+      let top = rect.top - 50;
+
+      // Keep modal within viewport vertically
+      if (top + modalHeight > viewportHeight - 20) {
+        top = viewportHeight - modalHeight - 20;
       }
-      if (top < 30) {
-        top = 30; // Minimum top padding
+      if (top < 20) {
+        top = 20;
       }
 
       setModalPosition({ top, left });
@@ -74,6 +77,22 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       }
     };
   }, [isHovered]);
+
+  // Lock body scroll when modal is visible
+  useEffect(() => {
+    if (showModal) {
+      // Prevent body scroll (scrollbar-gutter: stable is set globally in index.css)
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore body scroll
+      document.body.style.overflow = '';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showModal]);
 
   return (
     <div
@@ -156,6 +175,8 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       {showModal && (
         <div
           className="fixed z-50 pointer-events-auto"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           style={{
             top: `${modalPosition.top}px`,
             left: `${modalPosition.left}px`,
@@ -164,7 +185,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
             animation: 'modalEntrance 0.25s ease-out',
           }}
         >
-          <Card className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
+          <Card className="overflow-hidden rounded-2xl bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-xl">
             <style>{`
               @keyframes modalEntrance {
                 0% {
@@ -211,7 +232,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
             </div>
 
             {/* Info Section */}
-            <div className="p-5 space-y-3.5 bg-white dark:bg-gray-900">
+            <div className="p-5 space-y-3.5 bg-white dark:bg-black">
               {/* Title Section */}
               <div className="flex items-start justify-between gap-3">
                 <h3 className="font-bold text-xl leading-tight line-clamp-2 flex-1 text-gray-900 dark:text-white">
