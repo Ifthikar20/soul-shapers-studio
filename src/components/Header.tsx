@@ -300,7 +300,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
   };
 
   const ExpertsDropdown = () => (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -411,7 +411,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             </Button>
           )}
 
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:scale-105 transition-transform">
                 <Avatar className="h-9 w-9">
