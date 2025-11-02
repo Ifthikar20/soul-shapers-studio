@@ -1,11 +1,11 @@
 // src/components/Browse/HybridVideoCard.tsx - Amazon Prime-style card with hover modal
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useVideoAccess } from '@/hooks/useVideoAccess';
 import {
-  Play, Crown, TrendingUp, Clock, Star, User, ThumbsUp
+  Play, Crown, TrendingUp, Clock, Star, User
 } from 'lucide-react';
 import { VideoContent } from '@/types/video.types';
 
@@ -18,18 +18,76 @@ interface HybridVideoCardProps {
 const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => {
   const { canWatchVideo } = useVideoAccess();
   const [isHovered, setIsHovered] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Use accessTier to determine if video is accessible
   const canWatch = video.accessTier === 'free' || canWatchVideo(video);
 
+  // Calculate modal position when hovering
+  useEffect(() => {
+    if (isHovered && cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const modalWidth = 400;
+      const modalHeight = 540; // Approximate modal height
+
+      // Determine horizontal position with smart centering
+      let left = rect.left - (modalWidth - rect.width) / 2;
+      if (left + modalWidth > viewportWidth - 30) {
+        // Too close to right edge
+        left = Math.max(30, viewportWidth - modalWidth - 30);
+      } else if (left < 30) {
+        // Too close to left edge
+        left = 30;
+      }
+
+      // Determine vertical position
+      let top = rect.top - 50; // Slightly above the card
+      if (top + modalHeight > viewportHeight - 30) {
+        // Would overflow bottom
+        top = Math.max(30, viewportHeight - modalHeight - 30);
+      }
+      if (top < 30) {
+        top = 30; // Minimum top padding
+      }
+
+      setModalPosition({ top, left });
+
+      // Delay showing modal
+      hoverTimeoutRef.current = setTimeout(() => {
+        setShowModal(true);
+      }, 300);
+    } else {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+      setShowModal(false);
+    }
+
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, [isHovered]);
+
   return (
     <div
+      ref={cardRef}
       className="relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Card
-        className="cursor-pointer overflow-hidden border-0 rounded-2xl transition-all duration-300 ease-in-out bg-transparent group-hover:invisible"
+        className={`cursor-pointer overflow-hidden border-0 rounded-xl transition-all duration-300 ease-out bg-transparent ${
+          showModal
+            ? 'opacity-0 scale-95'
+            : 'opacity-100 scale-100'
+        }`}
         onClick={() => canWatch ? onPlay(video) : onUpgrade(video)}
       >
         <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-gray-900">
@@ -94,18 +152,31 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
         </div>
       </Card>
 
-      {/* Amazon Prime-style Hover Modal */}
-      {isHovered && (
-        <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center">
-          <div className="pointer-events-auto animate-in fade-in zoom-in-95 duration-200" style={{
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
+      {/* Clean Hover Modal */}
+      {showModal && (
+        <div
+          className="fixed z-50 pointer-events-auto"
+          style={{
+            top: `${modalPosition.top}px`,
+            left: `${modalPosition.left}px`,
             width: '400px',
-            maxWidth: '90vw'
-          }}>
-          <Card className="overflow-hidden border-0 rounded-2xl shadow-2xl bg-card">
+            maxWidth: '90vw',
+            animation: 'modalEntrance 0.25s ease-out',
+          }}
+        >
+          <Card className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
+            <style>{`
+              @keyframes modalEntrance {
+                0% {
+                  opacity: 0;
+                  transform: translateY(-10px) scale(0.95);
+                }
+                100% {
+                  opacity: 1;
+                  transform: translateY(0) scale(1);
+                }
+              }
+            `}</style>
             {/* Image Section */}
             <div className="relative aspect-video w-full overflow-hidden bg-gray-900">
               <img
@@ -119,110 +190,100 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
               <div className="absolute inset-0 flex items-center justify-center">
                 <Button
                   size="lg"
-                  className="rounded-full h-14 w-14 p-0"
+                  className="rounded-full h-16 w-16 p-0 bg-white hover:bg-white text-black shadow-lg transition-all duration-200 hover:scale-110 active:scale-95"
                   onClick={(e) => {
                     e.stopPropagation();
                     canWatch ? onPlay(video) : onUpgrade(video);
                   }}
                 >
                   {!canWatch ? (
-                    <Crown className="w-6 h-6" />
+                    <Crown className="w-7 h-7" />
                   ) : (
-                    <Play className="w-6 h-6 fill-current" />
+                    <Play className="w-7 h-7 fill-current ml-1" />
                   )}
                 </Button>
               </div>
 
-              {/* Duration */}
-              <div className="absolute bottom-3 right-3 bg-black/80 text-white px-2 py-1 rounded text-xs font-medium">
+              {/* Duration Badge */}
+              <div className="absolute bottom-3 right-3 bg-black/90 backdrop-blur-sm text-white px-2.5 py-1 rounded-md text-sm font-semibold">
                 {video.duration}
               </div>
             </div>
 
-            {/* Expanded Info Section */}
-            <div className="p-4 space-y-3 bg-card">
-              {/* Title */}
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-bold text-sm line-clamp-2 flex-1">
+            {/* Info Section */}
+            <div className="p-5 space-y-3.5 bg-white dark:bg-gray-900">
+              {/* Title Section */}
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-bold text-xl leading-tight line-clamp-2 flex-1 text-gray-900 dark:text-white">
                   {video.title}
                 </h3>
                 {!canWatch && (
-                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] px-2 py-0.5 flex-shrink-0">
-                    <Crown className="w-3 h-3 mr-1" />
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm px-2.5 py-1 flex-shrink-0 font-semibold">
+                    <Crown className="w-4 h-4 mr-1" />
                     PRO
                   </Badge>
                 )}
               </div>
 
               {/* Stats Row */}
-              <div className="flex items-center gap-3 text-xs">
-                <div className="flex items-center gap-1 text-yellow-500">
-                  <Star className="w-3 h-3 fill-current" />
-                  <span className="font-semibold text-foreground">{video.rating}</span>
+              <div className="flex items-center gap-3 text-base">
+                <div className="flex items-center gap-1.5 text-yellow-500">
+                  <Star className="w-5 h-5 fill-current" />
+                  <span className="font-bold text-gray-900 dark:text-white">{video.rating}</span>
                 </div>
-                <span className="text-muted-foreground">•</span>
-                <span className="text-muted-foreground">{video.views}</span>
-                <span className="text-muted-foreground">•</span>
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                <span className="text-gray-400 dark:text-gray-600">•</span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{video.views}</span>
+                <span className="text-gray-400 dark:text-gray-600">•</span>
+                <Badge variant="outline" className="text-sm px-2 py-0.5 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">
                   {video.category}
                 </Badge>
               </div>
 
-              {/* Expert */}
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <User className="w-3 h-3" />
-                <span>{video.expert}</span>
+              {/* Expert Section */}
+              <div className="flex items-center gap-2.5 text-base">
+                <User className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                <span className="font-medium text-gray-700 dark:text-gray-300">{video.expert}</span>
               </div>
 
               {/* Description */}
               {video.description && (
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                <p className="text-base text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
                   {video.description}
                 </p>
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2.5 pt-2">
                 {!canWatch ? (
                   <Button
-                    size="sm"
+                    size="lg"
                     variant="default"
-                    className="flex-1"
+                    className="w-full h-11 font-semibold text-base rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 transition-colors duration-200"
                     onClick={(e) => {
                       e.stopPropagation();
                       onUpgrade(video);
                     }}
                   >
-                    <Crown className="w-3 h-3 mr-1" />
+                    <Crown className="w-4 h-4 mr-2" />
                     Upgrade to Watch
                   </Button>
                 ) : (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="default"
-                      className="flex-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onPlay(video);
-                      }}
-                    >
-                      <Play className="w-3 h-3 mr-1 fill-current" />
-                      Watch Now
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <ThumbsUp className="w-3 h-3" />
-                    </Button>
-                  </>
+                  <Button
+                    size="lg"
+                    variant="default"
+                    className="w-full h-11 font-semibold text-base rounded-xl transition-colors duration-200"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPlay(video);
+                    }}
+                  >
+                    <Play className="w-4 h-4 mr-2 fill-current" />
+                    Watch Now
+                  </Button>
                 )}
               </div>
             </div>
           </Card>
-          </div>
         </div>
       )}
     </div>
