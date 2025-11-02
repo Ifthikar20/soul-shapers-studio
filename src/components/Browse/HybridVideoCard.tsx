@@ -30,34 +30,15 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
   useEffect(() => {
     if (isHovered && cardRef.current) {
       const rect = cardRef.current.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
       const modalWidth = 400;
       const modalHeight = 540; // Approximate modal height
 
-      // Get scroll position for absolute positioning
-      const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
-      const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+      // For absolute positioning, calculate relative to parent
+      // Center the modal horizontally over the card
+      let left = (rect.width - modalWidth) / 2;
 
-      // Determine horizontal position with smart centering
-      let left = rect.left + scrollX - (modalWidth - rect.width) / 2;
-      if (rect.left + modalWidth > viewportWidth - 30) {
-        // Too close to right edge
-        left = Math.max(30 + scrollX, viewportWidth - modalWidth - 30 + scrollX);
-      } else if (rect.left < 30) {
-        // Too close to left edge
-        left = 30 + scrollX;
-      }
-
-      // Determine vertical position
-      let top = rect.top + scrollY - 50; // Slightly above the card
-      if (rect.top + modalHeight > viewportHeight - 30) {
-        // Would overflow bottom of viewport
-        top = Math.max(30 + scrollY, viewportHeight - modalHeight - 30 + scrollY);
-      }
-      if (rect.top < 30) {
-        top = 30 + scrollY; // Minimum top padding
-      }
+      // Position modal slightly above the card
+      let top = -50;
 
       setModalPosition({ top, left });
 
@@ -160,6 +141,8 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       {showModal && (
         <div
           className="absolute z-50 pointer-events-auto"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           style={{
             top: `${modalPosition.top}px`,
             left: `${modalPosition.left}px`,
