@@ -320,23 +320,27 @@ const WatchPage = () => {
         </Button>
 
         {/* Video Player */}
-        <div className="relative w-full aspect-video bg-black max-w-[1920px] mx-auto">
-          {streamUrl ? (
-            <HLSVideoPlayer
-              ref={videoRef}
-              src={streamUrl}
-              poster={video.thumbnail}
-              className="w-full h-full"
-              autoPlay={true}
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-black">
-              <div className="text-center text-white">
-                <AlertCircle className="w-12 h-12 mx-auto mb-4" />
-                <p>No stream URL available</p>
-              </div>
+        <div className="relative w-full bg-black">
+          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-12">
+            <div className="relative w-full aspect-video bg-black">
+              {streamUrl ? (
+                <HLSVideoPlayer
+                  ref={videoRef}
+                  src={streamUrl}
+                  poster={video.thumbnail}
+                  className="w-full h-full"
+                  autoPlay={true}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-black">
+                  <div className="text-center text-white">
+                    <AlertCircle className="w-12 h-12 mx-auto mb-4" />
+                    <p>No stream URL available</p>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 
