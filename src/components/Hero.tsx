@@ -19,8 +19,8 @@ const Hero = () => {
   };
 
   return (
-    <section 
-      className={`relative min-h-screen bg-white overflow-hidden transition-transform ${
+    <section
+      className={`relative min-h-screen bg-white overflow-visible transition-transform ${
         isSwiping ? '-translate-x-full' : 'translate-x-0'
       }`}
       style={{
@@ -28,17 +28,17 @@ const Hero = () => {
         transitionTimingFunction: 'cubic-bezier(0.65, 0, 0.35, 1)', // More graceful easing
       }}
     >
-      
-      <div className="max-w-7xl mx-auto px-6 py-20 md:py-32">
-        
-        {/* Curved Image Backdrop with Content */}
-        <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl">
-          <img 
+
+      <div className="max-w-6xl mx-auto px-6 pt-12 pb-20 md:pt-16 md:pb-32">
+
+        {/* Floating Capsule - Curved Image Backdrop with Content */}
+        <div className="relative rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5 hover:shadow-[0_25px_70px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-1">
+          <img
             src={watercolor1}
             alt="Wellness journey backdrop"
             className="w-full h-[600px] object-cover"
           />
-          
+
           {/* Dark overlay for better text contrast */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60"></div>
           
