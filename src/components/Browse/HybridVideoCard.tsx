@@ -35,24 +35,28 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       const modalWidth = 400;
       const modalHeight = 540; // Approximate modal height
 
+      // Get scroll position for absolute positioning
+      const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
       // Determine horizontal position with smart centering
-      let left = rect.left - (modalWidth - rect.width) / 2;
-      if (left + modalWidth > viewportWidth - 30) {
+      let left = rect.left + scrollX - (modalWidth - rect.width) / 2;
+      if (rect.left + modalWidth > viewportWidth - 30) {
         // Too close to right edge
-        left = Math.max(30, viewportWidth - modalWidth - 30);
-      } else if (left < 30) {
+        left = Math.max(30 + scrollX, viewportWidth - modalWidth - 30 + scrollX);
+      } else if (rect.left < 30) {
         // Too close to left edge
-        left = 30;
+        left = 30 + scrollX;
       }
 
       // Determine vertical position
-      let top = rect.top - 50; // Slightly above the card
-      if (top + modalHeight > viewportHeight - 30) {
-        // Would overflow bottom
-        top = Math.max(30, viewportHeight - modalHeight - 30);
+      let top = rect.top + scrollY - 50; // Slightly above the card
+      if (rect.top + modalHeight > viewportHeight - 30) {
+        // Would overflow bottom of viewport
+        top = Math.max(30 + scrollY, viewportHeight - modalHeight - 30 + scrollY);
       }
-      if (top < 30) {
-        top = 30; // Minimum top padding
+      if (rect.top < 30) {
+        top = 30 + scrollY; // Minimum top padding
       }
 
       setModalPosition({ top, left });
@@ -155,7 +159,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
       {/* Clean Hover Modal */}
       {showModal && (
         <div
-          className="fixed z-50 pointer-events-auto"
+          className="absolute z-50 pointer-events-auto"
           style={{
             top: `${modalPosition.top}px`,
             left: `${modalPosition.left}px`,
@@ -164,7 +168,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
             animation: 'modalEntrance 0.25s ease-out',
           }}
         >
-          <Card className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
+          <Card className="overflow-hidden rounded-2xl bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-xl">
             <style>{`
               @keyframes modalEntrance {
                 0% {
@@ -211,7 +215,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
             </div>
 
             {/* Info Section */}
-            <div className="p-5 space-y-3.5 bg-white dark:bg-gray-900">
+            <div className="p-5 space-y-3.5 bg-white dark:bg-black">
               {/* Title Section */}
               <div className="flex items-start justify-between gap-3">
                 <h3 className="font-bold text-xl leading-tight line-clamp-2 flex-1 text-gray-900 dark:text-white">
