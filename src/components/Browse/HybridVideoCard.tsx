@@ -81,16 +81,22 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
   // Lock body scroll when modal is visible
   useEffect(() => {
     if (showModal) {
+      // Calculate scrollbar width to prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       // Prevent body scroll while keeping layout intact
       document.body.style.overflow = 'hidden';
+      // Compensate for scrollbar width to prevent page resize
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
     } else {
       // Restore body scroll
       document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
     }
 
     // Cleanup on unmount
     return () => {
       document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
     };
   }, [showModal]);
 
