@@ -20,17 +20,19 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
 
   if (loading) {
     return (
-      <div className="relative h-[65vh] w-full overflow-hidden rounded-b-3xl bg-gradient-to-r from-slate-200 to-slate-100">
-        <div className="absolute inset-0 flex items-end pb-12">
-          <div className="container mx-auto px-6">
-            <div className="max-w-2xl space-y-4">
-              <Skeleton className="h-16 w-12 rounded-full" />
-              <Skeleton className="h-12 w-96" />
-              <Skeleton className="h-6 w-80" />
-              <Skeleton className="h-4 w-full" />
-              <div className="flex gap-4">
-                <Skeleton className="h-12 w-32" />
-                <Skeleton className="h-12 w-32" />
+      <div className="container mx-auto px-6 pt-12 md:pt-16 pb-8">
+        <div className="relative h-[65vh] w-full overflow-hidden rounded-[3rem] bg-gradient-to-r from-slate-200 to-slate-100 shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5">
+          <div className="absolute inset-0 flex items-end pb-12">
+            <div className="container mx-auto px-6">
+              <div className="max-w-2xl space-y-4">
+                <Skeleton className="h-16 w-12 rounded-full" />
+                <Skeleton className="h-12 w-96" />
+                <Skeleton className="h-6 w-80" />
+                <Skeleton className="h-4 w-full" />
+                <div className="flex gap-4">
+                  <Skeleton className="h-12 w-32" />
+                  <Skeleton className="h-12 w-32" />
+                </div>
               </div>
             </div>
           </div>
@@ -44,7 +46,8 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
   const canWatch = canWatchVideo(featuredVideo, []);
 
   return (
-    <div className="relative h-[65vh] w-full overflow-hidden rounded-b-3xl">
+    <div className="container mx-auto px-6 pt-12 md:pt-16 pb-8">
+      <div className="relative h-[65vh] w-full overflow-hidden rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5 hover:shadow-[0_25px_70px_rgba(0,0,0,0.2)] transition-all duration-500 hover:-translate-y-1">
       {/* Background */}
       <div className="absolute inset-0">
         <img
@@ -128,6 +131,7 @@ const HeroSection = ({ featuredVideo, loading, onPlay, onMoreInfo }: HeroSection
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
