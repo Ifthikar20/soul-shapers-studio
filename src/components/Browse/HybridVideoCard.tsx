@@ -83,20 +83,38 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
     if (showModal) {
       // Calculate scrollbar width to prevent layout shift
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
       // Prevent body scroll while keeping layout intact
       document.body.style.overflow = 'hidden';
       // Compensate for scrollbar width to prevent page resize
       document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+      // Also apply padding to header to keep it stable
+      const header = document.querySelector('header');
+      if (header) {
+        (header as HTMLElement).style.paddingRight = `${scrollbarWidth}px`;
+      }
     } else {
       // Restore body scroll
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
+
+      // Restore header padding
+      const header = document.querySelector('header');
+      if (header) {
+        (header as HTMLElement).style.paddingRight = '';
+      }
     }
 
     // Cleanup on unmount
     return () => {
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
+
+      const header = document.querySelector('header');
+      if (header) {
+        (header as HTMLElement).style.paddingRight = '';
+      }
     };
   }, [showModal]);
 
