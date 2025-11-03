@@ -232,12 +232,9 @@ const BrowsePage = () => {
     setCurrentFeaturedIndex((prev) => (prev + 1) % featuredVideos.length);
   };
 
-  // Data organization - Exclude featured carousel videos from trending row
+  // Data organization
   const videosToShow = isSearching ? filteredVideos : allVideos;
-  const featuredVideoIds = featuredVideos.map(v => v.id);
-  const trendingVideos = !isSearching
-    ? allVideos.filter(v => v.isTrending && !featuredVideoIds.includes(v.id)).slice(0, 12)
-    : [];
+  const trendingVideos = !isSearching ? allVideos.filter(v => v.isTrending).slice(0, 12) : [];
   const newVideos = !isSearching ? allVideos.filter(v => v.isNew).slice(0, 12) : [];
   const freeVideos = !isSearching ? allVideos.filter(v => v.accessTier === 'free').slice(0, 12) : [];
   const premiumVideos = !isSearching ? allVideos.filter(v => v.accessTier === 'premium').slice(0, 12) : [];
