@@ -206,9 +206,34 @@ const BrowsePage = () => {
     navigate(`/video/${video.id}`); // ✅ Navigate with UUID
   };
 
+  // Featured videos carousel state
+  const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
+  const featuredVideos = !isSearching ? allVideos.filter(v => v.isTrending).slice(0, 5) : [];
+  const featuredVideo = !isSearching && featuredVideos.length > 0 ? featuredVideos[currentFeaturedIndex] : null;
+
+  // Auto-advance carousel every 10 seconds
+  useEffect(() => {
+    if (!isSearching && featuredVideos.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentFeaturedIndex((prev) => (prev + 1) % featuredVideos.length);
+      }, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [isSearching, featuredVideos.length]);
+
+  // Carousel navigation handlers
+  const handlePrevFeatured = () => {
+    setCurrentFeaturedIndex((prev) =>
+      prev === 0 ? featuredVideos.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextFeatured = () => {
+    setCurrentFeaturedIndex((prev) => (prev + 1) % featuredVideos.length);
+  };
+
   // Data organization
   const videosToShow = isSearching ? filteredVideos : allVideos;
-  const featuredVideo = !isSearching ? (allVideos.find(v => v.isTrending) || allVideos[0] || null) : null;
   const trendingVideos = !isSearching ? allVideos.filter(v => v.isTrending).slice(0, 12) : [];
   const newVideos = !isSearching ? allVideos.filter(v => v.isNew).slice(0, 12) : [];
   const freeVideos = !isSearching ? allVideos.filter(v => v.accessTier === 'free').slice(0, 12) : [];
@@ -224,6 +249,10 @@ const BrowsePage = () => {
           loading={loading}
           onPlay={handlePlay}
           onMoreInfo={handleMoreInfo}
+          onPrevSlide={handlePrevFeatured}
+          onNextSlide={handleNextFeatured}
+          currentIndex={currentFeaturedIndex}
+          totalSlides={featuredVideos.length}
         />
       )}
 

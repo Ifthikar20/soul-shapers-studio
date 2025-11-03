@@ -243,34 +243,36 @@ const AudioPage = () => {
     <div className="min-h-screen bg-white dark:bg-black">
       <Header />
 
-      {/* Hero Section with Purple Canvas Background */}
-      <div
-        className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-24 overflow-hidden dark:from-black dark:via-black dark:to-black"
-        style={{
-          backgroundImage: `url(${canvasBackground})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundBlendMode: 'multiply'
-        }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-purple-900/40 dark:bg-black/80"></div>
+      {/* Hero Section with Floating Capsule Design */}
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 pt-8 md:pt-12 lg:pt-16 pb-6 md:pb-8">
+        <div
+          className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white overflow-hidden dark:from-black dark:via-black dark:to-black rounded-[2rem] md:rounded-[3rem] shadow-[0_15px_40px_rgba(0,0,0,0.12)] md:shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-black/5"
+          style={{
+            backgroundImage: `url(${canvasBackground})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundBlendMode: 'multiply'
+          }}
+        >
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-purple-900/40 dark:bg-black/80"></div>
 
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 dark:bg-white/10">
-              <Headphones className="w-5 h-5" />
-              <span className="text-sm font-medium">Audio Library</span>
+          <div className="relative z-10 px-4 sm:px-6 md:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-4 sm:mb-6 dark:bg-white/10">
+                <Headphones className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Audio Library</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
+                Find Your Perfect
+                <span className="block text-purple-200 dark:text-white">Audio Collection</span>
+              </h1>
+
+              <p className="text-base sm:text-lg md:text-xl text-purple-100 dark:text-gray-300 leading-relaxed">
+                Explore curated collections for every moment. From quick meditations to deep dives into mindfulness.
+              </p>
             </div>
-
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Find Your Perfect
-              <span className="block text-purple-200 dark:text-white">Audio Collection</span>
-            </h1>
-
-            <p className="text-xl text-purple-100 dark:text-gray-300 leading-relaxed">
-              Explore curated collections for every moment. From quick meditations to deep dives into mindfulness.
-            </p>
           </div>
         </div>
       </div>
