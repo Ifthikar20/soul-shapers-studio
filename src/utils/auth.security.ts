@@ -210,6 +210,14 @@ if (typeof window !== 'undefined') {
  */
 export const SecureCookies = {
   /**
+   * Get a specific cookie value by name
+   */
+  getCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+  },
+
+  /**
    * Get authentication-related cookies only
    */
   getAuthCookies(): string[] {
