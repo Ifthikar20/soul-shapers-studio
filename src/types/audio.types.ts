@@ -1,6 +1,10 @@
 // src/types/audio.types.ts
+//
+// ⚠️ NOTE: When integrating with backend, 'id' should be UUID format string
+// Currently using mock data with simple numeric IDs
+//
 export interface AudioContent {
-    id: number;
+    id: number | string; // Can be number (mock) or UUID string (backend)
     title: string;
     expert: string;
     expertCredentials: string;
