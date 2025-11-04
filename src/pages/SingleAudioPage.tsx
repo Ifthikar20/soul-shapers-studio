@@ -50,49 +50,49 @@ const SingleAudioPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/50 dark:from-gray-950 dark:via-purple-950/20 dark:to-blue-950/20">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       {/* Close Button */}
       <div className="fixed top-6 left-6 z-50">
         <button
           onClick={() => navigate('/audio')}
-          className="w-12 h-12 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-700 flex items-center justify-center transition-all shadow-lg hover:shadow-xl"
+          className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-colors"
           title="Close"
         >
-          <X className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+          <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
         </button>
       </div>
 
       {/* Main Content Container */}
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Left Side - Plant Image */}
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[500px] lg:h-[700px] lg:sticky lg:top-8">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/80 via-indigo-600/80 to-blue-600/80 dark:from-purple-900/90 dark:via-indigo-900/90 dark:to-blue-900/90" />
+          <div className="relative rounded-2xl overflow-hidden h-[400px] lg:h-[600px] lg:sticky lg:top-8 bg-gray-50 dark:bg-gray-900">
             <img
               src={plant7}
               alt="Meditation"
-              className="w-full h-full object-cover opacity-40 dark:opacity-30"
+              className="w-full h-full object-contain"
             />
-            {/* Overlay Text */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+          </div>
+
+          {/* Right Side - Audio Player and Content */}
+          <div className="space-y-6">
+            {/* Title Section */}
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-3">
                 {audioData?.title || 'Audio Meditation'}
               </h1>
               {audioData?.expert_name && (
-                <p className="text-lg sm:text-xl text-purple-100 mb-3 drop-shadow">
+                <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
                   with {audioData.expert_name}
                 </p>
               )}
               {audioData?.category && (
-                <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-sm text-white text-sm font-medium rounded-full">
+                <span className="inline-block px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-full">
                   {audioData.category}
                 </span>
               )}
             </div>
-          </div>
 
-          {/* Right Side - Audio Player and Transcript */}
-          <div className="space-y-6">
             {/* Audio Player */}
             <div>
               <StreamingAudioPlayer
@@ -108,61 +108,47 @@ const SingleAudioPage = () => {
 
             {/* Description Section */}
             {audioData?.description && (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 shadow-lg">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <div className="pt-4">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                   About This Session
                 </h2>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   {audioData.description}
                 </p>
               </div>
             )}
 
             {/* Transcript Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+            <div className="pt-2">
               {/* Transcript Header */}
               <button
                 onClick={() => setShowTranscript(!showTranscript)}
-                className="w-full flex items-center justify-between px-6 sm:px-8 py-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                className="w-full flex items-center justify-between py-4 hover:opacity-70 transition-opacity"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    Transcript
-                  </h2>
-                </div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Transcript
+                </h2>
                 {showTranscript ? (
-                  <ChevronUp className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                  <ChevronUp className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 ) : (
-                  <ChevronDown className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                  <ChevronDown className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 )}
               </button>
 
               {/* Transcript Content */}
               {showTranscript && (
-                <div className="px-6 sm:px-8 pb-8 border-t border-gray-100 dark:border-gray-700">
-                  <div className="pt-6 max-h-96 overflow-y-auto">
+                <div className="pt-2 pb-6">
+                  <div className="max-h-96 overflow-y-auto">
                     {audioData?.transcript ? (
-                      <div className="prose prose-gray dark:prose-invert max-w-none">
-                        <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                          {audioData.transcript}
-                        </p>
-                      </div>
+                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
+                        {audioData.transcript}
+                      </p>
                     ) : (
                       <div className="text-center py-12">
-                        <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4">
-                          <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                        </div>
-                        <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">
+                        <p className="text-gray-500 dark:text-gray-500 text-base mb-1">
                           No transcript available
                         </p>
-                        <p className="text-gray-400 dark:text-gray-500 text-sm">
+                        <p className="text-gray-400 dark:text-gray-600 text-sm">
                           The transcript for this audio session is not yet available.
                         </p>
                       </div>
