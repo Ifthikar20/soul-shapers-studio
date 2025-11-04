@@ -69,13 +69,15 @@ class AudioStreamingService {
 
   /**
    * Get HLS streaming URL for audio content
+   * @param contentId - UUID of the content (must be in UUID format)
    */
   async getAudioStreamingUrl(contentId: string): Promise<AudioStreamingUrlResponse> {
     try {
       console.log(`🎵 Requesting audio streaming URL for content: ${contentId}`);
 
+      // Use the correct endpoint: /api/streaming/content/{UUID}/stream
       const response = await this.api.get<AudioStreamingUrlResponse>(
-        `/api/audio/streaming/${contentId}`
+        `/api/streaming/content/${contentId}/stream`
       );
 
       console.log('✅ Audio streaming URL obtained:', {
@@ -92,7 +94,7 @@ class AudioStreamingService {
       } else if (error.response?.status === 403) {
         throw new Error('You do not have access to this audio content');
       } else if (error.response?.status === 404) {
-        throw new Error('Audio content not found');
+        throw new Error('Audio content not found. Ensure you are using a valid UUID.');
       } else {
         throw new Error(
           error.response?.data?.detail || 'Failed to load audio streaming URL'
