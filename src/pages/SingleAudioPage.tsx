@@ -9,11 +9,27 @@ import plant1 from '../assets/plant1.png';
 // UUID validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// Sample transcript with timestamps
+const SAMPLE_TRANSCRIPT = [
+  { time: 0, text: "Welcome to this guided meditation session. Find a comfortable position, either sitting or lying down." },
+  { time: 8, text: "Close your eyes gently, and take a deep breath in through your nose..." },
+  { time: 15, text: "Hold it for a moment... and now release slowly through your mouth." },
+  { time: 22, text: "Feel your body beginning to relax with each breath you take." },
+  { time: 30, text: "Notice any tension in your shoulders, and let it melt away." },
+  { time: 38, text: "Bring your awareness to the present moment, right here, right now." },
+  { time: 46, text: "There's nowhere else you need to be, nothing else you need to do." },
+  { time: 54, text: "Continue breathing naturally, observing the gentle rise and fall of your chest." },
+  { time: 62, text: "If your mind wanders, that's perfectly okay. Gently bring it back to your breath." },
+  { time: 72, text: "Feel the calm spreading through your entire body, from head to toe." },
+];
+
 const SingleAudioPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [showTranscript, setShowTranscript] = useState(true);
   const [audioData, setAudioData] = useState<any>(null);
+  const [showPlantInfo, setShowPlantInfo] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
 
   // Check if ID exists or is not a valid UUID - redirect to 404
   if (!id || !UUID_REGEX.test(id)) {
@@ -49,6 +65,20 @@ const SingleAudioPage = () => {
     console.error('❌ Audio error:', error.message);
   };
 
+  const handleTimeUpdate = (time: number) => {
+    setCurrentTime(time);
+  };
+
+  // Get current transcript segment
+  const getCurrentSegmentIndex = () => {
+    for (let i = SAMPLE_TRANSCRIPT.length - 1; i >= 0; i--) {
+      if (currentTime >= SAMPLE_TRANSCRIPT[i].time) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       {/* Close Button */}
@@ -64,14 +94,31 @@ const SingleAudioPage = () => {
 
       {/* Main Content Container */}
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
-        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-6 lg:gap-10 items-start">
+        <div className="grid lg:grid-cols-[1fr_1.3fr] gap-6 lg:gap-10 items-start">
           {/* Left Side - Plant Image */}
-          <div className="relative rounded-2xl overflow-hidden h-[300px] sm:h-[350px] lg:h-[450px] lg:sticky lg:top-8 bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+          <div
+            className="relative h-[450px] sm:h-[500px] lg:h-[550px] lg:sticky lg:top-8 flex items-center justify-center group cursor-pointer"
+            onMouseEnter={() => setShowPlantInfo(true)}
+            onMouseLeave={() => setShowPlantInfo(false)}
+          >
             <img
               src={plant1}
-              alt="Meditation"
-              className="w-full h-full object-contain p-4 sm:p-6"
+              alt="Meditation Plant"
+              className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
             />
+
+            {/* Plant Info Modal */}
+            {showPlantInfo && (
+              <div className="absolute bottom-4 left-4 right-4 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-2xl border border-gray-200 dark:border-gray-700 z-10 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1.5 text-sm">
+                  Monstera Deliciosa
+                </h3>
+                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Known as the "Swiss Cheese Plant," this tropical beauty symbolizes growth and transformation.
+                  Its presence promotes calmness, improved air quality, and serves as a reminder of nature's resilience during meditation.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Right Side - Audio Player and Content */}
@@ -103,6 +150,7 @@ const SingleAudioPage = () => {
                 onEnded={handleEnded}
                 onError={handleError}
                 showMetadata={false}
+                onTimeUpdate={handleTimeUpdate}
               />
             </div>
 
@@ -135,24 +183,31 @@ const SingleAudioPage = () => {
                 )}
               </button>
 
-              {/* Transcript Content */}
+              {/* Transcript Content with Sync */}
               {showTranscript && (
                 <div className="pt-2 pb-6">
-                  <div className="max-h-96 overflow-y-auto">
-                    {audioData?.transcript ? (
-                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
-                        {audioData.transcript}
-                      </p>
-                    ) : (
-                      <div className="text-center py-12">
-                        <p className="text-gray-500 dark:text-gray-500 text-base mb-1">
-                          No transcript available
-                        </p>
-                        <p className="text-gray-400 dark:text-gray-600 text-sm">
-                          The transcript for this audio session is not yet available.
-                        </p>
-                      </div>
-                    )}
+                  <div className="max-h-96 overflow-y-auto space-y-4">
+                    {SAMPLE_TRANSCRIPT.map((segment, index) => {
+                      const isActive = index === getCurrentSegmentIndex();
+                      return (
+                        <div
+                          key={index}
+                          className={`transition-all duration-300 p-3 rounded-lg ${
+                            isActive
+                              ? 'bg-gray-100 dark:bg-gray-800 scale-[1.02]'
+                              : 'opacity-60'
+                          }`}
+                        >
+                          <p className={`text-sm leading-relaxed ${
+                            isActive
+                              ? 'text-gray-900 dark:text-white font-medium'
+                              : 'text-gray-600 dark:text-gray-400'
+                          }`}>
+                            {segment.text}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
