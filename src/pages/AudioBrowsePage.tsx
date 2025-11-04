@@ -113,15 +113,15 @@ const AudioBrowsePage = () => {
   const popularAudio = audioContent.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-900 dark:to-black">
       <Header />
 
       <div className="max-w-7xl mx-auto px-5 py-8">
         {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-12 h-12 text-purple-600 animate-spin mb-4" />
-            <p className="text-gray-600">Loading audio content...</p>
+            <Loader2 className="w-12 h-12 text-purple-600 dark:text-purple-400 animate-spin mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">Loading audio content...</p>
           </div>
         )}
 
@@ -157,7 +157,7 @@ const AudioBrowsePage = () => {
         {!loading && !error && audioContent.length > 0 && (
           <>
             {/* Audio of the Day Section */}
-            <div className="bg-gradient-to-br from-gray-700 to-gray-900 rounded-3xl p-10 mb-10 shadow-2xl">
+            <div className="bg-gradient-to-br from-gray-700 to-gray-900 dark:from-gray-800 dark:to-black rounded-3xl p-10 mb-10 shadow-2xl">
               <h2 className="text-white text-3xl font-bold mb-8">Audio of the day</h2>
 
               {/* Time Filters */}
@@ -193,11 +193,11 @@ const AudioBrowsePage = () => {
                     className={`bg-gradient-to-br ${gradients[index % gradients.length]} rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl relative h-52`}
                   >
                     {/* Plant Background Image */}
-                    <div className="absolute inset-0 opacity-20 pointer-events-none">
+                    <div className="absolute inset-0 opacity-20 dark:opacity-15 pointer-events-none">
                       <img
                         src={plantImages[index % plantImages.length]}
                         alt=""
-                        className="w-full h-full object-cover mix-blend-overlay"
+                        className="w-full h-full object-cover mix-blend-overlay dark:mix-blend-soft-light"
                       />
                     </div>
 
@@ -234,14 +234,14 @@ const AudioBrowsePage = () => {
             </div>
 
             {/* Recommendations Section */}
-            <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-10 mb-10 shadow-2xl flex flex-col md:flex-row items-center gap-10">
-              <div className="flex-shrink-0 w-full md:w-80 h-52 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center relative overflow-hidden">
+            <div className="bg-gradient-to-br from-purple-600 to-indigo-700 dark:from-purple-800 dark:to-indigo-950 rounded-3xl p-10 mb-10 shadow-2xl flex flex-col md:flex-row items-center gap-10">
+              <div className="flex-shrink-0 w-full md:w-80 h-52 bg-gradient-to-br from-pink-500 to-rose-600 dark:from-pink-700 dark:to-rose-800 rounded-2xl flex items-center justify-center relative overflow-hidden">
                 <img
                   src={happyLady}
                   alt="Happy person meditating"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 dark:from-black/60 to-transparent"></div>
               </div>
 
               <div className="flex-1">
@@ -259,15 +259,15 @@ const AudioBrowsePage = () => {
             </div>
 
             {/* Favorites Section */}
-            <div className="bg-white rounded-3xl p-10 mb-10 shadow-lg">
-              <h2 className="text-gray-900 text-3xl font-bold mb-6">Favorites</h2>
-              <div className="flex items-center gap-5 p-8 bg-gray-50 rounded-2xl">
-                <div className="w-14 h-14 bg-gray-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Bookmark className="w-6 h-6 text-gray-500" />
+            <div className="bg-white dark:bg-gray-800 rounded-3xl p-10 mb-10 shadow-lg">
+              <h2 className="text-gray-900 dark:text-white text-3xl font-bold mb-6">Favorites</h2>
+              <div className="flex items-center gap-5 p-8 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <div className="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Bookmark className="w-6 h-6 text-gray-500 dark:text-gray-400" />
                 </div>
                 <div>
-                  <h3 className="text-gray-900 text-lg font-bold mb-2">Nothing to show here yet!</h3>
-                  <p className="text-gray-600 text-sm">
+                  <h3 className="text-gray-900 dark:text-white text-lg font-bold mb-2">Nothing to show here yet!</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
                     Start exploring our content and save your favorites for later.
                   </p>
                 </div>
@@ -278,14 +278,14 @@ const AudioBrowsePage = () => {
             <div className="mb-10">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-gray-900 text-3xl font-bold">Popular now</h2>
-                  <p className="text-gray-600 text-sm mt-2">
+                  <h2 className="text-gray-900 dark:text-white text-3xl font-bold">Popular now</h2>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
                     Update your profile to get personalized program recommendations.
                   </p>
                 </div>
                 <button
                   onClick={() => navigate('/profile')}
-                  className="text-purple-600 text-sm font-semibold hover:underline"
+                  className="text-purple-600 dark:text-purple-400 text-sm font-semibold hover:underline"
                 >
                   Update profile
                 </button>
@@ -296,7 +296,7 @@ const AudioBrowsePage = () => {
                   <div
                     key={audio.id}
                     onClick={() => handlePlayAudio(audio.id)}
-                    className="bg-white rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 cursor-pointer"
+                    className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100 dark:border-gray-700"
                   >
                     {/* Card Image with Plant */}
                     <div
@@ -307,7 +307,7 @@ const AudioBrowsePage = () => {
                       <img
                         src={plantImages[(index + 3) % plantImages.length]}
                         alt=""
-                        className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay"
+                        className="absolute inset-0 w-full h-full object-cover opacity-30 dark:opacity-20 mix-blend-overlay dark:mix-blend-soft-light"
                       />
                       <div className="relative z-10 flex flex-col items-center">
                         <Play className="w-16 h-16 text-white/80 mb-2" />
@@ -319,12 +319,12 @@ const AudioBrowsePage = () => {
 
                     {/* Card Body */}
                     <div className="p-5">
-                      <h3 className="text-gray-900 text-lg font-bold mb-2 line-clamp-2">
+                      <h3 className="text-gray-900 dark:text-white text-lg font-bold mb-2 line-clamp-2">
                         {audio.title}
                       </h3>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">{audio.expert_name}</span>
-                        <div className="flex items-center gap-1 text-gray-600 text-sm">
+                        <span className="text-gray-600 dark:text-gray-400 text-sm">{audio.expert_name}</span>
+                        <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400 text-sm">
                           <span className="text-base">👥</span>
                           {audio.view_count?.toLocaleString() || '0'}
                         </div>
@@ -336,16 +336,16 @@ const AudioBrowsePage = () => {
             </div>
 
             {/* Debug Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mt-10">
-              <h3 className="text-blue-900 text-lg font-semibold mb-3 flex items-center gap-2">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-6 mt-10">
+              <h3 className="text-blue-900 dark:text-blue-300 text-lg font-semibold mb-3 flex items-center gap-2">
                 <span>ℹ️</span>
                 How Audio Streaming Works
               </h3>
-              <ul className="space-y-2 text-sm text-blue-800">
+              <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
                 <li>• Content is fetched from your backend database with UUIDs</li>
                 <li>• Click any audio card to start streaming</li>
                 <li>
-                  • Streaming uses: <code className="bg-blue-100 px-2 py-0.5 rounded font-mono text-xs">/api/streaming/content/{'{UUID}'}/stream</code>
+                  • Streaming uses: <code className="bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 rounded font-mono text-xs">/api/streaming/content/{'{UUID}'}/stream</code>
                 </li>
                 <li>• Total audio items: <strong>{audioContent.length}</strong></li>
               </ul>
