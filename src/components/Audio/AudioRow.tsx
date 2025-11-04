@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import AudioCard from './AudioCard';
 
 interface AudioContent {
-  id: number;
+  id: string; // UUID format
   title: string;
   expert: string;
   expertCredentials: string;
