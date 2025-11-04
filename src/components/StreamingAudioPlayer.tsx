@@ -22,6 +22,7 @@ export interface StreamingAudioPlayerProps {
   onPause?: () => void;
   onEnded?: () => void;
   onError?: (error: Error) => void;
+  onTimeUpdate?: (time: number) => void;
   className?: string;
   showMetadata?: boolean;
 }
@@ -33,6 +34,7 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
   onPause,
   onEnded,
   onError,
+  onTimeUpdate,
   className = '',
   showMetadata = true,
 }) => {
@@ -222,6 +224,9 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
 
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
+      if (onTimeUpdate) {
+        onTimeUpdate(audio.currentTime);
+      }
     };
 
     const handleLoadedMetadata = () => {
@@ -317,7 +322,7 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
       <audio ref={audioRef} preload="metadata" />
 
       {/* Audio Player UI */}
-      <div className="bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 rounded-2xl p-6 shadow-2xl">
+      <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
         {/* Metadata Section */}
         {showMetadata && streamData && (
           <div className="mb-6 text-center">
@@ -338,18 +343,24 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
         {/* Loading State */}
         {loading && !error && (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-8 h-8 text-purple-300 animate-spin" />
-            <span className="ml-3 text-purple-200">Loading audio...</span>
+            <Loader2 className="w-8 h-8 text-gray-400 dark:text-gray-500 animate-spin" />
+            <span className="ml-3 text-gray-600 dark:text-gray-400">Loading audio...</span>
           </div>
         )}
 
         {/* Error Display */}
         {error && (
           <div className="flex items-center justify-center py-8">
-            <div className="bg-red-500/10 border border-red-500/50 text-white p-4 rounded-xl max-w-md text-center backdrop-blur-sm">
-              <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
-              <p className="font-bold mb-1">Playback Error</p>
-              <p className="text-sm text-red-200">{error}</p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-6 rounded-xl max-w-md">
+              <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400 mx-auto mb-3" />
+              <p className="font-bold text-red-900 dark:text-red-100 mb-2">Playback Error</p>
+              <p className="text-sm text-red-700 dark:text-red-300 mb-3">{error}</p>
+              {error.includes('Network Error') || error.includes('timeout') ? (
+                <div className="text-xs text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/40 p-3 rounded-lg mt-3">
+                  <p className="font-semibold mb-1">Backend Server Required</p>
+                  <p>Make sure the backend server is running on port 8000.</p>
+                </div>
+              ) : null}
             </div>
           </div>
         )}
@@ -362,29 +373,29 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
               <div
                 ref={progressBarRef}
                 onClick={handleProgressClick}
-                className="relative h-2 bg-white/10 rounded-full cursor-pointer group hover:h-3 transition-all"
+                className="relative h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full cursor-pointer group hover:h-2 transition-all"
               >
                 <div
-                  className="absolute h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all"
+                  className="absolute h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all"
                   style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
                 >
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg scale-0 group-hover:scale-100 transition-transform" />
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-gray-900 dark:bg-gray-100 rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform" />
                 </div>
               </div>
 
               {/* Time Display */}
               <div className="flex justify-between mt-2">
-                <span className="text-purple-200 text-sm font-medium">{formatTime(currentTime)}</span>
-                <span className="text-purple-200 text-sm font-medium">{formatTime(duration)}</span>
+                <span className="text-gray-600 dark:text-gray-400 text-sm font-medium">{formatTime(currentTime)}</span>
+                <span className="text-gray-600 dark:text-gray-400 text-sm font-medium">{formatTime(duration)}</span>
               </div>
             </div>
 
             {/* Main Controls */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-center gap-4 mb-4">
               {/* Skip Back */}
               <button
                 onClick={() => handleSkip(-10)}
-                className="p-3 rounded-full hover:bg-white/10 text-white transition-all"
+                className="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all"
                 disabled={!!error}
               >
                 <SkipBack className="w-5 h-5" />
@@ -393,16 +404,16 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
               {/* Play/Pause */}
               <button
                 onClick={togglePlayPause}
-                className="p-4 rounded-full bg-white hover:bg-purple-100 text-purple-900 transition-all shadow-lg hover:scale-105"
+                className="p-4 rounded-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 transition-all shadow-md"
                 disabled={!!error}
               >
-                {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8 ml-0.5" />}
+                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
               </button>
 
               {/* Skip Forward */}
               <button
                 onClick={() => handleSkip(10)}
-                className="p-3 rounded-full hover:bg-white/10 text-white transition-all"
+                className="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-all"
                 disabled={!!error}
               >
                 <SkipForward className="w-5 h-5" />
@@ -410,19 +421,19 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
             </div>
 
             {/* Bottom Controls */}
-            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+            <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-800">
               {/* Volume Control */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={toggleMute}
                   onMouseEnter={() => setShowVolumeSlider(true)}
-                  className="p-2 rounded-full hover:bg-white/10 text-white transition-all"
+                  className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-all"
                 >
-                  {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 </button>
 
                 {showVolumeSlider && (
-                  <div className="w-24" onMouseLeave={() => setShowVolumeSlider(false)}>
+                  <div className="w-20" onMouseLeave={() => setShowVolumeSlider(false)}>
                     <input
                       type="range"
                       min="0"
@@ -430,7 +441,7 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
                       step="0.01"
                       value={isMuted ? 0 : volume}
                       onChange={handleVolumeChangeInput}
-                      className="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                      className="w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gray-900 dark:[&::-webkit-slider-thumb]:bg-gray-100"
                     />
                   </div>
                 )}
@@ -440,23 +451,23 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
               <div className="relative">
                 <button
                   onClick={() => setShowSettings(!showSettings)}
-                  className="p-2 rounded-full hover:bg-white/10 text-white transition-all"
+                  className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-all"
                 >
-                  <Settings className="w-5 h-5" />
+                  <Settings className="w-4 h-4" />
                 </button>
 
                 {showSettings && (
-                  <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-lg rounded-xl p-3 min-w-[150px] shadow-2xl">
-                    <p className="text-gray-400 text-xs mb-2">Playback Speed</p>
+                  <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 min-w-[150px] shadow-lg">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs mb-2">Playback Speed</p>
                     <div className="grid grid-cols-2 gap-1">
                       {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
                         <button
                           key={speed}
                           onClick={() => handleSpeedChange(speed)}
-                          className={`px-2 py-1 rounded text-sm ${
+                          className={`px-2 py-1 rounded text-sm transition-colors ${
                             playbackSpeed === speed
-                              ? 'bg-purple-600 text-white'
-                              : 'bg-white/10 text-white hover:bg-white/20'
+                              ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                           }`}
                         >
                           {speed}x

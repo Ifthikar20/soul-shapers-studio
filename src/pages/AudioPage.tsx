@@ -236,7 +236,8 @@ const AudioPage = () => {
   const navigate = useNavigate();
 
   const handleTopicClick = (topicId: string) => {
-    navigate(`/audio/library/${topicId}`);
+    // Navigate to audio browse page instead of library
+    navigate('/audio/browse');
   };
 
   return (
