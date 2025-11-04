@@ -351,10 +351,16 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
         {/* Error Display */}
         {error && (
           <div className="flex items-center justify-center py-8">
-            <div className="bg-red-500/10 border border-red-500/50 text-white p-4 rounded-xl max-w-md text-center backdrop-blur-sm">
-              <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
-              <p className="font-bold mb-1">Playback Error</p>
-              <p className="text-sm text-red-200">{error}</p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-6 rounded-xl max-w-md">
+              <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400 mx-auto mb-3" />
+              <p className="font-bold text-red-900 dark:text-red-100 mb-2">Playback Error</p>
+              <p className="text-sm text-red-700 dark:text-red-300 mb-3">{error}</p>
+              {error.includes('Network Error') || error.includes('timeout') ? (
+                <div className="text-xs text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/40 p-3 rounded-lg mt-3">
+                  <p className="font-semibold mb-1">Backend Server Required</p>
+                  <p>Make sure the backend server is running on port 8000.</p>
+                </div>
+              ) : null}
             </div>
           </div>
         )}
