@@ -69,21 +69,49 @@ class AudioStreamingService {
 
   /**
    * Get HLS streaming URL for audio content
+   * @param contentId - UUID of the content (must be in UUID format)
    */
   async getAudioStreamingUrl(contentId: string): Promise<AudioStreamingUrlResponse> {
     try {
       console.log(`🎵 Requesting audio streaming URL for content: ${contentId}`);
 
-      const response = await this.api.get<AudioStreamingUrlResponse>(
-        `/api/audio/streaming/${contentId}`
+      // Use the correct endpoint: /api/streaming/content/{UUID}/stream
+      const response = await this.api.get<any>(
+        `/api/streaming/content/${contentId}/stream`
       );
 
-      console.log('✅ Audio streaming URL obtained:', {
-        contentId: response.data.content_id,
-        hlsUrl: response.data.hls_url,
+      console.log('✅ Raw backend response:', response.data);
+
+      // Backend might return different field names, try all possibilities
+      const hlsUrl =
+        response.data.hls_url ||
+        response.data.hls_playlist_url ||
+        response.data.streaming_urls?.['audio'] ||
+        response.data.streaming_urls?.['720p'] ||
+        response.data.stream_url ||
+        response.data.audio_url;
+
+      if (!hlsUrl) {
+        console.error('❌ No HLS URL found in response:', response.data);
+        throw new Error('No streaming URL provided by backend');
+      }
+
+      console.log('✅ Audio streaming URL extracted:', {
+        contentId: response.data.content_id || contentId,
+        hlsUrl: hlsUrl,
       });
 
-      return response.data;
+      // Normalize response to expected format
+      return {
+        hls_url: hlsUrl,
+        content_id: response.data.content_id || contentId,
+        title: response.data.title,
+        expert_name: response.data.expert_name,
+        category: response.data.category,
+        duration: response.data.duration,
+        description: response.data.description,
+        thumbnail_url: response.data.thumbnail_url,
+      };
     } catch (error: any) {
       console.error('❌ Failed to get audio streaming URL:', error);
 
@@ -92,10 +120,10 @@ class AudioStreamingService {
       } else if (error.response?.status === 403) {
         throw new Error('You do not have access to this audio content');
       } else if (error.response?.status === 404) {
-        throw new Error('Audio content not found');
+        throw new Error('Audio content not found. Ensure you are using a valid UUID.');
       } else {
         throw new Error(
-          error.response?.data?.detail || 'Failed to load audio streaming URL'
+          error.response?.data?.detail || error.message || 'Failed to load audio streaming URL'
         );
       }
     }

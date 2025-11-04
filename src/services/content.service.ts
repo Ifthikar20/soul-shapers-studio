@@ -51,11 +51,59 @@ class ContentService {
 
       const response = await this.api.get(`/content/browse?${params.toString()}`);
       const videos = response.data.content.map((item: any) => normalizeVideo(item));
-      
+
       return videos;
     } catch (error) {
       console.error('Failed to get videos for frontend:', error);
       return [];
+    }
+  }
+
+  /**
+   * Get audio content from backend
+   * @param category Optional category filter
+   * @param limit Maximum number of items to return
+   */
+  async getAudioContent(category?: string, limit: number = 50): Promise<ContentItem[]> {
+    try {
+      const params = new URLSearchParams();
+      params.append('content_type', 'audio');
+      if (category) params.append('category', category);
+      params.append('limit', limit.toString());
+
+      console.log('🎵 Fetching audio content from backend:', params.toString());
+
+      const response = await this.api.get(`/content/browse?${params.toString()}`);
+      console.log(`✅ Loaded ${response.data.content?.length || 0} audio items from backend`);
+
+      return response.data.content || [];
+    } catch (error) {
+      console.error('❌ Failed to get audio content:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get audio content by UUID
+   */
+  async getAudioByUUID(uuid: string): Promise<ContentItem> {
+    try {
+      console.log('🎵 Fetching audio with UUID:', uuid);
+
+      const response = await this.api.get(`/content/detail/${uuid}`);
+      console.log('✅ Audio loaded from backend:', response.data);
+
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Failed to fetch audio by UUID:', error);
+
+      if (error.response?.status === 404) {
+        throw new Error('Audio content not found');
+      } else if (error.response?.status === 403) {
+        throw new Error('Access denied. Please upgrade your subscription.');
+      } else {
+        throw new Error(`Failed to load audio: ${error.message}`);
+      }
     }
   }
 

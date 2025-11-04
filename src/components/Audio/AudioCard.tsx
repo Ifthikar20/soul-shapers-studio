@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 interface AudioContent {
-  id: number;
+  id: string; // UUID format
   title: string;
   expert: string;
   expertCredentials: string;
