@@ -204,14 +204,14 @@ const Header = ({ onShowAuth }: HeaderProps) => {
 
   const LogoSection = () => {
     return (
-      <div 
+      <div
         className="flex items-center space-x-4 cursor-pointer group"
         onClick={() => navigate(isAuthenticated ? '/browse' : '/')}
       >
-        <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
-          <img 
-            src={bbLogo} 
-            alt="Better & Bliss Logo" 
+        <div className="w-16 h-16 flex items-center justify-center transition-transform group-hover:scale-110">
+          <img
+            src={bbLogo}
+            alt="Better & Bliss Logo"
             className="w-full h-full object-contain"
           />
         </div>
@@ -304,7 +304,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={`font-medium text-base flex items-center gap-1.5 transition-all duration-200 hover:scale-105 group ${getTextClasses()}`}
+          className={`font-medium text-base flex items-center gap-1.5 transition-colors duration-200 group ${getTextClasses()}`}
         >
           Experts
           <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
@@ -314,15 +314,16 @@ const Header = ({ onShowAuth }: HeaderProps) => {
         align="start"
         sideOffset={12}
         className="w-72 p-3 bg-background/95 backdrop-blur-xl border-border/50 shadow-2xl"
+        forceMount={false}
       >
         {/* Header Section */}
         <div className="mb-3">
           <Button
             variant="ghost"
             onClick={() => navigate('/experts')}
-            className="flex items-center gap-3 p-3 w-full justify-start rounded-xl hover:bg-primary/10 text-foreground group transition-all duration-200 hover:scale-[1.02]"
+            className="flex items-center gap-3 p-3 w-full justify-start rounded-xl hover:bg-primary/10 text-foreground transition-colors duration-200"
           >
-            <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+            <div className="p-2 rounded-lg bg-primary/10 transition-colors">
               <Users className="w-5 h-5 text-primary" />
             </div>
             <div className="text-left">
@@ -347,10 +348,10 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                   key={specialty.name}
                   variant="ghost"
                   onClick={() => navigate(`/experts?specialty=${encodeURIComponent(specialty.name)}`)}
-                  className="flex flex-col items-center gap-2 p-3 h-auto hover:bg-primary/10 rounded-xl group transition-all duration-200 hover:scale-[1.02]"
+                  className="flex flex-col items-center gap-2 p-3 h-auto hover:bg-primary/10 rounded-xl transition-colors duration-200"
                 >
-                  <div className="p-2 rounded-lg bg-muted group-hover:bg-primary/20 transition-colors">
-                    <Icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <div className="p-2 rounded-lg bg-muted transition-colors">
+                    <Icon className="w-4 h-4 text-muted-foreground transition-colors" />
                   </div>
                   <span className="text-xs font-medium text-center leading-tight text-foreground">
                     {specialty.name}
@@ -376,7 +377,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             key={item.href}
             variant="ghost"
             onClick={() => navigate(item.href)}
-            className={`font-medium text-base transition-all hover:scale-105 ${getTextClasses()}`}
+            className={`font-medium text-base transition-colors ${getTextClasses()}`}
           >
             {item.label}
           </Button>
@@ -403,7 +404,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
             <Button
               variant="outline"
               size="sm"
-              className="hidden sm:flex rounded-full border-yellow-300 text-yellow-600 hover:bg-yellow-50 transition-all hover:scale-105"
+              className="hidden sm:flex rounded-full border-yellow-300 text-yellow-600 hover:bg-yellow-50 transition-colors"
               onClick={() => navigate('/upgrade')}
             >
               <Crown className="w-3 h-3 mr-2" />
@@ -413,7 +414,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
 
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:scale-105 transition-transform">
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full transition-opacity hover:opacity-80">
                 <Avatar className="h-9 w-9">
                   <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} />
                   <AvatarFallback className="text-xs">
@@ -422,7 +423,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end">
+            <DropdownMenuContent className="w-56" align="end" sideOffset={8} forceMount={false}>
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{user.name}</p>
@@ -476,11 +477,11 @@ const Header = ({ onShowAuth }: HeaderProps) => {
 
     return (
       <div className="flex items-center gap-3">
-        <Button 
-          variant="ghost" 
-          className={`font-medium text-base rounded-full hover:scale-105 transition-all border ring-2 ring-purple-400/50 bg-purple-50 hover:bg-purple-100 ${
-            isScrolled 
-              ? 'text-foreground hover:text-primary border-border/40' 
+        <Button
+          variant="ghost"
+          className={`font-medium text-base rounded-full transition-colors border ring-2 ring-purple-400/50 bg-purple-50 hover:bg-purple-100 ${
+            isScrolled
+              ? 'text-foreground hover:text-primary border-border/40'
               : 'text-black hover:text-black/90 border-white/40'
           }`}
           onClick={() => navigate('/login')}
@@ -515,7 +516,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden rounded-full hover:scale-105 transition-transform"
+                className="lg:hidden rounded-full transition-opacity hover:opacity-80"
               >
                 <Menu className="w-5 h-5" />
               </Button>
