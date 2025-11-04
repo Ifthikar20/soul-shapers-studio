@@ -26,7 +26,6 @@ const ReadLandingPage = lazy(() => import('./pages/blog/BlogLandingPage'));
 const ReadPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
 const ReadCategoryPage = lazy(() => import('./pages/blog/BlogCategoryPage'));
 const AudioPage = lazy(() => import("./pages/AudioPage"));
-const AudioLibraryPage = lazy(() => import("./pages/AudioLibraryPage"));
 const AudioBrowsePage = lazy(() => import("./pages/AudioBrowsePage")); // ✅ NEW: Real audio content with UUIDs
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
@@ -151,14 +150,6 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <AudioPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/audio/library/:collectionId"
-                  element={
-                    <ProtectedRoute>
-                      <AudioLibraryPage />
                     </ProtectedRoute>
                   }
                 />
