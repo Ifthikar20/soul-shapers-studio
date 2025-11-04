@@ -1,46 +1,53 @@
-// src/pages/AudioBrowsePage.tsx - Browse Real Audio Content with UUIDs
+// src/pages/AudioBrowsePage.tsx - Meditation-style Audio Browse Page
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
 import { contentService } from '@/services/content.service';
-import { Play, Clock, User, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Play, Loader2, AlertCircle, RefreshCw, Bookmark, Target } from 'lucide-react';
 
 interface AudioContentItem {
-  id: string; // UUID
+  id: string;
   title: string;
   description: string;
   expert_name: string;
-  expert_title: string;
   duration_seconds: number;
   category_name: string;
   thumbnail_url?: string;
   access_tier: 'free' | 'premium';
+  view_count?: number;
 }
+
+const gradients = [
+  'from-cyan-400 to-blue-400',
+  'from-blue-900 to-blue-700',
+  'from-orange-400 to-pink-400',
+  'from-amber-200 to-orange-300',
+  'from-purple-500 to-indigo-600',
+  'from-pink-400 to-rose-500',
+  'from-teal-400 to-emerald-500',
+  'from-indigo-500 to-purple-600',
+];
 
 const AudioBrowsePage = () => {
   const navigate = useNavigate();
   const [audioContent, setAudioContent] = useState<AudioContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [timeFilter, setTimeFilter] = useState<string>('all');
 
   const loadAudioContent = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🎵 Loading audio content from backend...');
-
       const content = await contentService.getAudioContent();
 
       if (content.length === 0) {
         setError('No audio content found in database. Please add audio content with UUIDs.');
       } else {
         setAudioContent(content as any);
-        console.log(`✅ Loaded ${content.length} audio items`);
       }
     } catch (err: any) {
-      console.error('❌ Failed to load audio content:', err);
       setError(err.message || 'Failed to load audio content from backend');
     } finally {
       setLoading(false);
@@ -53,181 +60,250 @@ const AudioBrowsePage = () => {
 
   const formatDuration = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}m`;
   };
 
-  const handlePlayAudio = (audioId: string, accessTier: string) => {
-    if (accessTier === 'premium') {
-      // You might want to check user subscription here
-      console.log('Premium content clicked');
+  const filterByDuration = (audio: AudioContentItem[]): AudioContentItem[] => {
+    switch (timeFilter) {
+      case 'under5':
+        return audio.filter(a => a.duration_seconds < 300);
+      case 'under10':
+        return audio.filter(a => a.duration_seconds < 600);
+      case 'under20':
+        return audio.filter(a => a.duration_seconds < 1200);
+      case 'over20':
+        return audio.filter(a => a.duration_seconds >= 1200);
+      default:
+        return audio;
     }
+  };
+
+  const handlePlayAudio = (audioId: string) => {
     navigate(`/audio/${audioId}`);
   };
 
+  const featuredAudio = filterByDuration(audioContent).slice(0, 4);
+  const popularAudio = audioContent.slice(0, 3);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200">
       <Header />
 
-      <div className="container mx-auto px-6 py-12">
-        {/* Header Section */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Audio Library
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
-            Browse and listen to audio content from our collection
-          </p>
-        </div>
-
+      <div className="max-w-7xl mx-auto px-5 py-8">
         {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-12 h-12 text-purple-600 animate-spin mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">Loading audio content...</p>
+            <p className="text-gray-600">Loading audio content...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && !loading && (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-              <div className="flex items-start gap-4 mb-4">
-                <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-2">
-                    Unable to Load Audio Content
-                  </h3>
-                  <p className="text-red-800 dark:text-red-200 mb-4">{error}</p>
+          <div className="bg-gradient-to-br from-gray-700 to-gray-900 rounded-3xl p-10 shadow-2xl">
+            <div className="flex items-start gap-4 mb-6">
+              <AlertCircle className="w-8 h-8 text-red-400 flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-white mb-3">Unable to Load Audio Content</h3>
+                <p className="text-gray-300 mb-6">{error}</p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={loadAudioContent}
+                    className="px-6 py-3 bg-white text-purple-600 rounded-full font-bold hover:scale-105 transition-transform flex items-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Retry
+                  </button>
+                  <button
+                    onClick={() => navigate('/')}
+                    className="px-6 py-3 bg-gray-600 text-white rounded-full font-bold hover:bg-gray-500 transition-colors"
+                  >
+                    Back to Home
+                  </button>
                 </div>
-              </div>
-
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
-                <p className="text-sm text-blue-900 dark:text-blue-100 font-semibold mb-2">
-                  To add audio content:
-                </p>
-                <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1 ml-4">
-                  <li>1. Ensure your backend is running</li>
-                  <li>2. Add content to the database with UUIDs</li>
-                  <li>3. Set content_type = 'audio'</li>
-                  <li>4. Refresh this page</li>
-                </ol>
-              </div>
-
-              <div className="flex gap-3">
-                <Button
-                  onClick={loadAudioContent}
-                  variant="default"
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Retry
-                </Button>
-                <Button
-                  onClick={() => navigate('/')}
-                  variant="outline"
-                >
-                  Back to Home
-                </Button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Content Grid */}
+        {/* Main Content */}
         {!loading && !error && audioContent.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {audioContent.map((audio) => (
-              <div
-                key={audio.id}
-                onClick={() => handlePlayAudio(audio.id, audio.access_tier)}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group overflow-hidden border border-gray-200 dark:border-gray-700"
-              >
-                {/* Thumbnail */}
-                <div className="relative aspect-video w-full bg-gradient-to-br from-purple-500 to-indigo-600 overflow-hidden">
-                  {audio.thumbnail_url ? (
-                    <img
-                      src={audio.thumbnail_url}
-                      alt={audio.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Play className="w-12 h-12 text-white opacity-50" />
-                    </div>
-                  )}
+          <>
+            {/* Audio of the Day Section */}
+            <div className="bg-gradient-to-br from-gray-700 to-gray-900 rounded-3xl p-10 mb-10 shadow-2xl">
+              <h2 className="text-white text-3xl font-bold mb-8">Audio of the day</h2>
 
-                  {/* Play Button Overlay */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full bg-purple-600 flex items-center justify-center">
-                      <Play className="w-6 h-6 text-white fill-current ml-1" />
-                    </div>
+              {/* Time Filters */}
+              <div className="flex flex-wrap gap-8 mb-6">
+                {[
+                  { key: 'all', label: 'All Durations', icon: '⏱' },
+                  { key: 'under5', label: 'Under 5 mins', icon: '⏱' },
+                  { key: 'under10', label: 'Under 10 mins', icon: '⏱' },
+                  { key: 'under20', label: 'Under 20 mins', icon: '⏱' },
+                  { key: 'over20', label: 'Over 20 mins', icon: '⏱' },
+                ].map((filter) => (
+                  <div
+                    key={filter.key}
+                    onClick={() => setTimeFilter(filter.key)}
+                    className={`flex items-center gap-2 text-sm cursor-pointer transition-colors ${
+                      timeFilter === filter.key
+                        ? 'text-white font-semibold'
+                        : 'text-white/70 hover:text-white'
+                    }`}
+                  >
+                    <span className="text-base">{filter.icon}</span>
+                    {filter.label}
                   </div>
+                ))}
+              </div>
 
-                  {/* Access Tier Badge */}
-                  {audio.access_tier === 'premium' && (
-                    <div className="absolute top-2 right-2 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded">
-                      PREMIUM
-                    </div>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    {audio.title}
-                  </h3>
-
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                    {audio.description}
-                  </p>
-
-                  {/* Metadata */}
-                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center gap-1">
-                      <User className="w-3 h-3" />
-                      <span className="truncate">{audio.expert_name}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span>{formatDuration(audio.duration_seconds)}</span>
-                    </div>
-                  </div>
-
-                  {/* Category */}
-                  {audio.category_name && (
-                    <div className="mt-3">
-                      <span className="inline-block bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 text-xs font-medium px-2 py-1 rounded">
-                        {audio.category_name}
+              {/* Featured Audio Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                {featuredAudio.map((audio, index) => (
+                  <div
+                    key={audio.id}
+                    onClick={() => handlePlayAudio(audio.id)}
+                    className={`bg-gradient-to-br ${gradients[index % gradients.length]} rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl relative h-52`}
+                  >
+                    <div className="p-5 h-full flex flex-col justify-between relative">
+                      {/* Duration Badge */}
+                      <span className="absolute top-3 right-3 bg-black/50 text-white px-3 py-1 rounded-xl text-xs font-semibold backdrop-blur-sm">
+                        {formatDuration(audio.duration_seconds)}
                       </span>
-                    </div>
-                  )}
 
-                  {/* UUID Display (for debugging) */}
-                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-xs text-gray-400 dark:text-gray-600 font-mono truncate" title={audio.id}>
-                      ID: {audio.id.substring(0, 8)}...
-                    </p>
+                      {/* Premium Badge */}
+                      {audio.access_tier === 'premium' && (
+                        <span className="absolute top-3 left-3 bg-amber-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
+                          PRO
+                        </span>
+                      )}
+
+                      {/* Title and Author */}
+                      <div className="mt-auto">
+                        <h3 className="text-white text-xl font-bold leading-tight mb-1 drop-shadow-lg">
+                          {audio.title}
+                        </h3>
+                        <p className="text-white/90 text-sm">{audio.expert_name}</p>
+                      </div>
+                    </div>
                   </div>
+                ))}
+              </div>
+
+              {featuredAudio.length === 0 && (
+                <div className="text-white/70 text-center py-10">
+                  No audio found for this duration filter
+                </div>
+              )}
+            </div>
+
+            {/* Recommendations Section */}
+            <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-10 mb-10 shadow-2xl flex flex-col md:flex-row items-center gap-10">
+              <div className="flex-shrink-0 w-full md:w-80 h-52 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center relative overflow-hidden">
+                <Target className="w-20 h-20 text-white/30 absolute" />
+                <span className="text-8xl">🎯</span>
+              </div>
+
+              <div className="flex-1">
+                <h2 className="text-white text-3xl font-bold mb-4">Your growth journey awaits</h2>
+                <p className="text-white/90 text-lg mb-6 leading-relaxed">
+                  Go beyond browsing — get tailored recommendations based on your growth goals.
+                </p>
+                <button
+                  onClick={() => navigate('/settings')}
+                  className="bg-white text-purple-600 px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform"
+                >
+                  Set your goals
+                </button>
+              </div>
+            </div>
+
+            {/* Favorites Section */}
+            <div className="bg-white rounded-3xl p-10 mb-10 shadow-lg">
+              <h2 className="text-gray-900 text-3xl font-bold mb-6">Favorites</h2>
+              <div className="flex items-center gap-5 p-8 bg-gray-50 rounded-2xl">
+                <div className="w-14 h-14 bg-gray-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Bookmark className="w-6 h-6 text-gray-500" />
+                </div>
+                <div>
+                  <h3 className="text-gray-900 text-lg font-bold mb-2">Nothing to show here yet!</h3>
+                  <p className="text-gray-600 text-sm">
+                    Start exploring our content and save your favorites for later.
+                  </p>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
 
-        {/* Info Box */}
-        {!loading && !error && audioContent.length > 0 && (
-          <div className="mt-12 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">
-              ℹ️ How Audio Streaming Works
-            </h3>
-            <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-              <li>• Content is fetched from your backend database with UUIDs</li>
-              <li>• Click any audio card to start streaming</li>
-              <li>• Streaming uses HLS format via: <code className="bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 rounded font-mono text-xs">/api/streaming/content/{'{UUID}'}/stream</code></li>
-              <li>• Premium content may require authentication</li>
-            </ul>
-          </div>
+            {/* Popular Now Section */}
+            <div className="mb-10">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-gray-900 text-3xl font-bold">Popular now</h2>
+                  <p className="text-gray-600 text-sm mt-2">
+                    Update your profile to get personalized program recommendations.
+                  </p>
+                </div>
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="text-purple-600 text-sm font-semibold hover:underline"
+                >
+                  Update profile
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {popularAudio.map((audio, index) => (
+                  <div
+                    key={audio.id}
+                    onClick={() => handlePlayAudio(audio.id)}
+                    className="bg-white rounded-2xl overflow-hidden shadow-lg hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 cursor-pointer"
+                  >
+                    {/* Card Image */}
+                    <div
+                      className={`w-full h-48 bg-gradient-to-br ${
+                        gradients[(index + 4) % gradients.length]
+                      } flex items-center justify-center relative`}
+                    >
+                      <Play className="w-12 h-12 text-white/30 absolute" />
+                      <span className="text-white text-6xl font-bold drop-shadow-lg">
+                        {audio.category_name?.substring(0, 1) || '🎵'}
+                      </span>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="p-5">
+                      <h3 className="text-gray-900 text-lg font-bold mb-2 line-clamp-1">
+                        {audio.title}
+                      </h3>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 text-sm">{audio.expert_name}</span>
+                        <div className="flex items-center gap-1 text-gray-600 text-sm">
+                          <span className="text-base">👥</span>
+                          {audio.view_count?.toLocaleString() || '0'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Debug Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mt-10">
+              <h3 className="text-blue-900 text-lg font-semibold mb-3 flex items-center gap-2">
+                <span>ℹ️</span>
+                How Audio Streaming Works
+              </h3>
+              <ul className="space-y-2 text-sm text-blue-800">
+                <li>• Content is fetched from your backend database with UUIDs</li>
+                <li>• Click any audio card to start streaming</li>
+                <li>
+                  • Streaming uses: <code className="bg-blue-100 px-2 py-0.5 rounded font-mono text-xs">/api/streaming/content/{'{UUID}'}/stream</code>
+                </li>
+                <li>• Total audio items: <strong>{audioContent.length}</strong></li>
+              </ul>
+            </div>
+          </>
         )}
       </div>
 
