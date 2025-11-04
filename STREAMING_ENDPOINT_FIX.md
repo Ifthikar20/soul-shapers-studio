@@ -197,29 +197,80 @@ DB_PASSWORD=your_password
 
 ## Files Modified
 
+### Phase 1: Fix Streaming Endpoint
 1. `src/services/audio.service.ts` - Updated streaming endpoint
 2. `get_content_uuids.py` - New utility script
 3. `STREAMING_ENDPOINT_FIX.md` - This documentation
 
+### Phase 2: Fix UUID Navigation
+4. `src/pages/SingleAudioPage.tsx` - Added UUID validation with helpful error UI
+5. `src/components/Audio/AudioCard.tsx` - Updated interface to use string UUIDs
+6. `src/components/Audio/AudioRow.tsx` - Updated interface to use string UUIDs
+
+### Phase 3: Integrate Real Backend Data
+7. `src/services/content.service.ts` - Added getAudioContent() and getAudioByUUID()
+8. `src/pages/AudioBrowsePage.tsx` - New page for browsing real audio content
+9. `src/App.tsx` - Updated routing to use AudioBrowsePage
+
 ## Related Components
 
 These components use the updated streaming service:
-- `src/pages/SingleAudioPage.tsx` - Main audio playback page
+- `src/pages/SingleAudioPage.tsx` - Main audio playback page with UUID validation
+- `src/pages/AudioBrowsePage.tsx` - Browse real audio content from backend
 - `src/components/StreamingAudioPlayer.tsx` - HLS audio player component
 - `src/components/HLSAudioPlayer.tsx` - Alternative player implementation
+- `src/components/Audio/AudioCard.tsx` - Audio card component
+- `src/components/Audio/AudioRow.tsx` - Audio row component
+
+## Complete Solution
+
+### The Problem
+1. ❌ Frontend used mock data with integer IDs (1, 2, 3, etc.)
+2. ❌ Links navigated to `/audio/5` instead of `/audio/{UUID}`
+3. ❌ Audio service expected `/api/streaming/content/{UUID}/stream`
+4. ❌ Result: All audio playback failed with 404 errors
+
+### The Fix
+1. ✅ Updated audio.service.ts to use correct endpoint path
+2. ✅ Added UUID validation in SingleAudioPage with helpful error messages
+3. ✅ Created AudioBrowsePage to fetch real content from backend
+4. ✅ Added getAudioContent() to contentService
+5. ✅ Updated routing so /audio shows real backend data
+
+### New Data Flow
+```
+User visits /audio
+    ↓
+AudioBrowsePage loads
+    ↓
+Fetches from: /content/browse?content_type=audio
+    ↓
+Gets audio items with UUIDs from database
+    ↓
+Displays audio cards
+    ↓
+User clicks card
+    ↓
+Navigates to: /audio/{UUID}
+    ↓
+SingleAudioPage validates UUID format ✅
+    ↓
+StreamingAudioPlayer calls: /api/streaming/content/{UUID}/stream ✅
+    ↓
+HLS streaming works! 🎵
+```
 
 ## Commit Information
 
 **Branch:** `claude/fix-streaming-endpoint-uuid-011CUn4zyr8oEiqDLwnCkiTG`
 
-**Changes:**
-- Fix streaming endpoint path to use correct UUID-based route
-- Add UUID retrieval script for database queries
-- Update error messages for better debugging
-- Add comprehensive documentation
+**Commits:**
+1. Fix audio streaming endpoint to use UUID-based routing
+2. Add UUID validation with helpful error UI for audio streaming
+3. Add AudioBrowsePage to fetch real audio content with UUIDs from backend
 
 ---
 
 **Date:** 2025-11-04
 **Issue:** Streaming 404 errors due to incorrect endpoint and ID format
-**Resolution:** Updated to UUID-based `/api/streaming/content/{UUID}/stream` endpoint
+**Resolution:** Updated to UUID-based `/api/streaming/content/{UUID}/stream` endpoint and integrated real backend data
