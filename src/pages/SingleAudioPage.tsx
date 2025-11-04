@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { X, AlertCircle, Terminal, ChevronDown, ChevronUp } from 'lucide-react';
 import { StreamingAudioPlayer } from '../components/StreamingAudioPlayer';
 import { audioStreamingService } from '../services/audio.service';
-import plant7 from '../assets/plant7.png';
+import plant1 from '../assets/plant1.png';
 
 // UUID validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -64,13 +64,13 @@ const SingleAudioPage = () => {
 
       {/* Main Content Container */}
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-6 lg:gap-10 items-start">
           {/* Left Side - Plant Image */}
-          <div className="relative rounded-2xl overflow-hidden h-[400px] lg:h-[600px] lg:sticky lg:top-8 bg-gray-50 dark:bg-gray-900">
+          <div className="relative rounded-2xl overflow-hidden h-[300px] sm:h-[350px] lg:h-[450px] lg:sticky lg:top-8 bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
             <img
-              src={plant7}
+              src={plant1}
               alt="Meditation"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain p-4 sm:p-6"
             />
           </div>
 
