@@ -37,6 +37,7 @@ const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const VideoTestPage = lazy(() => import("./pages/VideoTestPage")); // ✅ NEW: Video test page
 
 // Lazy load components
 const UnderConstructionPage = lazy(() => import("./components/UnderConstructionPage"));
@@ -215,6 +216,16 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <SearchResults />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* PROTECTED: Video Test Page - Requires Authentication */}
+                <Route
+                  path="/video-test"
+                  element={
+                    <ProtectedRoute>
+                      <VideoTestPage />
                     </ProtectedRoute>
                   }
                 />
