@@ -66,6 +66,7 @@ const NAVIGATION_CONFIG = {
     authenticated: [
       { label: 'Browse', href: '/browse' },
       { label: 'Audio', href: '/audio' },
+      { label: 'Meditate', href: '/meditate' },
       { label: 'Read', href: '/read' },
     ],
     guest: [
