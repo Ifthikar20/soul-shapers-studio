@@ -11,8 +11,9 @@ import { analyticsService } from '@/services/analytics.service';
 import { dummySeriesVideos } from '@/data/dummyVideos';
 import {
   X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw,
-  Clock, BookOpen, Hash
+  Clock, BookOpen, Hash, Heart, MessageCircle, List
 } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 const WatchPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,6 +29,7 @@ const WatchPage = () => {
   const [copied, setCopied] = useState(false);
   const [viewTracked, setViewTracked] = useState(false);
   const [seriesEpisodes, setSeriesEpisodes] = useState<Video[]>([]);
+  const [isFavourite, setIsFavourite] = useState(false);
 
   // Debug info
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -231,6 +233,11 @@ const WatchPage = () => {
       });
   };
 
+  const handleToggleFavourite = () => {
+    setIsFavourite(!isFavourite);
+    toast.success(isFavourite ? 'Removed from favourites' : 'Added to favourites');
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -347,23 +354,9 @@ const WatchPage = () => {
       {/* Video Info */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-white mb-4">{video.title}</h1>
-        
-        <div className="flex items-center gap-4 mb-6">
-          <img
-            src={video.expertAvatar}
-            alt={video.expert}
-            className="w-12 h-12 rounded-full"
-          />
-          <div>
-            <p className="text-white font-semibold">{video.expert}</p>
-            {video.expertCredentials && (
-              <p className="text-gray-400 text-sm">{video.expertCredentials}</p>
-            )}
-          </div>
-        </div>
 
         <div className="flex gap-2 mb-6">
-          <Badge variant="outline" className="border-gray-700 text-gray-300">
+          <Badge variant="outline" className="border-gray-700 text-gray-300 bg-gray-900/50">
             {video.category}
           </Badge>
           {video.isNew && (
@@ -371,16 +364,12 @@ const WatchPage = () => {
           )}
         </div>
 
-        <p className="text-gray-300 leading-relaxed mb-6">
-          {video.fullDescription || video.description}
-        </p>
-
         {/* Action Buttons */}
         <div className="flex gap-3 mb-8">
           <Button
             onClick={handleCopyLink}
             variant="outline"
-            className="border-gray-700 text-white hover:bg-gray-800"
+            className="border-gray-700 bg-gray-900/50 text-white hover:bg-gray-800 hover:border-gray-600 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
           >
             {copied ? (
               <>
@@ -396,105 +385,169 @@ const WatchPage = () => {
           </Button>
 
           <Button
+            onClick={handleToggleFavourite}
             variant="outline"
-            className="border-gray-700 text-white hover:bg-gray-800"
+            className={`border-gray-700 bg-gray-900/50 hover:bg-gray-800 hover:border-gray-600 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800 transition-colors ${
+              isFavourite ? 'text-red-500 border-red-700 hover:border-red-600' : 'text-white'
+            }`}
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Add to List
-          </Button>
-
-          <Button
-            variant="outline"
-            className="border-gray-700 text-white hover:bg-gray-800"
-          >
-            <ThumbsUp className="w-4 h-4 mr-2" />
-            Like
+            <Heart className={`w-4 h-4 mr-2 ${isFavourite ? 'fill-red-500' : ''}`} />
+            {isFavourite ? 'Added to Favourites' : 'Add to Favourites'}
           </Button>
         </div>
 
-        {/* Content Sections */}
-        <div className="max-w-4xl">
-          {/* Learning Objectives */}
-          {video.learningObjectives && video.learningObjectives.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-purple-500" />
-                What You'll Learn
-              </h2>
-              <ul className="space-y-2">
-                {video.learningObjectives.map((objective, index) => (
-                  <li key={index} className="text-gray-300 flex items-start gap-2">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>{objective}</span>
-                  </li>
-                ))}
-              </ul>
+        {/* Instructor Section */}
+        <div className="bg-gray-900/50 dark:bg-gray-900 border border-gray-800 dark:border-gray-700 rounded-lg p-6 mb-8">
+          <h2 className="text-white text-xl font-semibold mb-4">About the Instructor</h2>
+          <div className="flex items-start gap-4">
+            <img
+              src={video.expertAvatar}
+              alt={video.expert}
+              className="w-16 h-16 rounded-full flex-shrink-0"
+            />
+            <div>
+              <p className="text-white font-semibold text-lg mb-1">{video.expert}</p>
+              {video.expertCredentials && (
+                <p className="text-gray-400 text-sm mb-3">{video.expertCredentials}</p>
+              )}
+              <p className="text-gray-300 leading-relaxed">
+                {video.fullDescription || video.description}
+              </p>
             </div>
-          )}
+          </div>
+        </div>
 
-          {/* Related Topics */}
-          {video.relatedTopics && video.relatedTopics.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
-                <Hash className="w-5 h-5 text-purple-500" />
-                Related Topics
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {video.relatedTopics.map((topic, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 cursor-pointer"
-                  >
-                    {topic}
-                  </Badge>
-                ))}
+        {/* Tabs Section */}
+        <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="bg-gray-900/50 dark:bg-gray-900 border border-gray-800 dark:border-gray-700 mb-6">
+            <TabsTrigger
+              value="overview"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="comments"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Comments
+            </TabsTrigger>
+            <TabsTrigger
+              value="episodes"
+              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+            >
+              <List className="w-4 h-4 mr-2" />
+              Episodes
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-8">
+            {/* Learning Objectives */}
+            {video.learningObjectives && video.learningObjectives.length > 0 && (
+              <div>
+                <h2 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-purple-500" />
+                  What You'll Learn
+                </h2>
+                <ul className="space-y-2">
+                  {video.learningObjectives.map((objective, index) => (
+                    <li key={index} className="text-gray-300 flex items-start gap-2">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span>{objective}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
+            )}
+
+            {/* Related Topics */}
+            {video.relatedTopics && video.relatedTopics.length > 0 && (
+              <div>
+                <h2 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Hash className="w-5 h-5 text-purple-500" />
+                  Related Topics
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {video.relatedTopics.map((topic, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="border-purple-500/50 bg-gray-900/50 text-purple-300 hover:bg-purple-500/10 cursor-pointer"
+                    >
+                      {topic}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Comments Tab */}
+          <TabsContent value="comments">
+            <div className="bg-gray-900/50 dark:bg-gray-900 border border-gray-800 dark:border-gray-700 rounded-lg p-8 text-center">
+              <MessageCircle className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-white text-lg font-semibold mb-2">Comments Coming Soon</h3>
+              <p className="text-gray-400">
+                Share your thoughts and connect with other viewers.
+              </p>
             </div>
-          )}
+          </TabsContent>
 
-          {/* Next Episodes */}
-          {seriesEpisodes.length > 0 && (
-            <div className="space-y-4">
-              {seriesEpisodes.map((episode) => {
-                const episodeNum = episode.episode_number || episode.episodeNumber;
+          {/* Episodes Tab */}
+          <TabsContent value="episodes">
+            {seriesEpisodes.length > 0 ? (
+              <div className="space-y-4">
+                {seriesEpisodes.map((episode) => {
+                  const episodeNum = episode.episode_number || episode.episodeNumber;
 
-                return (
-                  <div
-                    key={episode.id}
-                    onClick={() => navigate(`/watch/${episode.id}`)}
-                    className="flex gap-4 cursor-pointer group py-2"
-                  >
-                    <div className="relative flex-shrink-0 w-48">
-                      <img
-                        src={episode.thumbnail}
-                        alt={episode.title}
-                        className="w-full aspect-video object-cover rounded"
-                      />
-                      {episodeNum && (
-                        <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded">
-                          Episode {episodeNum}
+                  return (
+                    <div
+                      key={episode.id}
+                      onClick={() => navigate(`/watch/${episode.id}`)}
+                      className="flex gap-4 cursor-pointer group p-4 bg-gray-900/50 dark:bg-gray-900 border border-gray-800 dark:border-gray-700 rounded-lg hover:bg-gray-800/50 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <div className="relative flex-shrink-0 w-48">
+                        <img
+                          src={episode.thumbnail}
+                          alt={episode.title}
+                          className="w-full aspect-video object-cover rounded"
+                        />
+                        {episodeNum && (
+                          <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded">
+                            Episode {episodeNum}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-medium text-base mb-1 group-hover:text-purple-400 transition-colors line-clamp-1">
+                          {episode.title}
+                        </h3>
+                        <p className="text-gray-400 text-sm line-clamp-2 mb-2">
+                          {episode.description}
+                        </p>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <Clock className="w-3 h-3" />
+                          <span>{episode.duration}</span>
                         </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-white font-medium text-base mb-1 group-hover:text-purple-400 transition-colors line-clamp-1">
-                        {episode.title}
-                      </h3>
-                      <p className="text-gray-400 text-sm line-clamp-2 mb-2">
-                        {episode.description}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Clock className="w-3 h-3" />
-                        <span>{episode.duration}</span>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="bg-gray-900/50 dark:bg-gray-900 border border-gray-800 dark:border-gray-700 rounded-lg p-8 text-center">
+                <List className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-white text-lg font-semibold mb-2">No Episodes Available</h3>
+                <p className="text-gray-400">
+                  More episodes will be added soon.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
