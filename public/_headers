@@ -1,0 +1,36 @@
+# Security headers for AWS Amplify hosting
+# These headers help protect against common web vulnerabilities
+
+# Apply to all routes
+/*
+  # Prevent clickjacking attacks
+  X-Frame-Options: DENY
+
+  # Enable XSS protection in older browsers
+  X-XSS-Protection: 1; mode=block
+
+  # Prevent MIME type sniffing
+  X-Content-Type-Options: nosniff
+
+  # Control referrer information
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Content Security Policy - adjust based on your needs
+  # This is a strict policy, you may need to relax it based on your requirements
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cognito-idp.*.amazonaws.com https://*.amazonaws.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.amazonaws.com https://cognito-idp.*.amazonaws.com wss://*.amazonaws.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+
+  # Permissions Policy (formerly Feature Policy)
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+
+  # Force HTTPS (only enable if you're serving over HTTPS)
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+# Ensure sensitive paths return 404 with no caching
+/.git/*
+  Cache-Control: no-store, no-cache, must-revalidate
+
+/.svn/*
+  Cache-Control: no-store, no-cache, must-revalidate
+
+/.env*
+  Cache-Control: no-store, no-cache, must-revalidate
