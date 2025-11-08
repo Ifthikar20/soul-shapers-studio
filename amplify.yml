@@ -7,10 +7,34 @@ frontend:
     build:
       commands:
         - npm run build
+        # Remove any accidentally copied sensitive files from dist
+        - rm -rf dist/.git dist/.svn dist/.env* dist/amplify.yml dist/package*.json dist/tsconfig* dist/vite.config*
   artifacts:
     baseDirectory: dist
     files:
       - '**/*'
+    # Exclude sensitive files from deployment
+    excludeFiles:
+      - .git/**/*
+      - .svn/**/*
+      - .env*
+      - amplify.yml
+      - package*.json
+      - tsconfig*.json
+      - vite.config*
   cache:
     paths:
       - node_modules/**/*
+customHeaders:
+  - pattern: '**/*'
+    headers:
+      - key: X-Frame-Options
+        value: DENY
+      - key: X-XSS-Protection
+        value: 1; mode=block
+      - key: X-Content-Type-Options
+        value: nosniff
+      - key: Strict-Transport-Security
+        value: max-age=31536000; includeSubDomains
+      - key: Referrer-Policy
+        value: strict-origin-when-cross-origin

@@ -1,0 +1,48 @@
+# Security: Block access to sensitive directories and files
+# This file is used by AWS Amplify to configure redirects and access control
+
+# Block .git directory and files
+/.git/* 404
+/.git 404
+
+# Block .svn directory and files
+/.svn/* 404
+/.svn 404
+
+# Block other version control systems
+/.hg/* 404
+/.bzr/* 404
+
+# Block common sensitive files
+/.env 404
+/.env.* 404
+/.htaccess 404
+/.htpasswd 404
+/composer.json 404
+/composer.lock 404
+/package.json 404
+/package-lock.json 404
+/yarn.lock 404
+/pnpm-lock.yaml 404
+/.npmrc 404
+/.yarnrc 404
+
+# Block configuration files
+/amplify.yml 404
+/vite.config.* 404
+/tsconfig.* 404
+/webpack.config.* 404
+
+# Block backup and temporary files
+/*~ 404
+/*.bak 404
+/*.tmp 404
+/*.swp 404
+/*.swo 404
+/*# 404
+
+# Block well-known paths that shouldn't exist (return 404 instead of 301)
+/.well-known/* 404
+
+# Default: Allow all other requests (SPA fallback for React Router)
+/* /index.html 200
