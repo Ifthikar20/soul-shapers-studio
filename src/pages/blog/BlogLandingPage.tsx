@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Share2, Send, MoreHorizontal, User } from 'lucide-react';
+import { Heart, MessageCircle, Send, MoreHorizontal, User, BookOpen } from 'lucide-react';
 import Header from '@/components/Header';
 import PageLayout from '@/components/Layout/PageLayout';
 import { Button } from '@/components/ui/button';
@@ -49,6 +49,9 @@ interface Story {
 }
 
 const BlogLandingPage = () => {
+  // Check if user story posting is enabled via environment variable
+  const canPostStories = import.meta.env.VITE_ENABLE_STORY_POSTING !== 'false';
+
   const [stories, setStories] = useState<Story[]>([
     {
       id: '1',
@@ -155,7 +158,23 @@ const BlogLandingPage = () => {
   };
 
   const handleShareStory = () => {
-    if (!newStoryTitle.trim() || !newStoryContent.trim()) return;
+    // Validation
+    if (!newStoryTitle.trim()) {
+      alert('Please add a title to your story');
+      return;
+    }
+    if (!newStoryContent.trim()) {
+      alert('Please add content to your story');
+      return;
+    }
+    if (newStoryTitle.length < 5) {
+      alert('Story title should be at least 5 characters');
+      return;
+    }
+    if (newStoryContent.length < 20) {
+      alert('Story content should be at least 20 characters');
+      return;
+    }
 
     const newStory: Story = {
       id: Date.now().toString(),
@@ -163,8 +182,8 @@ const BlogLandingPage = () => {
       authorAvatar: undefined,
       timeAgo: 'Just now',
       category: newStoryCategory || 'Personal Story',
-      title: newStoryTitle,
-      content: newStoryContent,
+      title: newStoryTitle.trim(),
+      content: newStoryContent.trim(),
       likes: 0,
       commentsCount: 0,
       isLiked: false,
@@ -192,12 +211,18 @@ const BlogLandingPage = () => {
     const commentText = newComment[storyId];
     if (!commentText?.trim()) return;
 
+    // Validation
+    if (commentText.trim().length < 2) {
+      alert('Comment must be at least 2 characters');
+      return;
+    }
+
     setStories(stories.map(story => {
       if (story.id === storyId) {
         const newCommentObj: Comment = {
           id: `c${Date.now()}`,
           author: 'You',
-          content: commentText,
+          content: commentText.trim(),
           timeAgo: 'Just now',
           likes: 0,
         };
@@ -228,12 +253,14 @@ const BlogLandingPage = () => {
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
                 Community Stories
               </h1>
-              <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-                <DialogTrigger asChild>
-                  <Button className="rounded-full">
-                    Share Your Story
-                  </Button>
-                </DialogTrigger>
+              {canPostStories && (
+                <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+                  <DialogTrigger asChild>
+                    <Button className="rounded-full">
+                      <BookOpen className="w-4 h-4 mr-2" />
+                      Share Your Story
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px]">
                   <DialogHeader>
                     <DialogTitle>Share Your Story</DialogTitle>
@@ -291,6 +318,7 @@ const BlogLandingPage = () => {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              )}
             </div>
             <p className="text-lg text-gray-600 dark:text-gray-400">
               Real stories from real people. Share, connect, and find support in our community.
@@ -385,23 +413,19 @@ const BlogLandingPage = () => {
                 <div className="flex items-center gap-6 pt-4 border-t border-gray-200 dark:border-gray-800">
                   <button
                     onClick={() => handleLike(story.id)}
-                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors group"
                   >
                     <Heart
-                      className={`w-5 h-5 ${story.isLiked ? 'fill-red-500 text-red-500' : ''}`}
+                      className={`w-5 h-5 transition-all ${story.isLiked ? 'fill-red-500 text-red-500' : 'group-hover:scale-110'}`}
                     />
                     <span className="text-sm font-medium">{story.likes}</span>
                   </button>
                   <button
                     onClick={() => toggleComments(story.id)}
-                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors group"
                   >
-                    <MessageCircle className="w-5 h-5" />
+                    <MessageCircle className={`w-5 h-5 transition-all ${expandedComments.has(story.id) ? 'fill-blue-500 text-blue-500' : 'group-hover:scale-110'}`} />
                     <span className="text-sm font-medium">{story.commentsCount}</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 transition-colors">
-                    <Share2 className="w-5 h-5" />
-                    <span className="text-sm font-medium">Share</span>
                   </button>
                 </div>
 
@@ -476,17 +500,20 @@ const BlogLandingPage = () => {
           {filteredStories.length === 0 && (
             <div className="text-center py-16">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                <MessageCircle className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                <BookOpen className="w-8 h-8 text-gray-400 dark:text-gray-500" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 No stories in this category yet
               </h3>
               <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                Be the first to share your story
+                {canPostStories ? 'Be the first to share your story' : 'Check back later for inspiring stories'}
               </p>
-              <Button onClick={() => setShowShareDialog(true)} className="rounded-full">
-                Share Your Story
-              </Button>
+              {canPostStories && (
+                <Button onClick={() => setShowShareDialog(true)} className="rounded-full">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Share Your Story
+                </Button>
+              )}
             </div>
           )}
         </div>

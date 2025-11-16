@@ -21,6 +21,7 @@ import audioPage1 from '@/assets/audio-page-1.png';
 import audioPage2 from '@/assets/audio-page-2.png';
 import morningBliss from '@/assets/morningbliss.png';
 import happyLady from '@/assets/happylady.png';
+import watercolorBg from '@/assets/audio-watercolor-background.png';
 
 interface AudioContentItem {
   id: string;
@@ -46,14 +47,14 @@ const plantImages = [
 ];
 
 const gradients = [
-  'from-cyan-400 to-blue-400',
-  'from-blue-900 to-blue-700',
-  'from-orange-400 to-pink-400',
-  'from-amber-200 to-orange-300',
-  'from-purple-500 to-indigo-600',
-  'from-pink-400 to-rose-500',
-  'from-teal-400 to-emerald-500',
-  'from-indigo-500 to-purple-600',
+  'from-gray-600 to-gray-700',
+  'from-gray-700 to-gray-800',
+  'from-gray-500 to-gray-600',
+  'from-gray-600 to-gray-800',
+  'from-gray-700 to-gray-900',
+  'from-gray-500 to-gray-700',
+  'from-gray-600 to-gray-700',
+  'from-gray-700 to-gray-800',
 ];
 
 const AudioBrowsePage = () => {
@@ -120,7 +121,7 @@ const AudioBrowsePage = () => {
         {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-12 h-12 text-purple-600 dark:text-purple-400 animate-spin mb-4" />
+            <Loader2 className="w-12 h-12 text-gray-600 dark:text-gray-400 animate-spin mb-4" />
             <p className="text-gray-600 dark:text-gray-400">Loading audio content...</p>
           </div>
         )}
@@ -136,7 +137,7 @@ const AudioBrowsePage = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={loadAudioContent}
-                    className="px-6 py-3 bg-white text-purple-600 rounded-full font-bold hover:scale-105 transition-transform flex items-center gap-2"
+                    className="px-6 py-3 bg-white text-gray-900 rounded-full font-bold hover:scale-105 transition-transform flex items-center gap-2"
                   >
                     <RefreshCw className="w-4 h-4" />
                     Retry
@@ -234,24 +235,33 @@ const AudioBrowsePage = () => {
             </div>
 
             {/* Recommendations Section */}
-            <div className="bg-gradient-to-br from-purple-600 to-indigo-700 dark:from-purple-800 dark:to-indigo-950 rounded-3xl p-10 mb-10 shadow-2xl flex flex-col md:flex-row items-center gap-10">
-              <div className="flex-shrink-0 w-full md:w-80 h-52 bg-gradient-to-br from-pink-500 to-rose-600 dark:from-pink-700 dark:to-rose-800 rounded-2xl flex items-center justify-center relative overflow-hidden">
+            <div
+              className="rounded-3xl p-10 mb-10 shadow-2xl flex flex-col md:flex-row items-center gap-10 relative overflow-hidden"
+              style={{
+                backgroundImage: `url(${watercolorBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              {/* Subtle overlay for text readability */}
+              <div className="absolute inset-0 bg-white/10 dark:bg-black/20"></div>
+
+              <div className="flex-shrink-0 w-full md:w-80 h-52 rounded-2xl overflow-hidden relative z-10 shadow-xl">
                 <img
                   src={happyLady}
                   alt="Happy person meditating"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 dark:from-black/60 to-transparent"></div>
               </div>
 
-              <div className="flex-1">
-                <h2 className="text-white text-3xl font-bold mb-4">Your growth journey awaits</h2>
-                <p className="text-white/90 text-lg mb-6 leading-relaxed">
+              <div className="flex-1 relative z-10">
+                <h2 className="text-gray-900 dark:text-white text-3xl font-bold mb-4">Your growth journey awaits</h2>
+                <p className="text-gray-800 dark:text-gray-200 text-lg mb-6 leading-relaxed">
                   Go beyond browsing — get tailored recommendations based on your growth goals.
                 </p>
                 <button
                   onClick={() => navigate('/settings')}
-                  className="bg-white text-purple-600 px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-lg"
+                  className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-lg"
                 >
                   Set your goals
                 </button>
@@ -259,14 +269,14 @@ const AudioBrowsePage = () => {
             </div>
 
             {/* Favorites Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-3xl p-10 mb-10 shadow-lg">
-              <h2 className="text-gray-900 dark:text-white text-3xl font-bold mb-6">Favorites</h2>
-              <div className="flex items-center gap-5 p-8 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700">
-                <div className="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Bookmark className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mb-10 shadow-lg">
+              <h2 className="text-gray-900 dark:text-white text-2xl font-bold mb-4">Favorites</h2>
+              <div className="flex items-center gap-4 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Bookmark className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </div>
                 <div>
-                  <h3 className="text-gray-900 dark:text-white text-lg font-bold mb-2">Nothing to show here yet!</h3>
+                  <h3 className="text-gray-900 dark:text-white text-base font-bold mb-1">Nothing to show here yet!</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
                     Start exploring our content and save your favorites for later.
                   </p>
@@ -276,19 +286,8 @@ const AudioBrowsePage = () => {
 
             {/* Popular Now Section */}
             <div className="mb-10">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h2 className="text-gray-900 dark:text-white text-3xl font-bold">Popular now</h2>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
-                    Update your profile to get personalized program recommendations.
-                  </p>
-                </div>
-                <button
-                  onClick={() => navigate('/profile')}
-                  className="text-purple-600 dark:text-purple-400 text-sm font-semibold hover:underline"
-                >
-                  Update profile
-                </button>
+              <div className="mb-6">
+                <h2 className="text-gray-900 dark:text-white text-3xl font-bold">Popular now</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
