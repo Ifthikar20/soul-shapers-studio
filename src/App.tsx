@@ -29,6 +29,7 @@ const AudioPage = lazy(() => import("./pages/AudioPage"));
 const AudioBrowsePage = lazy(() => import("./pages/AudioBrowsePage")); // ✅ NEW: Real audio content with UUIDs
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 const MeditatePage = lazy(() => import("./pages/MeditatePage"));
+const SoundDetailPage = lazy(() => import("./pages/SoundDetailPage"));
 const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
 const ExpertsPage = lazy(() => import("./pages/ExpertsPage")); // ✅ NEW: Experts listing page
 const ExpertProfilePage = lazy(() => import("./pages/ExpertProfilePage")); // ✅ NEW: Expert profile page
@@ -170,6 +171,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <MeditatePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/meditate/:soundId"
+                  element={
+                    <ProtectedRoute>
+                      <SoundDetailPage />
                     </ProtectedRoute>
                   }
                 />
