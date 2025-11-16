@@ -68,6 +68,36 @@ const MeditatePage: React.FC = () => {
       "Let the wind carry you to new heights.",
       "In the autumn breeze, nature speaks in whispers.",
     ],
+    'ocean-waves': [
+      "The ocean stirs the heart, inspires the imagination and brings eternal joy to the soul.",
+      "The voice of the sea speaks to the soul.",
+      "The sea, once it casts its spell, holds one in its net of wonder forever.",
+      "To escape and sit quietly on the beach - that's my idea of paradise.",
+      "The ocean is everything I want to be. Beautiful, mysterious, wild and free.",
+      "The waves of the sea help me get back to me.",
+      "Live in the sunshine, swim the sea, drink the wild air.",
+      "The cure for anything is salt water: sweat, tears, or the sea.",
+    ],
+    'rain-forest': [
+      "In every walk with nature, one receives far more than he seeks.",
+      "Look deep into nature, and then you will understand everything better.",
+      "The clearest way into the Universe is through a forest wilderness.",
+      "Between every two pines is a doorway to a new world.",
+      "The forest makes your heart gentle. You become one with it.",
+      "A walk in nature walks the soul back home.",
+      "Nature does not hurry, yet everything is accomplished.",
+      "Adopt the pace of nature: her secret is patience.",
+    ],
+    'mountain-stream': [
+      "Mountains are the beginning and the end of all natural scenery.",
+      "Climb the mountains and get their good tidings.",
+      "The mountains are calling and I must go.",
+      "In every walk with nature, one receives far more than he seeks.",
+      "Going to the mountains is going home.",
+      "Mountains have a way of dealing with overconfidence.",
+      "The mountains are fountains of men as well as of rivers.",
+      "It is not the mountain we conquer, but ourselves.",
+    ],
   };
 
   // Get quotes for the selected experience, or default to autumn leaves
@@ -88,7 +118,7 @@ const MeditatePage: React.FC = () => {
       description: 'Watch leaves dance gracefully in the autumn breeze',
       videoUrl: autumnLeavesVideo,
       imageUrl: autumnLeavesImage,
-      category: 'Nature',
+      category: 'Seasonal',
     },
     {
       id: 'autumn-wind',
@@ -96,7 +126,31 @@ const MeditatePage: React.FC = () => {
       description: 'Feel the crisp autumn air and gentle rustling of trees',
       videoUrl: autumnWindVideo,
       imageUrl: autumnWindImage,
-      category: 'Nature',
+      category: 'Seasonal',
+    },
+    {
+      id: 'ocean-waves',
+      title: 'Ocean Waves',
+      description: 'Experience the rhythmic peace of ocean waves at sunset',
+      videoUrl: autumnLeavesVideo, // Placeholder
+      imageUrl: autumnLeavesImage, // Placeholder
+      category: 'Ocean',
+    },
+    {
+      id: 'rain-forest',
+      title: 'Rain Forest',
+      description: 'Immerse yourself in the peaceful sounds of a tropical rainforest',
+      videoUrl: autumnWindVideo, // Placeholder
+      imageUrl: autumnWindImage, // Placeholder
+      category: 'Forest',
+    },
+    {
+      id: 'mountain-stream',
+      title: 'Mountain Stream',
+      description: 'Find serenity in the gentle flow of a mountain stream',
+      videoUrl: waterflowVideo, // Placeholder
+      imageUrl: waterfallImage, // Placeholder
+      category: 'Mountain',
     },
   ];
 
@@ -179,7 +233,7 @@ const MeditatePage: React.FC = () => {
           </div>
 
           {/* Meditation Experiences Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {meditationExperiences.map((experience) => (
               <div
                 key={experience.id}
@@ -189,7 +243,7 @@ const MeditatePage: React.FC = () => {
                 {/* Card Container */}
                 <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out transform hover:-translate-y-2">
                   {/* Image */}
-                  <div className="relative h-52 overflow-hidden">
+                  <div className="relative h-44 overflow-hidden">
                     <img
                       src={experience.imageUrl}
                       alt={experience.title}
@@ -214,16 +268,16 @@ const MeditatePage: React.FC = () => {
                     </div>
 
                     {/* Title Overlay on Image */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-2xl font-bold text-white mb-2">
+                    <div className="absolute bottom-0 left-0 right-0 p-5">
+                      <h3 className="text-xl font-bold text-white">
                         {experience.title}
                       </h3>
                     </div>
                   </div>
 
                   {/* Card Content */}
-                  <div className="p-6">
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <div className="p-5">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                       {experience.description}
                     </p>
                   </div>
