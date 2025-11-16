@@ -6,7 +6,6 @@ import { StreamingAudioPlayer } from '../components/StreamingAudioPlayer';
 import { audioStreamingService } from '../services/audio.service';
 import { progressService } from '@/services/progress.service';
 import ContentProgressBar from '@/components/progress/ContentProgressBar';
-import ContentPointsPreview from '@/components/progress/ContentPointsPreview';
 import plant1 from '../assets/plant1.png';
 
 // UUID validation regex
@@ -187,15 +186,6 @@ const SingleAudioPage = () => {
               currentTime={currentTime}
               duration={audioDuration}
               onContinue={handleContinueListening}
-              className="mt-6"
-            />
-
-            {/* Points Preview */}
-            <ContentPointsPreview
-              contentType="audio"
-              durationMinutes={Math.round((audioData?.duration_seconds || audioDuration) / 60)}
-              category={audioData?.category || 'Meditation'}
-              isCompleted={false}
               className="mt-6"
             />
 

@@ -27,7 +27,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import PageLayout from '@/components/layout/PageLayout';
+import PageLayout from '@/components/Layout/PageLayout';
 
 const ProgressPage: React.FC = () => {
   const { user } = useAuth();
