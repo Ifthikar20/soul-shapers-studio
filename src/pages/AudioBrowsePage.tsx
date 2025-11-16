@@ -21,6 +21,7 @@ import audioPage1 from '@/assets/audio-page-1.png';
 import audioPage2 from '@/assets/audio-page-2.png';
 import morningBliss from '@/assets/morningbliss.png';
 import happyLady from '@/assets/happylady.png';
+import watercolorBg from '@/assets/watercolor.png';
 
 interface AudioContentItem {
   id: string;
@@ -234,24 +235,33 @@ const AudioBrowsePage = () => {
             </div>
 
             {/* Recommendations Section */}
-            <div className="bg-gradient-to-br from-gray-700 to-gray-900 dark:from-gray-800 dark:to-black rounded-3xl p-10 mb-10 shadow-2xl flex flex-col md:flex-row items-center gap-10">
-              <div className="flex-shrink-0 w-full md:w-80 h-52 bg-gradient-to-br from-gray-600 to-gray-800 dark:from-gray-700 dark:to-gray-900 rounded-2xl flex items-center justify-center relative overflow-hidden">
+            <div
+              className="rounded-3xl p-10 mb-10 shadow-2xl flex flex-col md:flex-row items-center gap-10 relative overflow-hidden"
+              style={{
+                backgroundImage: `url(${watercolorBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              {/* Subtle overlay for text readability */}
+              <div className="absolute inset-0 bg-white/10 dark:bg-black/20"></div>
+
+              <div className="flex-shrink-0 w-full md:w-80 h-52 rounded-2xl overflow-hidden relative z-10 shadow-xl">
                 <img
                   src={happyLady}
                   alt="Happy person meditating"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 dark:from-black/60 to-transparent"></div>
               </div>
 
-              <div className="flex-1">
-                <h2 className="text-white text-3xl font-bold mb-4">Your growth journey awaits</h2>
-                <p className="text-white/90 text-lg mb-6 leading-relaxed">
+              <div className="flex-1 relative z-10">
+                <h2 className="text-gray-900 dark:text-white text-3xl font-bold mb-4">Your growth journey awaits</h2>
+                <p className="text-gray-800 dark:text-gray-200 text-lg mb-6 leading-relaxed">
                   Go beyond browsing — get tailored recommendations based on your growth goals.
                 </p>
                 <button
                   onClick={() => navigate('/settings')}
-                  className="bg-white text-gray-900 px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-lg"
+                  className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-lg"
                 >
                   Set your goals
                 </button>
@@ -259,14 +269,14 @@ const AudioBrowsePage = () => {
             </div>
 
             {/* Favorites Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-3xl p-10 mb-10 shadow-lg">
-              <h2 className="text-gray-900 dark:text-white text-3xl font-bold mb-6">Favorites</h2>
-              <div className="flex items-center gap-5 p-8 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700">
-                <div className="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Bookmark className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mb-10 shadow-lg">
+              <h2 className="text-gray-900 dark:text-white text-2xl font-bold mb-4">Favorites</h2>
+              <div className="flex items-center gap-4 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Bookmark className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </div>
                 <div>
-                  <h3 className="text-gray-900 dark:text-white text-lg font-bold mb-2">Nothing to show here yet!</h3>
+                  <h3 className="text-gray-900 dark:text-white text-base font-bold mb-1">Nothing to show here yet!</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
                     Start exploring our content and save your favorites for later.
                   </p>
