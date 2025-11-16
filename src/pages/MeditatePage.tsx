@@ -11,11 +11,19 @@ import { Play, Pause, Volume2, VolumeX, X, ChevronLeft, ChevronRight } from 'luc
 import waterflowVideo from '@/assets/waterflow-meditate.mp4';
 import autumnLeavesVideo from '@/assets/autumn-leaves-meditate.mp4';
 import autumnWindVideo from '@/assets/autumn-wind-meditate.mp4';
+import morningWalkVideo from '@/assets/morning-walk-meditate.mp4';
+import morningFishingVideo from '@/assets/morning-fishing-meditate.mp4';
+import burningWoodVideo from '@/assets/burning-wood-meditation.mp4';
+import thunderstormVillageVideo from '@/assets/thunderstorm-village-meditate.mp4';
 
 // Import images
 import waterfallImage from '@/assets/waterfall-meditate-img.jpg';
 import autumnLeavesImage from '@/assets/autumn-leaves-meditate.jpg';
 import autumnWindImage from '@/assets/autumn-wind-img.jpg';
+import morningWalkImage from '@/assets/morning-walk-img.jpg';
+import morningFishingImage from '@/assets/morning-fishing-meditate-img.jpg';
+import burningWoodImage from '@/assets/burning-wood-meditate.jpg';
+import thunderstormVillageImage from '@/assets/thunderstorm-village-meditate.jpg';
 
 interface MeditationExperience {
   id: string;
@@ -67,11 +75,13 @@ const MeditatePage: React.FC = () => {
   const meditationExperiences: MeditationExperience[] = [
     // Sounds of Nature
     { id: 'waterflow', title: 'Waterfall Meditation', description: 'Gentle cascade of water', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sounds of Nature', type: 'Sound' },
+    { id: 'morning-walk', title: 'Morning Walk', description: 'Peaceful nature stroll', videoUrl: morningWalkVideo, imageUrl: morningWalkImage, category: 'Sounds of Nature', type: 'Sound' },
+    { id: 'morning-fishing', title: 'Morning Fishing', description: 'Tranquil lakeside sounds', videoUrl: morningFishingVideo, imageUrl: morningFishingImage, category: 'Sounds of Nature', type: 'Sound' },
+    { id: 'thunder-rain', title: 'Village Thunderstorm', description: 'Powerful storm ambience', videoUrl: thunderstormVillageVideo, imageUrl: thunderstormVillageImage, category: 'Sounds of Nature', type: 'Sound' },
+    { id: 'burning-wood', title: 'Crackling Fireplace', description: 'Warm fire sounds', videoUrl: burningWoodVideo, imageUrl: burningWoodImage, category: 'Sounds of Nature', type: 'Sound' },
     { id: 'ocean-waves', title: 'Ocean Waves', description: 'Rhythmic peace of ocean', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sounds of Nature', type: 'Sound' },
     { id: 'rain-forest', title: 'Rain Forest', description: 'Tropical rainforest sounds', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sounds of Nature', type: 'Sound' },
     { id: 'mountain-stream', title: 'Mountain Stream', description: 'Gentle mountain flow', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sounds of Nature', type: 'Sound' },
-    { id: 'thunder-rain', title: 'Thunder & Rain', description: 'Powerful storm ambience', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sounds of Nature', type: 'Sound' },
-    { id: 'bird-songs', title: 'Morning Birds', description: 'Peaceful bird chirping', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sounds of Nature', type: 'Sound' },
 
     // Seasonal Meditations
     { id: 'autumn-leaves', title: 'Autumn Leaves', description: 'Leaves dancing in breeze', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Seasonal Meditations', type: 'Sound' },
