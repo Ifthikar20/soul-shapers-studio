@@ -22,6 +22,9 @@ import { checkBadgeUnlock } from '@/types/progress.types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
+// Development mode - set to true to use mock data only (no backend calls)
+const USE_MOCK_DATA = true; // TODO: Set to false when backend progress endpoints are ready
+
 class ProgressService {
   private api: AxiosInstance;
 
@@ -38,6 +41,11 @@ class ProgressService {
    * Get complete progress summary for dashboard
    */
   async getProgressSummary(): Promise<ProgressSummary> {
+    // Use mock data in development mode
+    if (USE_MOCK_DATA) {
+      return this.getMockProgressSummary();
+    }
+
     try {
       const response = await this.api.get('/api/progress/summary');
       return response.data;
@@ -58,6 +66,11 @@ class ProgressService {
    * Get user statistics
    */
   async getUserStats(): Promise<UserStats> {
+    // Use mock data in development mode
+    if (USE_MOCK_DATA) {
+      return this.getMockUserStats();
+    }
+
     try {
       const response = await this.api.get('/api/progress/stats');
       return response.data;
@@ -76,6 +89,11 @@ class ProgressService {
    * Get user badges
    */
   async getBadges(): Promise<Badge[]> {
+    // Use mock data in development mode
+    if (USE_MOCK_DATA) {
+      return this.getMockBadges();
+    }
+
     try {
       const response = await this.api.get('/api/progress/badges');
       return response.data.badges;
@@ -94,6 +112,11 @@ class ProgressService {
    * Get user's streak data
    */
   async getStreak(): Promise<StreakData> {
+    // Use mock data in development mode
+    if (USE_MOCK_DATA) {
+      return this.getMockStreak();
+    }
+
     try {
       const response = await this.api.get('/api/progress/streak');
       return response.data;
@@ -112,6 +135,11 @@ class ProgressService {
    * Get user goals
    */
   async getGoals(): Promise<Goal[]> {
+    // Use mock data in development mode
+    if (USE_MOCK_DATA) {
+      return this.getMockGoals();
+    }
+
     try {
       const response = await this.api.get('/api/progress/goals');
       return response.data.goals;
@@ -170,6 +198,12 @@ class ProgressService {
    * Track user activity (video watched, meditation completed, etc.)
    */
   async trackActivity(activityData: TrackActivityRequest): Promise<void> {
+    // Skip tracking in development mode
+    if (USE_MOCK_DATA) {
+      console.log('📊 [Mock Mode] Activity tracked:', activityData.activityType);
+      return;
+    }
+
     try {
       await this.api.post('/api/progress/activity', activityData);
       console.log('✅ Activity tracked:', activityData.activityType);
@@ -183,6 +217,11 @@ class ProgressService {
    * Get weekly progress data
    */
   async getWeeklyProgress(): Promise<WeeklyProgress> {
+    // Use mock data in development mode
+    if (USE_MOCK_DATA) {
+      return this.getMockWeeklyProgress();
+    }
+
     try {
       const response = await this.api.get('/api/progress/weekly');
       return response.data;
@@ -201,6 +240,11 @@ class ProgressService {
    * Get category statistics
    */
   async getCategoryStats(): Promise<CategoryStats[]> {
+    // Use mock data in development mode
+    if (USE_MOCK_DATA) {
+      return this.getMockCategoryStats();
+    }
+
     try {
       const response = await this.api.get('/api/progress/categories');
       return response.data.categories;
@@ -219,6 +263,11 @@ class ProgressService {
    * Get expert statistics
    */
   async getExpertStats(): Promise<ExpertStats[]> {
+    // Use mock data in development mode
+    if (USE_MOCK_DATA) {
+      return this.getMockExpertStats();
+    }
+
     try {
       const response = await this.api.get('/api/progress/experts');
       return response.data.experts;
@@ -237,6 +286,11 @@ class ProgressService {
    * Get recent activity
    */
   async getRecentActivity(limit: number = 10): Promise<ActivityEntry[]> {
+    // Use mock data in development mode
+    if (USE_MOCK_DATA) {
+      return this.getMockActivity();
+    }
+
     try {
       const response = await this.api.get(`/api/progress/activity?limit=${limit}`);
       return response.data.activities;
