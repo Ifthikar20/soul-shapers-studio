@@ -462,15 +462,6 @@ const WatchPage = () => {
           </div>
         </div>
 
-        {/* Points Preview */}
-        <ContentPointsPreview
-          contentType="video"
-          durationMinutes={Math.round((video.duration_seconds || 0) / 60)}
-          category={video.category}
-          isCompleted={false}
-          className="mb-8"
-        />
-
         {/* Tabs Section */}
         <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="bg-gray-900/50 dark:bg-gray-900 border border-gray-800 dark:border-gray-700 mb-6">
