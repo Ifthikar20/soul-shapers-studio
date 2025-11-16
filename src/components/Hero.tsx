@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { ArrowRight, Sparkles } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowRight, Sparkles, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { analyticsService } from "@/services/analytics.service";
 
 // Import watercolor backdrop image
 import watercolor1 from '@/assets/watercolor-1.png';
@@ -8,10 +9,34 @@ import watercolor1 from '@/assets/watercolor-1.png';
 const Hero = () => {
   const navigate = useNavigate();
   const [isSwiping, setIsSwiping] = useState(false);
+  const [totalViews, setTotalViews] = useState<number>(15000); // Default fallback
+  const [isLoadingViews, setIsLoadingViews] = useState(true);
+
+  // Fetch total video views on component mount
+  useEffect(() => {
+    const fetchTotalViews = async () => {
+      try {
+        const views = await analyticsService.getTotalVideoViews();
+        setTotalViews(views);
+      } catch (error) {
+        console.error('Failed to fetch total views:', error);
+        // Keep default fallback value
+      } finally {
+        setIsLoadingViews(false);
+      }
+    };
+
+    fetchTotalViews();
+  }, []);
+
+  // Format number with commas (e.g., 15,234)
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString('en-US');
+  };
 
   const handleExploreContent = () => {
     setIsSwiping(true);
-    
+
     // Wait for swipe animation to complete before navigating
     setTimeout(() => {
       navigate('/login');
@@ -73,15 +98,21 @@ const Hero = () => {
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
               
-              <p className="text-base text-white/80">
-                Join <strong className="text-white font-semibold">10,000+</strong> members transforming their mental health
-              </p>
+              <div className="flex items-center justify-center gap-2 text-base text-white/90">
+                <Eye className="w-5 h-5" />
+                <span>
+                  <strong className="text-white font-semibold">
+                    {isLoadingViews ? '...' : formatNumber(totalViews)}+
+                  </strong>{' '}
+                  Total video views
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Social Proof Below */}
-        <div 
+        <div
           className={`flex items-center justify-center gap-6 pt-12 transition-opacity ${
             isSwiping ? 'opacity-0' : 'opacity-100'
           }`}
@@ -90,14 +121,14 @@ const Hero = () => {
             transitionTimingFunction: 'ease-out',
           }}
         >
-          <div className="flex -space-x-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 border-2 border-white"></div>
-            ))}
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+            <Eye className="w-8 h-8 text-white" />
           </div>
           <div className="text-sm">
-            <p className="font-semibold text-gray-900">10,000+ Members</p>
-            <p className="text-gray-600">Growing daily</p>
+            <p className="font-semibold text-gray-900">
+              {isLoadingViews ? 'Loading...' : `${formatNumber(totalViews)}+`} Total views
+            </p>
+            <p className="text-gray-600">And growing every day</p>
           </div>
         </div>
 
