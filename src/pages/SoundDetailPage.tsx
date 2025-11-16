@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, Volume2, VolumeX, ArrowLeft, X } from 'lucide-react';
+import waterflowVideo from '@/assets/waterflow-meditate.mp4';
 
 interface SoundExperience {
   id: string;
@@ -29,37 +30,37 @@ const SoundDetailPage: React.FC = () => {
     'ocean-waves': {
       id: 'ocean-waves',
       title: 'Ocean Waves',
-      videoUrl: 'https://cdn.pixabay.com/video/2022/11/07/137607-768726001_large.mp4',
+      videoUrl: waterflowVideo,
       description: 'Gentle waves lapping against the shore at sunset',
     },
     'flowing-river': {
       id: 'flowing-river',
       title: 'Flowing River',
-      videoUrl: 'https://cdn.pixabay.com/video/2023/05/15/161877-826256929_large.mp4',
+      videoUrl: waterflowVideo,
       description: 'A peaceful river flowing through nature',
     },
     'forest-stream': {
       id: 'forest-stream',
       title: 'Forest Stream',
-      videoUrl: 'https://cdn.pixabay.com/video/2020/05/22/39619-422286365_large.mp4',
+      videoUrl: waterflowVideo,
       description: 'Water trickling over rocks in a forest',
     },
     'rain-sounds': {
       id: 'rain-sounds',
       title: 'Gentle Rain',
-      videoUrl: 'https://cdn.pixabay.com/video/2021/08/04/83854-583463332_large.mp4',
+      videoUrl: waterflowVideo,
       description: 'Soft rainfall creating a calming atmosphere',
     },
     'plants-germinating': {
       id: 'plants-germinating',
       title: 'Plants Germinating',
-      videoUrl: 'https://cdn.pixabay.com/video/2022/04/25/115481-704155943_large.mp4',
+      videoUrl: waterflowVideo,
       description: 'The subtle beauty of life emerging and growing',
     },
     'nature-ambience': {
       id: 'nature-ambience',
       title: 'Nature Ambience',
-      videoUrl: 'https://cdn.pixabay.com/video/2021/03/28/69410-531891050_large.mp4',
+      videoUrl: waterflowVideo,
       description: 'A blend of natural scenes for deep relaxation',
     },
   };
