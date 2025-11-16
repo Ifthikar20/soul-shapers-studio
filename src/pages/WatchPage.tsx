@@ -8,6 +8,7 @@ import { contentService } from '@/services/content.service';
 import { Video, isUUID } from '@/types/video.types';
 import { toast } from 'sonner';
 import { analyticsService } from '@/services/analytics.service';
+import { progressService } from '@/services/progress.service';
 import { dummySeriesVideos } from '@/data/dummyVideos';
 import {
   X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw,
@@ -30,6 +31,7 @@ const WatchPage = () => {
   const [viewTracked, setViewTracked] = useState(false);
   const [seriesEpisodes, setSeriesEpisodes] = useState<Video[]>([]);
   const [isFavourite, setIsFavourite] = useState(false);
+  const [watchStartTime, setWatchStartTime] = useState<Date | null>(null);
 
   // Debug info
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -140,8 +142,19 @@ const WatchPage = () => {
         session_id: sessionId
       });
 
+      // Track progress for gamification
+      const durationMinutes = Math.round((videoData.duration_seconds || 0) / 60);
+      await progressService.trackActivity({
+        activityType: 'video_watched',
+        contentId: videoData.id,
+        contentTitle: videoData.title,
+        durationMinutes: durationMinutes,
+      });
+
       setViewTracked(true);
+      setWatchStartTime(new Date());
       console.log('✅ Video view tracked:', videoData.title);
+      console.log('✅ Progress activity tracked:', durationMinutes, 'minutes');
     } catch (error) {
       console.error('❌ Failed to track video view:', error);
     }

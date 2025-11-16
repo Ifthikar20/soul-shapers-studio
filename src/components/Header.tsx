@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import bbLogo from "@/assets/b-b-logo.png";
+import StreakDisplay from "@/components/progress/StreakDisplay";
 
 interface HeaderProps {
   onShowAuth?: (mode: 'signin' | 'signup') => void;
@@ -401,6 +402,11 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     if (isAuthenticated && user) {
       return (
         <div className="flex items-center gap-3">
+          {/* Streak Display */}
+          <div className="hidden md:block">
+            <StreakDisplay />
+          </div>
+
           {user.subscription_tier === 'free' && (
             <Button
               variant="outline"
@@ -441,6 +447,11 @@ const Header = ({ onShowAuth }: HeaderProps) => {
               <DropdownMenuItem onClick={() => navigate('/profile')}>
                 <User className="mr-2 h-4 w-4" />
                 Profile
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => navigate('/progress')}>
+                <Activity className="mr-2 h-4 w-4" />
+                Progress & Stats
               </DropdownMenuItem>
 
               <DropdownMenuItem onClick={() => navigate('/settings')}>

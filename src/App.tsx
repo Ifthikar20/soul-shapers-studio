@@ -38,6 +38,7 @@ const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const ProgressPage = lazy(() => import("./pages/ProgressPage")); // ✅ NEW: Progress & Gamification page
 const VideoTestPage = lazy(() => import("./pages/VideoTestPage")); // ✅ NEW: Video test page
 
 // Lazy load components
@@ -215,6 +216,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <SettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/progress"
+                  element={
+                    <ProtectedRoute>
+                      <ProgressPage />
                     </ProtectedRoute>
                   }
                 />
