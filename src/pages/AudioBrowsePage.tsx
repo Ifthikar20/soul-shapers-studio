@@ -21,7 +21,7 @@ import audioPage1 from '@/assets/audio-page-1.png';
 import audioPage2 from '@/assets/audio-page-2.png';
 import morningBliss from '@/assets/morningbliss.png';
 import happyLady from '@/assets/happylady.png';
-import watercolorBg from '@/assets/watercolor.png';
+import watercolorBg from '@/assets/audio-watercolor-background.png';
 
 interface AudioContentItem {
   id: string;
