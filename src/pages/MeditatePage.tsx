@@ -202,7 +202,7 @@ const MeditatePage: React.FC = () => {
           {/* Fullscreen Video Background */}
           <video
             ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover opacity-40"
+            className="absolute inset-0 w-full h-full object-cover opacity-60"
             loop
             muted={isMuted}
             playsInline
@@ -210,7 +210,7 @@ const MeditatePage: React.FC = () => {
           />
 
           {/* Opaque Dark Overlay */}
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/30" />
 
           {/* Centered Video Player Controls */}
           <div className="absolute inset-0 flex items-center justify-center z-10">
