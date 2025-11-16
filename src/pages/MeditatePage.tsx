@@ -116,7 +116,7 @@ const MeditatePage: React.FC = () => {
     { id: 'positive-affirmations', title: 'Positive Affirmations', description: 'Build confidence', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Morning Meditations' },
 
     // Evening Wind Down
-    { id: 'sunset-reflection', title: 'Sunset Reflection', description: 'Day's end peace', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Evening Wind Down' },
+    { id: 'sunset-reflection', title: 'Sunset Reflection', description: 'Day\'s end peace', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Evening Wind Down' },
     { id: 'gratitude-evening', title: 'Evening Gratitude', description: 'Reflect with thanks', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Evening Wind Down' },
     { id: 'letting-go', title: 'Letting Go', description: 'Release the day', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Evening Wind Down' },
     { id: 'night-peace', title: 'Night Peace', description: 'Prepare for rest', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Evening Wind Down' },
