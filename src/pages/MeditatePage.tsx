@@ -24,6 +24,7 @@ interface MeditationExperience {
   videoUrl: string;
   imageUrl: string;
   category: string;
+  type: 'Sound' | 'Guided';
 }
 
 const MeditatePage: React.FC = () => {
@@ -65,73 +66,73 @@ const MeditatePage: React.FC = () => {
 
   const meditationExperiences: MeditationExperience[] = [
     // Sounds of Nature
-    { id: 'waterflow', title: 'Waterfall Meditation', description: 'Gentle cascade of water', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sounds of Nature' },
-    { id: 'ocean-waves', title: 'Ocean Waves', description: 'Rhythmic peace of ocean', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sounds of Nature' },
-    { id: 'rain-forest', title: 'Rain Forest', description: 'Tropical rainforest sounds', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sounds of Nature' },
-    { id: 'mountain-stream', title: 'Mountain Stream', description: 'Gentle mountain flow', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sounds of Nature' },
-    { id: 'thunder-rain', title: 'Thunder & Rain', description: 'Powerful storm ambience', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sounds of Nature' },
-    { id: 'bird-songs', title: 'Morning Birds', description: 'Peaceful bird chirping', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sounds of Nature' },
+    { id: 'waterflow', title: 'Waterfall Meditation', description: 'Gentle cascade of water', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sounds of Nature', type: 'Sound' },
+    { id: 'ocean-waves', title: 'Ocean Waves', description: 'Rhythmic peace of ocean', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sounds of Nature', type: 'Sound' },
+    { id: 'rain-forest', title: 'Rain Forest', description: 'Tropical rainforest sounds', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sounds of Nature', type: 'Sound' },
+    { id: 'mountain-stream', title: 'Mountain Stream', description: 'Gentle mountain flow', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sounds of Nature', type: 'Sound' },
+    { id: 'thunder-rain', title: 'Thunder & Rain', description: 'Powerful storm ambience', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sounds of Nature', type: 'Sound' },
+    { id: 'bird-songs', title: 'Morning Birds', description: 'Peaceful bird chirping', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sounds of Nature', type: 'Sound' },
 
     // Seasonal Meditations
-    { id: 'autumn-leaves', title: 'Autumn Leaves', description: 'Leaves dancing in breeze', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Seasonal Meditations' },
-    { id: 'autumn-wind', title: 'Autumn Wind', description: 'Crisp autumn air', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Seasonal Meditations' },
-    { id: 'winter-snow', title: 'Winter Snowfall', description: 'Peaceful falling snow', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Seasonal Meditations' },
-    { id: 'spring-garden', title: 'Spring Garden', description: 'Blooming flowers', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Seasonal Meditations' },
-    { id: 'summer-meadow', title: 'Summer Meadow', description: 'Warm sunny fields', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Seasonal Meditations' },
+    { id: 'autumn-leaves', title: 'Autumn Leaves', description: 'Leaves dancing in breeze', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Seasonal Meditations', type: 'Sound' },
+    { id: 'autumn-wind', title: 'Autumn Wind', description: 'Crisp autumn air', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Seasonal Meditations', type: 'Sound' },
+    { id: 'winter-snow', title: 'Winter Snowfall', description: 'Peaceful falling snow', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Seasonal Meditations', type: 'Sound' },
+    { id: 'spring-garden', title: 'Spring Garden', description: 'Blooming flowers', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Seasonal Meditations', type: 'Sound' },
+    { id: 'summer-meadow', title: 'Summer Meadow', description: 'Warm sunny fields', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Seasonal Meditations', type: 'Sound' },
 
     // Guided Meditation for Professionals
-    { id: 'focus-boost', title: 'Focus Boost', description: 'Enhance concentration', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Guided Meditation for Professionals' },
-    { id: 'stress-release', title: 'Stress Release', description: 'Let go of tension', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Guided Meditation for Professionals' },
-    { id: 'decision-clarity', title: 'Decision Clarity', description: 'Clear mind guidance', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Guided Meditation for Professionals' },
-    { id: 'leadership-mindset', title: 'Leadership Mindset', description: 'Executive presence', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Guided Meditation for Professionals' },
-    { id: 'creativity-flow', title: 'Creativity Flow', description: 'Unlock innovation', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Guided Meditation for Professionals' },
-    { id: 'work-life-balance', title: 'Work-Life Balance', description: 'Find equilibrium', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Guided Meditation for Professionals' },
+    { id: 'focus-boost', title: 'Focus Boost', description: 'Enhance concentration', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Guided Meditation for Professionals', type: 'Guided' },
+    { id: 'stress-release', title: 'Stress Release', description: 'Let go of tension', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Guided Meditation for Professionals', type: 'Guided' },
+    { id: 'decision-clarity', title: 'Decision Clarity', description: 'Clear mind guidance', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Guided Meditation for Professionals', type: 'Guided' },
+    { id: 'leadership-mindset', title: 'Leadership Mindset', description: 'Executive presence', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Guided Meditation for Professionals', type: 'Guided' },
+    { id: 'creativity-flow', title: 'Creativity Flow', description: 'Unlock innovation', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Guided Meditation for Professionals', type: 'Guided' },
+    { id: 'work-life-balance', title: 'Work-Life Balance', description: 'Find equilibrium', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Guided Meditation for Professionals', type: 'Guided' },
 
     // Sleep & Relaxation
-    { id: 'deep-sleep', title: 'Deep Sleep', description: 'Drift into slumber', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sleep & Relaxation' },
-    { id: 'insomnia-relief', title: 'Insomnia Relief', description: 'Overcome sleeplessness', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sleep & Relaxation' },
-    { id: 'bedtime-story', title: 'Bedtime Journey', description: 'Guided sleep story', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sleep & Relaxation' },
-    { id: 'power-nap', title: 'Power Nap', description: '20-minute refresh', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sleep & Relaxation' },
-    { id: 'evening-unwind', title: 'Evening Unwind', description: 'Release the day', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sleep & Relaxation' },
+    { id: 'deep-sleep', title: 'Deep Sleep', description: 'Drift into slumber', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sleep & Relaxation', type: 'Guided' },
+    { id: 'insomnia-relief', title: 'Insomnia Relief', description: 'Overcome sleeplessness', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sleep & Relaxation', type: 'Guided' },
+    { id: 'bedtime-story', title: 'Bedtime Journey', description: 'Guided sleep story', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sleep & Relaxation', type: 'Guided' },
+    { id: 'power-nap', title: 'Power Nap', description: '20-minute refresh', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sleep & Relaxation', type: 'Guided' },
+    { id: 'evening-unwind', title: 'Evening Unwind', description: 'Release the day', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sleep & Relaxation', type: 'Guided' },
 
     // Focus & Concentration
-    { id: 'study-focus', title: 'Study Focus', description: 'Academic concentration', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Focus & Concentration' },
-    { id: 'work-productivity', title: 'Work Productivity', description: 'Peak performance', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Focus & Concentration' },
-    { id: 'exam-preparation', title: 'Exam Preparation', description: 'Calm test anxiety', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Focus & Concentration' },
-    { id: 'deep-work', title: 'Deep Work', description: 'Eliminate distractions', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Focus & Concentration' },
-    { id: 'memory-boost', title: 'Memory Boost', description: 'Enhance recall', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Focus & Concentration' },
+    { id: 'study-focus', title: 'Study Focus', description: 'Academic concentration', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Focus & Concentration', type: 'Guided' },
+    { id: 'work-productivity', title: 'Work Productivity', description: 'Peak performance', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Focus & Concentration', type: 'Guided' },
+    { id: 'exam-preparation', title: 'Exam Preparation', description: 'Calm test anxiety', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Focus & Concentration', type: 'Guided' },
+    { id: 'deep-work', title: 'Deep Work', description: 'Eliminate distractions', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Focus & Concentration', type: 'Guided' },
+    { id: 'memory-boost', title: 'Memory Boost', description: 'Enhance recall', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Focus & Concentration', type: 'Guided' },
 
     // Stress Relief
-    { id: 'anxiety-calm', title: 'Anxiety Calm', description: 'Soothe worried mind', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Stress Relief' },
-    { id: 'panic-relief', title: 'Panic Relief', description: 'Ground yourself', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Stress Relief' },
-    { id: 'tension-release', title: 'Tension Release', description: 'Body scan relaxation', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Stress Relief' },
-    { id: 'overwhelm-support', title: 'Overwhelm Support', description: 'Find your center', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Stress Relief' },
-    { id: 'burnout-recovery', title: 'Burnout Recovery', description: 'Restore energy', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Stress Relief' },
+    { id: 'anxiety-calm', title: 'Anxiety Calm', description: 'Soothe worried mind', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Stress Relief', type: 'Guided' },
+    { id: 'panic-relief', title: 'Panic Relief', description: 'Ground yourself', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Stress Relief', type: 'Guided' },
+    { id: 'tension-release', title: 'Tension Release', description: 'Body scan relaxation', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Stress Relief', type: 'Guided' },
+    { id: 'overwhelm-support', title: 'Overwhelm Support', description: 'Find your center', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Stress Relief', type: 'Guided' },
+    { id: 'burnout-recovery', title: 'Burnout Recovery', description: 'Restore energy', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Stress Relief', type: 'Guided' },
 
     // Morning Meditations
-    { id: 'morning-energy', title: 'Morning Energy', description: 'Start day right', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Morning Meditations' },
-    { id: 'gratitude-practice', title: 'Gratitude Practice', description: 'Count blessings', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Morning Meditations' },
-    { id: 'intention-setting', title: 'Intention Setting', description: 'Define your day', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Morning Meditations' },
-    { id: 'sunrise-meditation', title: 'Sunrise Meditation', description: 'Greet the dawn', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Morning Meditations' },
-    { id: 'positive-affirmations', title: 'Positive Affirmations', description: 'Build confidence', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Morning Meditations' },
+    { id: 'morning-energy', title: 'Morning Energy', description: 'Start day right', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Morning Meditations', type: 'Guided' },
+    { id: 'gratitude-practice', title: 'Gratitude Practice', description: 'Count blessings', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Morning Meditations', type: 'Guided' },
+    { id: 'intention-setting', title: 'Intention Setting', description: 'Define your day', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Morning Meditations', type: 'Guided' },
+    { id: 'sunrise-meditation', title: 'Sunrise Meditation', description: 'Greet the dawn', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Morning Meditations', type: 'Guided' },
+    { id: 'positive-affirmations', title: 'Positive Affirmations', description: 'Build confidence', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Morning Meditations', type: 'Guided' },
 
     // Evening Wind Down
-    { id: 'sunset-reflection', title: 'Sunset Reflection', description: 'Day\'s end peace', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Evening Wind Down' },
-    { id: 'gratitude-evening', title: 'Evening Gratitude', description: 'Reflect with thanks', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Evening Wind Down' },
-    { id: 'letting-go', title: 'Letting Go', description: 'Release the day', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Evening Wind Down' },
-    { id: 'night-peace', title: 'Night Peace', description: 'Prepare for rest', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Evening Wind Down' },
+    { id: 'sunset-reflection', title: 'Sunset Reflection', description: 'Day\'s end peace', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Evening Wind Down', type: 'Guided' },
+    { id: 'gratitude-evening', title: 'Evening Gratitude', description: 'Reflect with thanks', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Evening Wind Down', type: 'Guided' },
+    { id: 'letting-go', title: 'Letting Go', description: 'Release the day', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Evening Wind Down', type: 'Guided' },
+    { id: 'night-peace', title: 'Night Peace', description: 'Prepare for rest', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Evening Wind Down', type: 'Guided' },
 
     // Mindfulness Practice
-    { id: 'present-moment', title: 'Present Moment', description: 'Be here now', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Mindfulness Practice' },
-    { id: 'body-awareness', title: 'Body Awareness', description: 'Connect with self', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Mindfulness Practice' },
-    { id: 'mindful-eating', title: 'Mindful Eating', description: 'Savor each bite', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Mindfulness Practice' },
-    { id: 'walking-meditation', title: 'Walking Meditation', description: 'Mindful movement', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Mindfulness Practice' },
+    { id: 'present-moment', title: 'Present Moment', description: 'Be here now', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Mindfulness Practice', type: 'Guided' },
+    { id: 'body-awareness', title: 'Body Awareness', description: 'Connect with self', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Mindfulness Practice', type: 'Guided' },
+    { id: 'mindful-eating', title: 'Mindful Eating', description: 'Savor each bite', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Mindfulness Practice', type: 'Guided' },
+    { id: 'walking-meditation', title: 'Walking Meditation', description: 'Mindful movement', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Mindfulness Practice', type: 'Guided' },
 
     // Breathing Exercises
-    { id: 'box-breathing', title: 'Box Breathing', description: '4-4-4-4 technique', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Breathing Exercises' },
-    { id: '478-breathing', title: '4-7-8 Breathing', description: 'Rapid relaxation', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Breathing Exercises' },
-    { id: 'alternate-nostril', title: 'Alternate Nostril', description: 'Balance energy', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Breathing Exercises' },
-    { id: 'diaphragmatic', title: 'Deep Belly Breathing', description: 'Full breath', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Breathing Exercises' },
+    { id: 'box-breathing', title: 'Box Breathing', description: '4-4-4-4 technique', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Breathing Exercises', type: 'Guided' },
+    { id: '478-breathing', title: '4-7-8 Breathing', description: 'Rapid relaxation', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Breathing Exercises', type: 'Guided' },
+    { id: 'alternate-nostril', title: 'Alternate Nostril', description: 'Balance energy', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Breathing Exercises', type: 'Guided' },
+    { id: 'diaphragmatic', title: 'Deep Belly Breathing', description: 'Full breath', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Breathing Exercises', type: 'Guided' },
   ];
 
   // Group experiences by category
@@ -221,9 +222,9 @@ const MeditatePage: React.FC = () => {
     <>
       <Header />
       <PageLayout hasHero={false}>
-        <div className="max-w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Page Header */}
-          <div className="mb-8 max-w-7xl mx-auto">
+          <div className="mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3 tracking-tight">
               Meditation
             </h1>
@@ -233,22 +234,31 @@ const MeditatePage: React.FC = () => {
           </div>
 
           {/* Categories with Horizontal Scrolling */}
-          {Object.entries(categorizedExperiences).map(([categoryName, experiences]) => (
-            <div key={categoryName} className="mb-10">
-              {/* Category Header */}
-              <div className="mb-4 max-w-7xl mx-auto">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                  {categoryName}
-                </h2>
-              </div>
+          {Object.entries(categorizedExperiences).map(([categoryName, experiences]) => {
+            const categoryType = experiences[0]?.type || 'Sound';
+            return (
+              <div key={categoryName} className="mb-10">
+                {/* Category Header with Type Badge */}
+                <div className="mb-4 flex items-center gap-3">
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                    {categoryName}
+                  </h2>
+                  <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                    categoryType === 'Sound'
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                      : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                  }`}>
+                    {categoryType === 'Sound' ? 'Sounds' : 'Expert Audio'}
+                  </span>
+                </div>
 
-              {/* Horizontal Scrollable Container */}
-              <div className="relative group">
-                <div
-                  id={`scroll-${categoryName.replace(/\s+/g, '-')}`}
-                  className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-6 lg:px-8"
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
+                {/* Horizontal Scrollable Container */}
+                <div className="relative group -mx-4 sm:-mx-6 lg:-mx-8">
+                  <div
+                    id={`scroll-${categoryName.replace(/\s+/g, '-')}`}
+                    className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-6 lg:px-8"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  >
                   {experiences.map((experience) => (
                     <div
                       key={experience.id}
@@ -309,7 +319,8 @@ const MeditatePage: React.FC = () => {
                 </button>
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
       </PageLayout>
       <Footer />
