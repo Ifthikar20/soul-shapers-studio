@@ -34,6 +34,19 @@ const MeditatePage: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([70]);
   const [isMuted, setIsMuted] = useState(false);
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+
+  // Autumn quotes that rotate every 5 minutes
+  const autumnQuotes = [
+    "Autumn carries more gold in its pocket than all the other seasons.",
+    "Every leaf speaks bliss to me, fluttering from the autumn tree.",
+    "Life starts all over again when it gets crisp in the fall.",
+    "Autumn is a second spring when every leaf is a flower.",
+    "The tints of autumn...a mighty flower garden blossoming under the spell of the enchanter, frost.",
+    "Autumn shows us how beautiful it is to let things go.",
+    "Notice that autumn is more the season of the soul than of nature.",
+    "Fall has always been my favorite season. The time when everything bursts with its last beauty.",
+  ];
 
   const meditationExperiences: MeditationExperience[] = [
     {
@@ -75,6 +88,15 @@ const MeditatePage: React.FC = () => {
       videoRef.current.volume = isMuted ? 0 : volume[0] / 100;
     }
   }, [volume, isMuted]);
+
+  // Rotate quotes every 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % autumnQuotes.length);
+    }, 300000); // 5 minutes = 300000ms
+
+    return () => clearInterval(interval);
+  }, [autumnQuotes.length]);
 
   const handleSoundClick = (soundId: string) => {
     setSelectedSound(soundId);
@@ -137,7 +159,7 @@ const MeditatePage: React.FC = () => {
                 {/* Card Container */}
                 <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out transform hover:-translate-y-2">
                   {/* Image */}
-                  <div className="relative h-64 overflow-hidden">
+                  <div className="relative h-52 overflow-hidden">
                     <img
                       src={experience.imageUrl}
                       alt={experience.title}
@@ -180,16 +202,32 @@ const MeditatePage: React.FC = () => {
             ))}
           </div>
 
-          {/* Bottom Section */}
+          {/* Rotating Autumn Quotes */}
           <div className="mt-20 text-center">
-            <div className="inline-block p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-gray-700">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                Mindful Moments
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                Each meditation experience is designed to help you disconnect from stress
-                and reconnect with your inner peace through the beauty of nature.
-              </p>
+            <div className="max-w-3xl mx-auto">
+              <div className="relative">
+                <svg className="absolute -top-6 -left-6 w-12 h-12 text-gray-300 dark:text-gray-700 opacity-50" fill="currentColor" viewBox="0 0 32 32">
+                  <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                </svg>
+                <p className="text-2xl md:text-3xl font-light text-gray-800 dark:text-gray-200 italic px-12 leading-relaxed transition-all duration-1000">
+                  {autumnQuotes[currentQuoteIndex]}
+                </p>
+                <svg className="absolute -bottom-6 -right-6 w-12 h-12 text-gray-300 dark:text-gray-700 opacity-50 transform rotate-180" fill="currentColor" viewBox="0 0 32 32">
+                  <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                </svg>
+              </div>
+              <div className="mt-8 flex justify-center gap-2">
+                {autumnQuotes.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`h-1.5 rounded-full transition-all duration-500 ${
+                      index === currentQuoteIndex
+                        ? 'w-8 bg-gray-800 dark:bg-gray-200'
+                        : 'w-1.5 bg-gray-300 dark:bg-gray-700'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
