@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { analyticsService } from '@/services/analytics.service';
 import { progressService } from '@/services/progress.service';
 import { dummySeriesVideos } from '@/data/dummyVideos';
+import ContentProgressBar from '@/components/progress/ContentProgressBar';
 import {
   X, Plus, ThumbsUp, Share2, Check, Loader2, AlertCircle, ArrowLeft, RefreshCw,
   Clock, BookOpen, Hash, Heart, MessageCircle, List
@@ -32,6 +33,8 @@ const WatchPage = () => {
   const [seriesEpisodes, setSeriesEpisodes] = useState<Video[]>([]);
   const [isFavourite, setIsFavourite] = useState(false);
   const [watchStartTime, setWatchStartTime] = useState<Date | null>(null);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [videoDuration, setVideoDuration] = useState<number>(0);
 
   // Debug info
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -251,6 +254,23 @@ const WatchPage = () => {
     toast.success(isFavourite ? 'Removed from favourites' : 'Added to favourites');
   };
 
+  const handleVideoTimeUpdate = (time: number) => {
+    setCurrentTime(time);
+  };
+
+  const handleVideoDurationChange = (duration: number) => {
+    setVideoDuration(duration);
+  };
+
+  const handleContinueWatching = () => {
+    // Scroll to video player and resume playback
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (videoRef.current) {
+      // The video player will auto-resume from saved position
+      videoRef.current.play();
+    }
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -350,6 +370,8 @@ const WatchPage = () => {
                   poster={video.thumbnail}
                   className="w-full h-full"
                   autoPlay={true}
+                  onTimeUpdate={handleVideoTimeUpdate}
+                  onDurationChange={handleVideoDurationChange}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-black">
@@ -367,6 +389,16 @@ const WatchPage = () => {
       {/* Video Info */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-white mb-4">{video.title}</h1>
+
+        {/* Watch Progress Bar */}
+        <ContentProgressBar
+          contentId={video.id}
+          contentType="video"
+          currentTime={currentTime}
+          duration={videoDuration}
+          onContinue={handleContinueWatching}
+          className="mb-6"
+        />
 
         <div className="flex gap-2 mb-6">
           <Badge variant="outline" className="border-gray-700 text-gray-300 bg-gray-900/50">

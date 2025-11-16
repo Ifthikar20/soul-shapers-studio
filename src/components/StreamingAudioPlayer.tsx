@@ -23,6 +23,7 @@ export interface StreamingAudioPlayerProps {
   onEnded?: () => void;
   onError?: (error: Error) => void;
   onTimeUpdate?: (time: number) => void;
+  onDurationChange?: (duration: number) => void;
   className?: string;
   showMetadata?: boolean;
 }
@@ -35,6 +36,7 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
   onEnded,
   onError,
   onTimeUpdate,
+  onDurationChange,
   className = '',
   showMetadata = true,
 }) => {
@@ -231,6 +233,7 @@ export const StreamingAudioPlayer: React.FC<StreamingAudioPlayerProps> = ({
 
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
+      onDurationChange?.(audio.duration);
     };
 
     const handleVolumeChange = () => {
