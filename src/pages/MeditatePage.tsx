@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBreathDetection, BreathEvent } from '@/hooks/useBreathDetection';
 import { meditationService } from '@/services/meditation.service';
+import { progressService } from '@/services/progress.service';
 import { Play, Pause, StopCircle, Activity, Wind, TrendingUp, Loader2 } from 'lucide-react';
 
 const MeditatePage: React.FC = () => {
@@ -78,6 +79,15 @@ const MeditatePage: React.FC = () => {
         elapsedTime,
         breathDetection.breathCount
       );
+
+      // Track meditation session for progress/gamification
+      const durationMinutes = Math.round(elapsedTime / 60);
+      await progressService.trackActivity({
+        activityType: 'meditation_session',
+        durationMinutes: durationMinutes,
+      });
+
+      console.log('✅ Meditation session tracked:', durationMinutes, 'minutes');
 
       setIsActive(false);
       setSessionId(null);

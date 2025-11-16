@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { X, AlertCircle, Terminal, ChevronDown, ChevronUp } from 'lucide-react';
 import { StreamingAudioPlayer } from '../components/StreamingAudioPlayer';
 import { audioStreamingService } from '../services/audio.service';
+import { progressService } from '@/services/progress.service';
+import ContentProgressBar from '@/components/progress/ContentProgressBar';
 import plant1 from '../assets/plant1.png';
 
 // UUID validation regex
@@ -30,6 +32,7 @@ const SingleAudioPage = () => {
   const [audioData, setAudioData] = useState<any>(null);
   const [showPlantInfo, setShowPlantInfo] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
 
   // Check if ID exists or is not a valid UUID - redirect to 404
   if (!id || !UUID_REGEX.test(id)) {
@@ -57,8 +60,20 @@ const SingleAudioPage = () => {
     console.log('⏸️ Audio paused');
   };
 
-  const handleEnded = () => {
+  const handleEnded = async () => {
     console.log('✅ Audio ended');
+
+    // Track audio completion for progress/gamification
+    if (id && audioDuration > 0) {
+      const durationMinutes = Math.round(audioDuration / 60);
+      await progressService.trackActivity({
+        activityType: 'audio_completed',
+        contentId: id,
+        contentTitle: audioData?.title || 'Audio Session',
+        durationMinutes: durationMinutes,
+      });
+      console.log('✅ Audio completion tracked:', durationMinutes, 'minutes');
+    }
   };
 
   const handleError = (error: Error) => {
@@ -67,6 +82,15 @@ const SingleAudioPage = () => {
 
   const handleTimeUpdate = (time: number) => {
     setCurrentTime(time);
+  };
+
+  const handleDurationChange = (duration: number) => {
+    setAudioDuration(duration);
+  };
+
+  const handleContinueListening = () => {
+    // The audio player will auto-resume from saved position
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Get current transcript segment
@@ -151,8 +175,19 @@ const SingleAudioPage = () => {
                 onError={handleError}
                 showMetadata={false}
                 onTimeUpdate={handleTimeUpdate}
+                onDurationChange={handleDurationChange}
               />
             </div>
+
+            {/* Listen Progress Bar */}
+            <ContentProgressBar
+              contentId={id}
+              contentType="audio"
+              currentTime={currentTime}
+              duration={audioDuration}
+              onContinue={handleContinueListening}
+              className="mt-6"
+            />
 
             {/* Description Section */}
             {audioData?.description && (
