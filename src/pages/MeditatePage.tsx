@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import PageLayout from '@/components/Layout/PageLayout';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Import videos
 import waterflowVideo from '@/assets/waterflow-meditate.mp4';
@@ -48,112 +48,90 @@ const MeditatePage: React.FC = () => {
       "The cure for anything is salt water: sweat, tears, or the sea.",
       "Still waters run deep.",
     ],
-    'autumn-leaves': [
-      "Autumn carries more gold in its pocket than all the other seasons.",
-      "Every leaf speaks bliss to me, fluttering from the autumn tree.",
-      "Life starts all over again when it gets crisp in the fall.",
-      "Autumn is a second spring when every leaf is a flower.",
-      "The tints of autumn...a mighty flower garden blossoming under the spell of the enchanter, frost.",
-      "Autumn shows us how beautiful it is to let things go.",
-      "Notice that autumn is more the season of the soul than of nature.",
-      "Fall has always been my favorite season. The time when everything bursts with its last beauty.",
-    ],
-    'autumn-wind': [
-      "The wind shows us how close to the edge we are.",
-      "Notice how the wind carries everything before it with ease.",
-      "The answer is blowin' in the wind.",
-      "Clouds come floating into my life, no longer to carry rain but to add color to my sunset sky.",
-      "A great wind is blowing, and that gives you either imagination or a headache.",
-      "The wind whispers secrets to those who listen.",
-      "Let the wind carry you to new heights.",
-      "In the autumn breeze, nature speaks in whispers.",
-    ],
-    'ocean-waves': [
-      "The ocean stirs the heart, inspires the imagination and brings eternal joy to the soul.",
-      "The voice of the sea speaks to the soul.",
-      "The sea, once it casts its spell, holds one in its net of wonder forever.",
-      "To escape and sit quietly on the beach - that's my idea of paradise.",
-      "The ocean is everything I want to be. Beautiful, mysterious, wild and free.",
-      "The waves of the sea help me get back to me.",
-      "Live in the sunshine, swim the sea, drink the wild air.",
-      "The cure for anything is salt water: sweat, tears, or the sea.",
-    ],
-    'rain-forest': [
-      "In every walk with nature, one receives far more than he seeks.",
-      "Look deep into nature, and then you will understand everything better.",
-      "The clearest way into the Universe is through a forest wilderness.",
-      "Between every two pines is a doorway to a new world.",
-      "The forest makes your heart gentle. You become one with it.",
-      "A walk in nature walks the soul back home.",
-      "Nature does not hurry, yet everything is accomplished.",
-      "Adopt the pace of nature: her secret is patience.",
-    ],
-    'mountain-stream': [
-      "Mountains are the beginning and the end of all natural scenery.",
-      "Climb the mountains and get their good tidings.",
-      "The mountains are calling and I must go.",
-      "In every walk with nature, one receives far more than he seeks.",
-      "Going to the mountains is going home.",
-      "Mountains have a way of dealing with overconfidence.",
-      "The mountains are fountains of men as well as of rivers.",
-      "It is not the mountain we conquer, but ourselves.",
+    'default': [
+      "Peace comes from within. Do not seek it without.",
+      "The present moment is the only time over which we have dominion.",
+      "Meditation is not evasion; it is a serene encounter with reality.",
+      "In the midst of movement and chaos, keep stillness inside of you.",
+      "Quiet the mind and the soul will speak.",
+      "Meditation brings wisdom; lack of meditation leaves ignorance.",
+      "The thing about meditation is: You become more and more you.",
+      "Wherever you are, be there totally.",
     ],
   };
 
-  // Get quotes for the selected experience, or default to autumn leaves
-  const currentQuotes = selectedSound ? (experienceQuotes[selectedSound] || experienceQuotes['autumn-leaves']) : experienceQuotes['autumn-leaves'];
+  // Get quotes for the selected experience, or default
+  const currentQuotes = selectedSound ? (experienceQuotes[selectedSound] || experienceQuotes['default']) : experienceQuotes['default'];
 
   const meditationExperiences: MeditationExperience[] = [
     // Sounds of Nature
-    {
-      id: 'waterflow',
-      title: 'Waterfall Meditation',
-      description: 'Let the gentle cascade of water wash away your worries',
-      videoUrl: waterflowVideo,
-      imageUrl: waterfallImage,
-      category: 'Sounds of Nature',
-    },
-    {
-      id: 'ocean-waves',
-      title: 'Ocean Waves',
-      description: 'Experience the rhythmic peace of ocean waves at sunset',
-      videoUrl: autumnLeavesVideo, // Placeholder
-      imageUrl: autumnLeavesImage, // Placeholder
-      category: 'Sounds of Nature',
-    },
-    {
-      id: 'rain-forest',
-      title: 'Rain Forest',
-      description: 'Immerse yourself in the peaceful sounds of a tropical rainforest',
-      videoUrl: autumnWindVideo, // Placeholder
-      imageUrl: autumnWindImage, // Placeholder
-      category: 'Sounds of Nature',
-    },
-    {
-      id: 'mountain-stream',
-      title: 'Mountain Stream',
-      description: 'Find serenity in the gentle flow of a mountain stream',
-      videoUrl: waterflowVideo, // Placeholder
-      imageUrl: waterfallImage, // Placeholder
-      category: 'Sounds of Nature',
-    },
+    { id: 'waterflow', title: 'Waterfall Meditation', description: 'Gentle cascade of water', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sounds of Nature' },
+    { id: 'ocean-waves', title: 'Ocean Waves', description: 'Rhythmic peace of ocean', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sounds of Nature' },
+    { id: 'rain-forest', title: 'Rain Forest', description: 'Tropical rainforest sounds', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sounds of Nature' },
+    { id: 'mountain-stream', title: 'Mountain Stream', description: 'Gentle mountain flow', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sounds of Nature' },
+    { id: 'thunder-rain', title: 'Thunder & Rain', description: 'Powerful storm ambience', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sounds of Nature' },
+    { id: 'bird-songs', title: 'Morning Birds', description: 'Peaceful bird chirping', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sounds of Nature' },
+
     // Seasonal Meditations
-    {
-      id: 'autumn-leaves',
-      title: 'Autumn Leaves',
-      description: 'Watch leaves dance gracefully in the autumn breeze',
-      videoUrl: autumnLeavesVideo,
-      imageUrl: autumnLeavesImage,
-      category: 'Seasonal Meditations',
-    },
-    {
-      id: 'autumn-wind',
-      title: 'Autumn Wind',
-      description: 'Feel the crisp autumn air and gentle rustling of trees',
-      videoUrl: autumnWindVideo,
-      imageUrl: autumnWindImage,
-      category: 'Seasonal Meditations',
-    },
+    { id: 'autumn-leaves', title: 'Autumn Leaves', description: 'Leaves dancing in breeze', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Seasonal Meditations' },
+    { id: 'autumn-wind', title: 'Autumn Wind', description: 'Crisp autumn air', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Seasonal Meditations' },
+    { id: 'winter-snow', title: 'Winter Snowfall', description: 'Peaceful falling snow', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Seasonal Meditations' },
+    { id: 'spring-garden', title: 'Spring Garden', description: 'Blooming flowers', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Seasonal Meditations' },
+    { id: 'summer-meadow', title: 'Summer Meadow', description: 'Warm sunny fields', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Seasonal Meditations' },
+
+    // Guided Meditation for Professionals
+    { id: 'focus-boost', title: 'Focus Boost', description: 'Enhance concentration', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Guided Meditation for Professionals' },
+    { id: 'stress-release', title: 'Stress Release', description: 'Let go of tension', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Guided Meditation for Professionals' },
+    { id: 'decision-clarity', title: 'Decision Clarity', description: 'Clear mind guidance', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Guided Meditation for Professionals' },
+    { id: 'leadership-mindset', title: 'Leadership Mindset', description: 'Executive presence', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Guided Meditation for Professionals' },
+    { id: 'creativity-flow', title: 'Creativity Flow', description: 'Unlock innovation', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Guided Meditation for Professionals' },
+    { id: 'work-life-balance', title: 'Work-Life Balance', description: 'Find equilibrium', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Guided Meditation for Professionals' },
+
+    // Sleep & Relaxation
+    { id: 'deep-sleep', title: 'Deep Sleep', description: 'Drift into slumber', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sleep & Relaxation' },
+    { id: 'insomnia-relief', title: 'Insomnia Relief', description: 'Overcome sleeplessness', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sleep & Relaxation' },
+    { id: 'bedtime-story', title: 'Bedtime Journey', description: 'Guided sleep story', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Sleep & Relaxation' },
+    { id: 'power-nap', title: 'Power Nap', description: '20-minute refresh', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Sleep & Relaxation' },
+    { id: 'evening-unwind', title: 'Evening Unwind', description: 'Release the day', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Sleep & Relaxation' },
+
+    // Focus & Concentration
+    { id: 'study-focus', title: 'Study Focus', description: 'Academic concentration', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Focus & Concentration' },
+    { id: 'work-productivity', title: 'Work Productivity', description: 'Peak performance', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Focus & Concentration' },
+    { id: 'exam-preparation', title: 'Exam Preparation', description: 'Calm test anxiety', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Focus & Concentration' },
+    { id: 'deep-work', title: 'Deep Work', description: 'Eliminate distractions', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Focus & Concentration' },
+    { id: 'memory-boost', title: 'Memory Boost', description: 'Enhance recall', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Focus & Concentration' },
+
+    // Stress Relief
+    { id: 'anxiety-calm', title: 'Anxiety Calm', description: 'Soothe worried mind', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Stress Relief' },
+    { id: 'panic-relief', title: 'Panic Relief', description: 'Ground yourself', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Stress Relief' },
+    { id: 'tension-release', title: 'Tension Release', description: 'Body scan relaxation', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Stress Relief' },
+    { id: 'overwhelm-support', title: 'Overwhelm Support', description: 'Find your center', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Stress Relief' },
+    { id: 'burnout-recovery', title: 'Burnout Recovery', description: 'Restore energy', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Stress Relief' },
+
+    // Morning Meditations
+    { id: 'morning-energy', title: 'Morning Energy', description: 'Start day right', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Morning Meditations' },
+    { id: 'gratitude-practice', title: 'Gratitude Practice', description: 'Count blessings', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Morning Meditations' },
+    { id: 'intention-setting', title: 'Intention Setting', description: 'Define your day', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Morning Meditations' },
+    { id: 'sunrise-meditation', title: 'Sunrise Meditation', description: 'Greet the dawn', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Morning Meditations' },
+    { id: 'positive-affirmations', title: 'Positive Affirmations', description: 'Build confidence', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Morning Meditations' },
+
+    // Evening Wind Down
+    { id: 'sunset-reflection', title: 'Sunset Reflection', description: 'Day's end peace', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Evening Wind Down' },
+    { id: 'gratitude-evening', title: 'Evening Gratitude', description: 'Reflect with thanks', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Evening Wind Down' },
+    { id: 'letting-go', title: 'Letting Go', description: 'Release the day', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Evening Wind Down' },
+    { id: 'night-peace', title: 'Night Peace', description: 'Prepare for rest', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Evening Wind Down' },
+
+    // Mindfulness Practice
+    { id: 'present-moment', title: 'Present Moment', description: 'Be here now', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Mindfulness Practice' },
+    { id: 'body-awareness', title: 'Body Awareness', description: 'Connect with self', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Mindfulness Practice' },
+    { id: 'mindful-eating', title: 'Mindful Eating', description: 'Savor each bite', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Mindfulness Practice' },
+    { id: 'walking-meditation', title: 'Walking Meditation', description: 'Mindful movement', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Mindfulness Practice' },
+
+    // Breathing Exercises
+    { id: 'box-breathing', title: 'Box Breathing', description: '4-4-4-4 technique', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Breathing Exercises' },
+    { id: '478-breathing', title: '4-7-8 Breathing', description: 'Rapid relaxation', videoUrl: autumnWindVideo, imageUrl: autumnWindImage, category: 'Breathing Exercises' },
+    { id: 'alternate-nostril', title: 'Alternate Nostril', description: 'Balance energy', videoUrl: waterflowVideo, imageUrl: waterfallImage, category: 'Breathing Exercises' },
+    { id: 'diaphragmatic', title: 'Deep Belly Breathing', description: 'Full breath', videoUrl: autumnLeavesVideo, imageUrl: autumnLeavesImage, category: 'Breathing Exercises' },
   ];
 
   // Group experiences by category
@@ -183,7 +161,7 @@ const MeditatePage: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % currentQuotes.length);
-    }, 300000); // 5 minutes = 300000ms
+    }, 300000);
 
     return () => clearInterval(interval);
   }, [currentQuotes.length]);
@@ -228,76 +206,107 @@ const MeditatePage: React.FC = () => {
     setIsPlaying(false);
   };
 
+  const scrollContainer = (categoryId: string, direction: 'left' | 'right') => {
+    const container = document.getElementById(`scroll-${categoryId}`);
+    if (container) {
+      const scrollAmount = 400;
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <>
       <Header />
       <PageLayout hasHero={false}>
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-full px-4 sm:px-6 lg:px-8 py-8">
           {/* Page Header */}
-          <div className="mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
+          <div className="mb-8 max-w-7xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3 tracking-tight">
               Meditation
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl">
+            <p className="text-lg text-gray-600 dark:text-gray-400">
               Find your calm. Choose an experience and let nature guide you to peace.
             </p>
           </div>
 
-          {/* Categories with Experiences */}
+          {/* Categories with Horizontal Scrolling */}
           {Object.entries(categorizedExperiences).map(([categoryName, experiences]) => (
-            <div key={categoryName} className="mb-16">
+            <div key={categoryName} className="mb-10">
               {/* Category Header */}
-              <div className="mb-6">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+              <div className="mb-4 max-w-7xl mx-auto">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                   {categoryName}
                 </h2>
               </div>
 
-              {/* Category Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {experiences.map((experience) => (
-                  <div
-                    key={experience.id}
-                    onClick={() => handleSoundClick(experience.id)}
-                    className="group relative cursor-pointer"
-                  >
-                    {/* Card Container */}
-                    <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out transform hover:-translate-y-2">
-                      {/* Image */}
-                      <div className="relative h-44 overflow-hidden">
-                        <img
-                          src={experience.imageUrl}
-                          alt={experience.title}
-                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                        />
+              {/* Horizontal Scrollable Container */}
+              <div className="relative group">
+                <div
+                  id={`scroll-${categoryName.replace(/\s+/g, '-')}`}
+                  className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-6 lg:px-8"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {experiences.map((experience) => (
+                    <div
+                      key={experience.id}
+                      onClick={() => handleSoundClick(experience.id)}
+                      className="flex-shrink-0 w-64 cursor-pointer group/card"
+                    >
+                      {/* Card Container */}
+                      <div className="relative overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        {/* Image */}
+                        <div className="relative h-36 overflow-hidden">
+                          <img
+                            src={experience.imageUrl}
+                            alt={experience.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-105"
+                          />
 
-                        {/* Gradient Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                          {/* Gradient Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                        {/* Play Button Overlay */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform duration-300">
-                            <Play className="w-7 h-7 text-gray-900 ml-0.5" fill="currentColor" />
+                          {/* Play Button Overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
+                            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-xl">
+                              <Play className="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" />
+                            </div>
+                          </div>
+
+                          {/* Title Overlay */}
+                          <div className="absolute bottom-0 left-0 right-0 p-3">
+                            <h3 className="text-sm font-bold text-white line-clamp-1">
+                              {experience.title}
+                            </h3>
                           </div>
                         </div>
 
-                        {/* Title Overlay on Image */}
-                        <div className="absolute bottom-0 left-0 right-0 p-5">
-                          <h3 className="text-xl font-bold text-white">
-                            {experience.title}
-                          </h3>
+                        {/* Card Content */}
+                        <div className="p-3">
+                          <p className="text-gray-600 dark:text-gray-400 text-xs leading-relaxed line-clamp-2">
+                            {experience.description}
+                          </p>
                         </div>
                       </div>
-
-                      {/* Card Content */}
-                      <div className="p-5">
-                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                          {experience.description}
-                        </p>
-                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                {/* Scroll Buttons */}
+                <button
+                  onClick={() => scrollContainer(categoryName.replace(/\s+/g, '-'), 'left')}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 z-10"
+                >
+                  <ChevronLeft className="w-5 h-5 text-gray-900 dark:text-white" />
+                </button>
+                <button
+                  onClick={() => scrollContainer(categoryName.replace(/\s+/g, '-'), 'right')}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 z-10"
+                >
+                  <ChevronRight className="w-5 h-5 text-gray-900 dark:text-white" />
+                </button>
               </div>
             </div>
           ))}
@@ -344,7 +353,7 @@ const MeditatePage: React.FC = () => {
                 {selectedExperience.description}
               </p>
 
-              {/* Rotating Autumn Quote */}
+              {/* Rotating Quote */}
               <div className="mb-12 max-w-2xl mx-auto px-6">
                 <div className="relative">
                   <svg className="absolute -top-4 -left-2 w-8 h-8 text-white/20" fill="currentColor" viewBox="0 0 32 32">
