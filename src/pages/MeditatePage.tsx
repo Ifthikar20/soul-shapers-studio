@@ -1,253 +1,161 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageLayout from '@/components/Layout/PageLayout';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
-import { useBreathDetection, BreathEvent } from '@/hooks/useBreathDetection';
-import { meditationService } from '@/services/meditation.service';
-import { progressService } from '@/services/progress.service';
-import { Play, Pause, StopCircle, Activity, Wind, TrendingUp, Loader2 } from 'lucide-react';
+import { Waves, Wind, Droplets, Leaf, Music, Sparkles } from 'lucide-react';
+
+interface CalmingSoundCard {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  gradient: string;
+  iconColor: string;
+}
 
 const MeditatePage: React.FC = () => {
-  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [isActive, setIsActive] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [startTime, setStartTime] = useState<number>(0);
-  const [latestBreathEvent, setLatestBreathEvent] = useState<BreathEvent | null>(null);
-  const [consistency, setConsistency] = useState<boolean | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const breathDetection = useBreathDetection({
-    sessionId: sessionId || '',
-    userId: user?.id || '',
-    targetBreathDuration: 4,
-    onBreathEvent: (event) => {
-      setLatestBreathEvent(event);
-      if (event.is_consistent !== undefined) {
-        setConsistency(event.is_consistent);
-      }
+  const calmingSounds: CalmingSoundCard[] = [
+    {
+      id: 'ocean-waves',
+      title: 'Ocean Waves',
+      description: 'Gentle waves lapping against the shore, bringing peace and tranquility',
+      icon: <Waves className="w-12 h-12" />,
+      gradient: 'from-blue-500 to-cyan-500',
+      iconColor: 'text-blue-100',
     },
-    onCalibrated: () => console.log('Calibration complete!'),
-    onError: (err) => setError(err.message),
-  });
+    {
+      id: 'flowing-river',
+      title: 'Flowing River',
+      description: 'The soothing sound of a river flowing through nature',
+      icon: <Droplets className="w-12 h-12" />,
+      gradient: 'from-teal-500 to-emerald-500',
+      iconColor: 'text-teal-100',
+    },
+    {
+      id: 'forest-stream',
+      title: 'Forest Stream',
+      description: 'Water trickling over rocks in a peaceful forest setting',
+      icon: <Sparkles className="w-12 h-12" />,
+      gradient: 'from-green-500 to-teal-500',
+      iconColor: 'text-green-100',
+    },
+    {
+      id: 'rain-sounds',
+      title: 'Gentle Rain',
+      description: 'Soft rainfall creating a calming, meditative atmosphere',
+      icon: <Wind className="w-12 h-12" />,
+      gradient: 'from-slate-500 to-blue-500',
+      iconColor: 'text-slate-100',
+    },
+    {
+      id: 'plants-germinating',
+      title: 'Plants Germinating',
+      description: 'The subtle sounds of life emerging and growing',
+      icon: <Leaf className="w-12 h-12" />,
+      gradient: 'from-lime-500 to-green-500',
+      iconColor: 'text-lime-100',
+    },
+    {
+      id: 'nature-ambience',
+      title: 'Nature Ambience',
+      description: 'A blend of natural sounds for deep relaxation',
+      icon: <Music className="w-12 h-12" />,
+      gradient: 'from-purple-500 to-pink-500',
+      iconColor: 'text-purple-100',
+    },
+  ];
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isActive && !isPaused) {
-      interval = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isActive, isPaused, startTime]);
-
-  const handleStart = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const session = await meditationService.startSession('free_practice', 4);
-      setSessionId(session.session_id);
-      setStartTime(Date.now());
-      setIsActive(true);
-
-      await breathDetection.connect();
-      await breathDetection.startAudioCapture();
-
-      setIsLoading(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to start meditation');
-      setIsLoading(false);
-    }
+  const handleSoundClick = (soundId: string) => {
+    // Navigate to a placeholder page - will be implemented later
+    navigate(`/meditate/${soundId}`);
   };
-
-  const handleStop = async () => {
-    try {
-      if (!sessionId) return;
-
-      breathDetection.stopAudioCapture();
-      breathDetection.disconnect();
-
-      await meditationService.completeSession(
-        sessionId,
-        elapsedTime,
-        breathDetection.breathCount
-      );
-
-      // Track meditation session for progress/gamification
-      const durationMinutes = Math.round(elapsedTime / 60);
-      await progressService.trackActivity({
-        activityType: 'meditation_session',
-        durationMinutes: durationMinutes,
-      });
-
-      console.log('✅ Meditation session tracked:', durationMinutes, 'minutes');
-
-      setIsActive(false);
-      setSessionId(null);
-      setElapsedTime(0);
-      setLatestBreathEvent(null);
-    } catch (err: any) {
-      setError(err.message || 'Failed to stop meditation');
-    }
-  };
-
-  const handlePause = () => setIsPaused(!isPaused);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getBreathCircleStyle = () => {
-    if (!isActive || !latestBreathEvent) {
-      return { scale: 0.5, color: 'bg-gray-300 dark:bg-gray-700', text: 'Ready' };
-    }
-
-    switch (latestBreathEvent.phase) {
-      case 'inhaling':
-        return { scale: 1.0, color: 'bg-blue-400', text: 'Breathe In' };
-      case 'exhaling':
-        return { scale: 0.5, color: 'bg-green-400', text: 'Breathe Out' };
-      case 'holding':
-        return { scale: 1.0, color: 'bg-purple-400', text: 'Hold' };
-      default:
-        return { scale: 0.5, color: 'bg-gray-300 dark:bg-gray-700', text: 'Idle' };
-    }
-  };
-
-  const circleStyle = getBreathCircleStyle();
 
   return (
     <>
       <Header />
       <PageLayout hasHero={false}>
-        <div className="max-w-4xl mx-auto py-12 px-4">
+        <div className="max-w-7xl mx-auto py-12 px-4">
+          {/* Page Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Live Meditation
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              Calming Sounds
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              Real-time breath guidance for mindful meditation
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Immerse yourself in the soothing sounds of nature. Choose from our collection
+              of calming audio experiences designed to help you relax and find inner peace.
             </p>
           </div>
 
-          {error && (
-            <Card className="p-4 mb-6 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-              <p className="text-red-800 dark:text-red-200">{error}</p>
-            </Card>
-          )}
-
-          {isActive && breathDetection.isCalibrating && (
-            <Card className="p-4 mb-6 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
-              <p className="text-yellow-800 dark:text-yellow-200 text-center">
-                🎯 Calibrating... Breathe naturally for the first 10 breaths
-              </p>
-            </Card>
-          )}
-
-          <div className="flex justify-center mb-12">
-            <div className="relative w-64 h-64">
-              <div
-                className={`absolute inset-0 rounded-full ${circleStyle.color} transition-all duration-1000 ease-in-out flex items-center justify-center shadow-lg`}
-                style={{
-                  transform: `scale(${circleStyle.scale})`,
-                  opacity: isActive ? 0.8 : 0.3,
-                }}
+          {/* Calming Sounds Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {calmingSounds.map((sound) => (
+              <Card
+                key={sound.id}
+                onClick={() => handleSoundClick(sound.id)}
+                className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
               >
-                <span className="text-white text-2xl font-semibold">
-                  {circleStyle.text}
-                </span>
-              </div>
+                {/* Gradient Background */}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${sound.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+                />
 
-              {isActive && latestBreathEvent?.phase === 'inhaling' && (
-                <div className="absolute inset-0 rounded-full bg-blue-300 animate-ping opacity-20" />
-              )}
-            </div>
+                {/* Card Content */}
+                <div className="relative p-8">
+                  {/* Icon Container */}
+                  <div
+                    className={`mb-6 w-20 h-20 rounded-full bg-gradient-to-br ${sound.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    <div className={sound.iconColor}>{sound.icon}</div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-pink-500 transition-all duration-300">
+                    {sound.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {sound.description}
+                  </p>
+
+                  {/* Hover Indicator */}
+                  <div className="mt-6 flex items-center text-sm font-medium text-gray-500 dark:text-gray-500 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors duration-300">
+                    <span>Click to listen</span>
+                    <svg
+                      className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
 
-          {isActive && (
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              <Card className="p-6 text-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
-                <Wind className="w-6 h-6 mx-auto mb-2 text-blue-600 dark:text-blue-400" />
-                <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
-                  {breathDetection.breathCount}
-                </div>
-                <div className="text-sm text-blue-700 dark:text-blue-300">Breaths</div>
-              </Card>
-
-              <Card className="p-6 text-center bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
-                <Activity className="w-6 h-6 mx-auto mb-2 text-purple-600 dark:text-purple-400" />
-                <div className="text-3xl font-bold text-purple-900 dark:text-purple-100">
-                  {formatTime(elapsedTime)}
-                </div>
-                <div className="text-sm text-purple-700 dark:text-purple-300">Time</div>
-              </Card>
-
-              <Card className="p-6 text-center bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
-                <TrendingUp className="w-6 h-6 mx-auto mb-2 text-green-600 dark:text-green-400" />
-                <div className="text-3xl font-bold text-green-900 dark:text-green-100">
-                  {Math.round(breathDetection.confidence * 100)}%
-                </div>
-                <div className="text-sm text-green-700 dark:text-green-300">Confidence</div>
-              </Card>
-            </div>
-          )}
-
-          {isActive && !breathDetection.isCalibrating && consistency !== null && (
-            <Card
-              className={`p-4 mb-8 text-center ${
-                consistency
-                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                  : 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
-              }`}
-            >
-              <p className={consistency ? 'text-green-800 dark:text-green-200' : 'text-orange-800 dark:text-orange-200'}>
-                {consistency ? '✨ Great! Your breathing is consistent' : '🎯 Try to maintain a steady rhythm'}
+          {/* Additional Info Section */}
+          <div className="mt-16 text-center">
+            <Card className="p-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Benefits of Sound Meditation
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+                Natural sounds have been proven to reduce stress, lower blood pressure, and improve
+                overall mental well-being. Take a moment each day to immerse yourself in these
+                calming soundscapes and experience deep relaxation.
               </p>
             </Card>
-          )}
-
-          <div className="flex justify-center gap-4">
-            {!isActive ? (
-              <Button
-                size="lg"
-                onClick={handleStart}
-                disabled={isLoading}
-                className="px-8 py-6 text-lg bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-6 h-6 mr-2 animate-spin" />
-                    Starting...
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-6 h-6 mr-2" />
-                    Start Meditation
-                  </>
-                )}
-              </Button>
-            ) : (
-              <>
-                <Button size="lg" variant="outline" onClick={handlePause} className="px-6 py-6">
-                  <Pause className="w-5 h-5 mr-2" />
-                  {isPaused ? 'Resume' : 'Pause'}
-                </Button>
-
-                <Button size="lg" variant="destructive" onClick={handleStop} className="px-6 py-6">
-                  <StopCircle className="w-5 h-5 mr-2" />
-                  Stop
-                </Button>
-              </>
-            )}
           </div>
         </div>
       </PageLayout>
