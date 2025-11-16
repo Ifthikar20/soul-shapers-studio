@@ -22,7 +22,7 @@ const MeditatePage: React.FC = () => {
     {
       id: 'ocean-waves',
       title: 'Ocean Waves',
-      description: 'Gentle waves lapping against the shore, bringing peace and tranquility',
+      description: 'Immerse yourself in sunset waves gently lapping against golden shores',
       icon: <Waves className="w-12 h-12" />,
       gradient: 'from-blue-500 to-cyan-500',
       iconColor: 'text-blue-100',
@@ -30,7 +30,7 @@ const MeditatePage: React.FC = () => {
     {
       id: 'flowing-river',
       title: 'Flowing River',
-      description: 'The soothing sound of a river flowing through nature',
+      description: 'Experience the peaceful flow of a crystal-clear river through nature',
       icon: <Droplets className="w-12 h-12" />,
       gradient: 'from-teal-500 to-emerald-500',
       iconColor: 'text-teal-100',
@@ -38,7 +38,7 @@ const MeditatePage: React.FC = () => {
     {
       id: 'forest-stream',
       title: 'Forest Stream',
-      description: 'Water trickling over rocks in a peaceful forest setting',
+      description: 'Lose yourself in the gentle sounds of water cascading over forest rocks',
       icon: <Sparkles className="w-12 h-12" />,
       gradient: 'from-green-500 to-teal-500',
       iconColor: 'text-green-100',
@@ -46,7 +46,7 @@ const MeditatePage: React.FC = () => {
     {
       id: 'rain-sounds',
       title: 'Gentle Rain',
-      description: 'Soft rainfall creating a calming, meditative atmosphere',
+      description: 'Let soft rainfall wash away your stress in this calming scene',
       icon: <Wind className="w-12 h-12" />,
       gradient: 'from-slate-500 to-blue-500',
       iconColor: 'text-slate-100',
@@ -54,7 +54,7 @@ const MeditatePage: React.FC = () => {
     {
       id: 'plants-germinating',
       title: 'Plants Germinating',
-      description: 'The subtle sounds of life emerging and growing',
+      description: 'Witness the quiet beauty and wonder of life emerging and growing',
       icon: <Leaf className="w-12 h-12" />,
       gradient: 'from-lime-500 to-green-500',
       iconColor: 'text-lime-100',
@@ -62,7 +62,7 @@ const MeditatePage: React.FC = () => {
     {
       id: 'nature-ambience',
       title: 'Nature Ambience',
-      description: 'A blend of natural sounds for deep relaxation',
+      description: 'A harmonious blend of natural scenes for profound relaxation',
       icon: <Music className="w-12 h-12" />,
       gradient: 'from-purple-500 to-pink-500',
       iconColor: 'text-purple-100',
@@ -82,11 +82,11 @@ const MeditatePage: React.FC = () => {
           {/* Page Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Calming Sounds
+              Immersive Meditation
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Immerse yourself in the soothing sounds of nature. Choose from our collection
-              of calming audio experiences designed to help you relax and find inner peace.
+              Escape into beautiful, calming scenes from nature. Each experience features
+              a fullscreen video with ambient sounds to help you relax and find inner peace.
             </p>
           </div>
 
@@ -124,7 +124,7 @@ const MeditatePage: React.FC = () => {
 
                   {/* Hover Indicator */}
                   <div className="mt-6 flex items-center text-sm font-medium text-gray-500 dark:text-gray-500 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors duration-300">
-                    <span>Click to listen</span>
+                    <span>Click to experience</span>
                     <svg
                       className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300"
                       fill="none"
@@ -148,12 +148,13 @@ const MeditatePage: React.FC = () => {
           <div className="mt-16 text-center">
             <Card className="p-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Benefits of Sound Meditation
+                Immersive Video Meditation
               </h2>
               <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-                Natural sounds have been proven to reduce stress, lower blood pressure, and improve
-                overall mental well-being. Take a moment each day to immerse yourself in these
-                calming soundscapes and experience deep relaxation.
+                Each experience takes you on a visual journey with beautiful nature scenes and ambient sounds.
+                The fullscreen video creates an immersive environment that helps you disconnect from stress
+                and reconnect with peace. Simply click, press play, and let the calming visuals and sounds
+                wash over you.
               </p>
             </Card>
           </div>
