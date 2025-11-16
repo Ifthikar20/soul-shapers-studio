@@ -3,20 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageLayout from '@/components/Layout/PageLayout';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Waves, Wind, Droplets, Leaf, Music, Sparkles, Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
-import waterflowVideo from '@/assets/waterflow-meditate.mp4';
-import waterfallImage from '@/assets/waterfall-meditate-img.jpg';
+import { Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
 
-interface CalmingSoundCard {
+// Import videos
+import waterflowVideo from '@/assets/waterflow-meditate.mp4';
+import autumnLeavesVideo from '@/assets/autumn-leaves-meditate.mp4';
+import autumnWindVideo from '@/assets/autumn-wind-meditate.mp4';
+
+// Import images
+import waterfallImage from '@/assets/waterfall-meditate-img.jpg';
+import autumnLeavesImage from '@/assets/autumn-leaves-meditate.jpg';
+import autumnWindImage from '@/assets/autumn-wind-img.jpg';
+
+interface MeditationExperience {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
-  gradient: string;
-  iconColor: string;
+  videoUrl: string;
+  imageUrl: string;
+  category: string;
 }
 
 const MeditatePage: React.FC = () => {
@@ -28,58 +35,34 @@ const MeditatePage: React.FC = () => {
   const [volume, setVolume] = useState([70]);
   const [isMuted, setIsMuted] = useState(false);
 
-  const calmingSounds: CalmingSoundCard[] = [
+  const meditationExperiences: MeditationExperience[] = [
     {
-      id: 'ocean-waves',
-      title: 'Ocean Waves',
-      description: 'Immerse yourself in sunset waves gently lapping against golden shores',
-      icon: <Waves className="w-12 h-12" />,
-      gradient: 'from-blue-500 to-cyan-500',
-      iconColor: 'text-blue-100',
+      id: 'waterflow',
+      title: 'Waterfall Meditation',
+      description: 'Let the gentle cascade of water wash away your worries',
+      videoUrl: waterflowVideo,
+      imageUrl: waterfallImage,
+      category: 'Water',
     },
     {
-      id: 'flowing-river',
-      title: 'Flowing River',
-      description: 'Experience the peaceful flow of a crystal-clear river through nature',
-      icon: <Droplets className="w-12 h-12" />,
-      gradient: 'from-teal-500 to-emerald-500',
-      iconColor: 'text-teal-100',
+      id: 'autumn-leaves',
+      title: 'Autumn Leaves',
+      description: 'Watch leaves dance gracefully in the autumn breeze',
+      videoUrl: autumnLeavesVideo,
+      imageUrl: autumnLeavesImage,
+      category: 'Nature',
     },
     {
-      id: 'forest-stream',
-      title: 'Forest Stream',
-      description: 'Lose yourself in the gentle sounds of water cascading over forest rocks',
-      icon: <Sparkles className="w-12 h-12" />,
-      gradient: 'from-green-500 to-teal-500',
-      iconColor: 'text-green-100',
-    },
-    {
-      id: 'rain-sounds',
-      title: 'Gentle Rain',
-      description: 'Let soft rainfall wash away your stress in this calming scene',
-      icon: <Wind className="w-12 h-12" />,
-      gradient: 'from-slate-500 to-blue-500',
-      iconColor: 'text-slate-100',
-    },
-    {
-      id: 'plants-germinating',
-      title: 'Plants Germinating',
-      description: 'Witness the quiet beauty and wonder of life emerging and growing',
-      icon: <Leaf className="w-12 h-12" />,
-      gradient: 'from-lime-500 to-green-500',
-      iconColor: 'text-lime-100',
-    },
-    {
-      id: 'nature-ambience',
-      title: 'Nature Ambience',
-      description: 'A harmonious blend of natural scenes for profound relaxation',
-      icon: <Music className="w-12 h-12" />,
-      gradient: 'from-purple-500 to-pink-500',
-      iconColor: 'text-purple-100',
+      id: 'autumn-wind',
+      title: 'Autumn Wind',
+      description: 'Feel the crisp autumn air and gentle rustling of trees',
+      videoUrl: autumnWindVideo,
+      imageUrl: autumnWindImage,
+      category: 'Nature',
     },
   ];
 
-  const selectedSoundData = calmingSounds.find(s => s.id === selectedSound);
+  const selectedExperience = meditationExperiences.find(e => e.id === selectedSound);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -132,103 +115,89 @@ const MeditatePage: React.FC = () => {
     <>
       <Header />
       <PageLayout hasHero={false}>
-        <div className="max-w-7xl mx-auto py-12 px-4">
+        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Immersive Meditation
+          <div className="mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
+              Meditation
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Escape into beautiful, calming scenes from nature. Each experience features
-              a fullscreen video with ambient sounds to help you relax and find inner peace.
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl">
+              Find your calm. Choose an experience and let nature guide you to peace.
             </p>
           </div>
 
-          {/* Calming Sounds Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {calmingSounds.map((sound) => (
-              <Card
-                key={sound.id}
-                onClick={() => handleSoundClick(sound.id)}
-                className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+          {/* Meditation Experiences Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {meditationExperiences.map((experience) => (
+              <div
+                key={experience.id}
+                onClick={() => handleSoundClick(experience.id)}
+                className="group relative cursor-pointer"
               >
-                {/* Image Preview */}
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={waterfallImage}
-                    alt={sound.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
+                {/* Card Container */}
+                <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out transform hover:-translate-y-2">
+                  {/* Image */}
+                  <div className="relative h-64 overflow-hidden">
+                    <img
+                      src={experience.imageUrl}
+                      alt={experience.title}
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
 
-                  {/* Play Icon Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
-                    <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                      <Play className="w-8 h-8 text-gray-900 ml-1" fill="currentColor" />
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                    {/* Category Badge */}
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1 text-xs font-medium tracking-wide uppercase bg-white/90 text-gray-900 rounded-full backdrop-blur-sm">
+                        {experience.category}
+                      </span>
+                    </div>
+
+                    {/* Play Button Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform duration-300">
+                        <Play className="w-7 h-7 text-gray-900 ml-0.5" fill="currentColor" />
+                      </div>
+                    </div>
+
+                    {/* Title Overlay on Image */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        {experience.title}
+                      </h3>
                     </div>
                   </div>
-                </div>
 
-                {/* Card Content */}
-                <div className="relative p-6">
-                  {/* Icon Container */}
-                  <div
-                    className={`mb-4 w-16 h-16 rounded-full bg-gradient-to-br ${sound.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
-                  >
-                    <div className={sound.iconColor}>{sound.icon}</div>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-pink-500 transition-all duration-300">
-                    {sound.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                    {sound.description}
-                  </p>
-
-                  {/* Hover Indicator */}
-                  <div className="mt-4 flex items-center text-sm font-medium text-gray-500 dark:text-gray-500 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors duration-300">
-                    <span>Click to experience</span>
-                    <svg
-                      className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                  {/* Card Content */}
+                  <div className="p-6">
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {experience.description}
+                    </p>
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
 
-          {/* Additional Info Section */}
-          <div className="mt-16 text-center">
-            <Card className="p-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Immersive Video Meditation
+          {/* Bottom Section */}
+          <div className="mt-20 text-center">
+            <div className="inline-block p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-gray-700">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                Mindful Moments
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-                Each experience takes you on a visual journey with beautiful nature scenes and ambient sounds.
-                The fullscreen video creates an immersive environment that helps you disconnect from stress
-                and reconnect with peace. Simply click, press play, and let the calming visuals and sounds
-                wash over you.
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                Each meditation experience is designed to help you disconnect from stress
+                and reconnect with your inner peace through the beauty of nature.
               </p>
-            </Card>
+            </div>
           </div>
         </div>
       </PageLayout>
       <Footer />
 
       {/* Fullscreen Video Overlay */}
-      {selectedSound && (
+      {selectedSound && selectedExperience && (
         <div className="fixed inset-0 z-50 bg-black">
           {/* Fullscreen Video Background */}
           <video
@@ -237,7 +206,7 @@ const MeditatePage: React.FC = () => {
             loop
             muted={isMuted}
             playsInline
-            src={waterflowVideo}
+            src={selectedExperience.videoUrl}
           />
 
           {/* Opaque Dark Overlay */}
@@ -258,12 +227,12 @@ const MeditatePage: React.FC = () => {
 
               {/* Title */}
               <h1 className="text-white text-3xl font-semibold mb-4">
-                {selectedSoundData?.title}
+                {selectedExperience.title}
               </h1>
 
               {/* Description */}
               <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto px-4">
-                {selectedSoundData?.description}
+                {selectedExperience.description}
               </p>
 
               {/* Play/Pause Button */}
