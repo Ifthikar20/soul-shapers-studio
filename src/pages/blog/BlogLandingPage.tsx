@@ -1,375 +1,497 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Calendar } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Heart, MessageCircle, Share2, Send, MoreHorizontal, User } from 'lucide-react';
+import Header from '@/components/Header';
+import PageLayout from '@/components/Layout/PageLayout';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-interface BlogPost {
+interface Comment {
   id: string;
-  title: string;
-  description: string;
-  image: string;
+  author: string;
+  authorAvatar?: string;
+  content: string;
+  timeAgo: string;
+  likes: number;
+}
+
+interface Story {
+  id: string;
+  author: string;
+  authorAvatar?: string;
   timeAgo: string;
   category: string;
-  author: string;
-  slug: string;
-  content?: string;
-  publishedAt?: string;
-  readTime?: string;
+  title: string;
+  content: string;
+  image?: string;
+  likes: number;
+  commentsCount: number;
+  comments: Comment[];
+  isLiked: boolean;
 }
 
 const BlogLandingPage = () => {
-  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-
-  const blogPosts: BlogPost[] = [
+  const [stories, setStories] = useState<Story[]>([
     {
       id: '1',
-      title: "Understanding Anxiety: Signs, Symptoms, and Coping Strategies",
-      description: "Learn to recognize the signs of anxiety and discover practical techniques to manage stress and worry. This guide covers breathing exercises, mindfulness practices...",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
-      timeAgo: "4 days ago",
-      category: "Anxiety",
-      author: "Dr. Sarah Mitchell",
-      slug: "understanding-anxiety-coping-strategies",
-      publishedAt: "2024-09-10",
-      readTime: "8 min read",
-      content: `
-        <h2>What is Anxiety?</h2>
-        <p>Anxiety is a natural human response to stress and potential threats. While everyone experiences anxiety from time to time, persistent or overwhelming anxiety can significantly impact your quality of life. Understanding the signs and learning effective coping strategies can help you regain control and find peace.</p>
-        
-        <h3>Common Signs and Symptoms</h3>
-        <p>Anxiety manifests differently for everyone, but common physical and emotional symptoms include:</p>
-        <ul>
-          <li>Racing heart or palpitations</li>
-          <li>Sweating or trembling</li>
-          <li>Difficulty concentrating</li>
-          <li>Restlessness or feeling on edge</li>
-          <li>Sleep disturbances</li>
-          <li>Muscle tension</li>
-          <li>Digestive issues</li>
-        </ul>
-        
-        <h3>Types of Anxiety Disorders</h3>
-        <p>There are several types of anxiety disorders, each with unique characteristics:</p>
-        <ol>
-          <li><strong>Generalized Anxiety Disorder (GAD):</strong> Persistent worry about various aspects of life</li>
-          <li><strong>Panic Disorder:</strong> Sudden, intense episodes of fear</li>
-          <li><strong>Social Anxiety:</strong> Fear of social situations and judgment</li>
-          <li><strong>Specific Phobias:</strong> Intense fear of specific objects or situations</li>
-        </ol>
-        
-        <h3>Effective Coping Strategies</h3>
-        <p>Here are evidence-based techniques to help manage anxiety:</p>
-        
-        <h4>1. Deep Breathing Exercises</h4>
-        <p>Practice the 4-7-8 breathing technique: Inhale for 4 counts, hold for 7, exhale for 8. This activates your body's relaxation response and helps calm your nervous system.</p>
-        
-        <h4>2. Mindfulness and Grounding</h4>
-        <p>Use the 5-4-3-2-1 technique: Notice 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, and 1 you can taste. This brings you back to the present moment.</p>
-        
-        <h4>3. Progressive Muscle Relaxation</h4>
-        <p>Systematically tense and release different muscle groups in your body. This helps identify and release physical tension associated with anxiety.</p>
-        
-        <h3>Lifestyle Changes That Help</h3>
-        <p>Supporting your mental health through lifestyle modifications:</p>
-        <ul>
-          <li>Regular exercise (even 10 minutes of walking can help)</li>
-          <li>Limiting caffeine and alcohol</li>
-          <li>Maintaining a consistent sleep schedule</li>
-          <li>Eating a balanced diet rich in omega-3 fatty acids</li>
-          <li>Staying connected with supportive friends and family</li>
-        </ul>
-        
-        <h3>When to Seek Professional Help</h3>
-        <p>Consider reaching out to a mental health professional if:</p>
-        <ul>
-          <li>Anxiety interferes with daily activities</li>
-          <li>You avoid situations due to fear</li>
-          <li>Physical symptoms are concerning</li>
-          <li>Coping strategies aren't providing relief</li>
-        </ul>
-        
-        <h3>Remember: You're Not Alone</h3>
-        <p>Anxiety affects millions of people worldwide. With the right tools, support, and sometimes professional guidance, it's entirely possible to manage anxiety effectively and live a fulfilling life. Be patient with yourself as you learn and practice these techniques.</p>
-      `
+      author: 'Sarah Chen',
+      authorAvatar: undefined,
+      timeAgo: '2 hours ago',
+      category: 'Anxiety Journey',
+      title: 'How I Overcame Social Anxiety',
+      content: 'After years of struggling with social anxiety, I finally found techniques that work for me. I started with small steps - making eye contact with cashiers, saying hi to neighbors. Each small victory built my confidence. Now I can attend social gatherings without that overwhelming dread. If you\'re struggling, know that progress is possible. Start small, be patient with yourself, and celebrate every step forward.',
+      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop',
+      likes: 127,
+      commentsCount: 23,
+      isLiked: false,
+      comments: [
+        {
+          id: 'c1',
+          author: 'Michael Torres',
+          content: 'This really resonates with me. Thank you for sharing your journey!',
+          timeAgo: '1 hour ago',
+          likes: 12,
+        },
+        {
+          id: 'c2',
+          author: 'Emma Wilson',
+          content: 'I\'m at the beginning of this journey. Your story gives me hope.',
+          timeAgo: '45 min ago',
+          likes: 8,
+        },
+      ],
     },
     {
       id: '2',
-      title: "The Power of Self-Compassion in Mental Wellness",
-      description: "Self-compassion is more than just being kind to yourself. Research shows it can reduce depression, increase motivation, and improve overall well-being...",
-      image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop",
-      timeAgo: "1 week ago",
-      category: "Self-Care",
-      author: "Dr. Michael Chen",
-      slug: "power-of-self-compassion",
-      publishedAt: "2024-09-07",
-      readTime: "6 min read",
-      content: `
-        <h2>Understanding Self-Compassion</h2>
-        <p>Self-compassion involves treating yourself with the same kindness and understanding you would offer a good friend during difficult times. Research by Dr. Kristin Neff shows that self-compassion is a powerful tool for emotional resilience and mental well-being.</p>
-        
-        <h3>The Three Components of Self-Compassion</h3>
-        <ol>
-          <li><strong>Self-Kindness:</strong> Being warm and understanding toward yourself when you suffer, fail, or feel inadequate</li>
-          <li><strong>Common Humanity:</strong> Recognizing that suffering and personal inadequacy are part of the shared human experience</li>
-          <li><strong>Mindfulness:</strong> Holding your experience in balanced awareness rather than over-identifying with thoughts and feelings</li>
-        </ol>
-        
-        <h3>Benefits of Self-Compassion</h3>
-        <p>Research has shown that self-compassion can:</p>
-        <ul>
-          <li>Reduce anxiety and depression</li>
-          <li>Increase motivation and personal responsibility</li>
-          <li>Improve emotional resilience</li>
-          <li>Enhance life satisfaction</li>
-          <li>Strengthen relationships</li>
-        </ul>
-        
-        <h3>Practical Self-Compassion Exercises</h3>
-        <h4>1. Self-Compassion Break</h4>
-        <p>When facing difficulty, place your hands on your heart and say: "This is a moment of suffering. Suffering is part of life. May I be kind to myself in this moment."</p>
-        
-        <h4>2. Loving-Kindness for Yourself</h4>
-        <p>Practice sending yourself the same good wishes you'd send to a loved one: "May I be happy. May I be healthy. May I be at peace."</p>
-        
-        <h3>Remember</h3>
-        <p>Self-compassion is not self-pity or self-indulgence. It's about treating yourself with the same care you'd show a dear friend, fostering resilience and genuine happiness.</p>
-      `
+      author: 'James Rodriguez',
+      authorAvatar: undefined,
+      timeAgo: '5 hours ago',
+      category: 'Self-Care',
+      title: 'My Morning Routine Changed Everything',
+      content: 'I used to jump straight into work, checking emails before I even got out of bed. Now I start with 10 minutes of meditation, a healthy breakfast, and journaling. This simple routine has transformed my mental health. I feel more grounded, less reactive, and actually enjoy my mornings. Sometimes the smallest changes make the biggest difference.',
+      likes: 89,
+      commentsCount: 15,
+      isLiked: false,
+      comments: [
+        {
+          id: 'c3',
+          author: 'Lisa Park',
+          content: 'I need to try this! What journaling prompts do you use?',
+          timeAgo: '3 hours ago',
+          likes: 5,
+        },
+      ],
     },
     {
       id: '3',
-      title: "Breaking the Cycle: Overcoming Depression Naturally",
-      description: "Depression can feel overwhelming, but there are natural approaches that can complement professional treatment. Explore lifestyle changes, nutrition...",
-      image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=400&h=300&fit=crop",
-      timeAgo: "2 weeks ago",
-      category: "Depression",
-      author: "Dr. Emma Rodriguez",
-      slug: "overcoming-depression-naturally"
+      author: 'Maya Patel',
+      authorAvatar: undefined,
+      timeAgo: '1 day ago',
+      category: 'Therapy',
+      title: 'Why I Finally Started Therapy',
+      content: 'For years I thought I could handle everything on my own. Asking for help felt like weakness. But starting therapy was one of the best decisions I\'ve ever made. Having a safe space to process my thoughts and emotions has been invaluable. If you\'re on the fence about therapy, this is your sign to take that step. You deserve support.',
+      image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=400&fit=crop',
+      likes: 234,
+      commentsCount: 42,
+      isLiked: false,
+      comments: [
+        {
+          id: 'c4',
+          author: 'David Kim',
+          content: 'How did you find the right therapist? That\'s what I\'m struggling with.',
+          timeAgo: '18 hours ago',
+          likes: 15,
+        },
+        {
+          id: 'c5',
+          author: 'Rachel Green',
+          content: 'Same here! Therapy changed my life. So glad you took that step.',
+          timeAgo: '12 hours ago',
+          likes: 9,
+        },
+      ],
     },
-    {
-      id: '4',
-      title: "Mindfulness for Beginners: Start Your Journey Today",
-      description: "Mindfulness isn't about emptying your mind – it's about being present. Learn simple techniques you can practice anywhere to reduce stress and increase awareness...",
-      image: "https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?w=400&h=300&fit=crop",
-      timeAgo: "3 weeks ago",
-      category: "Mindfulness",
-      author: "Lisa Thompson",
-      slug: "mindfulness-for-beginners"
-    },
-    {
-      id: '5',
-      title: "Building Healthy Boundaries: Protecting Your Mental Space",
-      description: "Healthy boundaries are essential for mental wellness. Learn how to set limits with family, friends, and colleagues while maintaining positive relationships...",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
-      timeAgo: "1 month ago",
-      category: "Boundaries",
-      author: "Dr. James Wilson",
-      slug: "building-healthy-boundaries"
-    },
-    {
-      id: '6',
-      title: "Sleep and Mental Health: The Connection You Can't Ignore",
-      description: "Quality sleep is fundamental to mental wellness. Discover how sleep affects your mood, cognition, and emotional regulation, plus tips for better sleep hygiene...",
-      image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=300&fit=crop",
-      timeAgo: "1 month ago",
-      category: "Sleep",
-      author: "Dr. Rachel Green",
-      slug: "sleep-mental-health-connection"
+  ]);
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [newStoryTitle, setNewStoryTitle] = useState('');
+  const [newStoryContent, setNewStoryContent] = useState('');
+  const [newStoryCategory, setNewStoryCategory] = useState('');
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
+  const [newComment, setNewComment] = useState<{ [key: string]: string }>({});
+
+  const categories = ['Anxiety Journey', 'Self-Care', 'Therapy', 'Depression', 'Mindfulness', 'Recovery', 'Relationships'];
+
+  const handleLike = (storyId: string) => {
+    setStories(stories.map(story => {
+      if (story.id === storyId) {
+        return {
+          ...story,
+          likes: story.isLiked ? story.likes - 1 : story.likes + 1,
+          isLiked: !story.isLiked,
+        };
+      }
+      return story;
+    }));
+  };
+
+  const handleShareStory = () => {
+    if (!newStoryTitle.trim() || !newStoryContent.trim()) return;
+
+    const newStory: Story = {
+      id: Date.now().toString(),
+      author: 'You',
+      authorAvatar: undefined,
+      timeAgo: 'Just now',
+      category: newStoryCategory || 'Personal Story',
+      title: newStoryTitle,
+      content: newStoryContent,
+      likes: 0,
+      commentsCount: 0,
+      isLiked: false,
+      comments: [],
+    };
+
+    setStories([newStory, ...stories]);
+    setNewStoryTitle('');
+    setNewStoryContent('');
+    setNewStoryCategory('');
+    setShowShareDialog(false);
+  };
+
+  const toggleComments = (storyId: string) => {
+    const newExpanded = new Set(expandedComments);
+    if (newExpanded.has(storyId)) {
+      newExpanded.delete(storyId);
+    } else {
+      newExpanded.add(storyId);
     }
-  ];
-
-  const categories = [...new Set(blogPosts.map(post => post.category))];
-
-  const handlePostClick = (post: BlogPost) => {
-    setSelectedPost(post);
+    setExpandedComments(newExpanded);
   };
 
-  const handleBackToList = () => {
-    setSelectedPost(null);
+  const handleAddComment = (storyId: string) => {
+    const commentText = newComment[storyId];
+    if (!commentText?.trim()) return;
+
+    setStories(stories.map(story => {
+      if (story.id === storyId) {
+        const newCommentObj: Comment = {
+          id: `c${Date.now()}`,
+          author: 'You',
+          content: commentText,
+          timeAgo: 'Just now',
+          likes: 0,
+        };
+        return {
+          ...story,
+          comments: [...story.comments, newCommentObj],
+          commentsCount: story.commentsCount + 1,
+        };
+      }
+      return story;
+    }));
+
+    setNewComment({ ...newComment, [storyId]: '' });
   };
 
-  // If a post is selected, show the blog post view
-  if (selectedPost) {
-    return (
-      <div className="min-h-screen bg-white">
-        {/* Navigation */}
-        <nav className="border-b border-gray-200 py-4">
-          <div className="max-w-4xl mx-auto px-4">
-            <button 
-              onClick={handleBackToList}
-              className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Read
-            </button>
-          </div>
-        </nav>
+  const filteredStories = selectedCategory
+    ? stories.filter(story => story.category === selectedCategory)
+    : stories;
 
-        {/* Article Header */}
-        <header className="py-12 px-4">
-          <div className="max-w-4xl mx-auto">
-            {/* Category Badge */}
-            <div className="mb-4">
-              <Badge variant="secondary" className="mb-4">
-                {selectedPost.category}
-              </Badge>
+  return (
+    <>
+      <Header />
+      <PageLayout hasHero={false}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Page Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
+                Community Stories
+              </h1>
+              <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+                <DialogTrigger asChild>
+                  <Button className="rounded-full">
+                    Share Your Story
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle>Share Your Story</DialogTitle>
+                    <DialogDescription>
+                      Your story matters. Share your journey to inspire and connect with others.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-900 dark:text-white">
+                        Category
+                      </label>
+                      <select
+                        value={newStoryCategory}
+                        onChange={(e) => setNewStoryCategory(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                      >
+                        <option value="">Select a category</option>
+                        {categories.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-900 dark:text-white">
+                        Title
+                      </label>
+                      <Input
+                        placeholder="Give your story a title..."
+                        value={newStoryTitle}
+                        onChange={(e) => setNewStoryTitle(e.target.value)}
+                        className="rounded-lg"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-900 dark:text-white">
+                        Your Story
+                      </label>
+                      <Textarea
+                        placeholder="Share your experience, insights, or journey..."
+                        value={newStoryContent}
+                        onChange={(e) => setNewStoryContent(e.target.value)}
+                        rows={8}
+                        className="rounded-lg resize-none"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowShareDialog(false)} className="rounded-full">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleShareStory} className="rounded-full">
+                      Share Story
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-
-            {/* Title */}
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              {selectedPost.title}
-            </h1>
-
-            {/* Excerpt */}
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              {selectedPost.description}
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Real stories from real people. Share, connect, and find support in our community.
             </p>
+          </div>
 
-            {/* Meta Information */}
-            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8">
-              <div className="flex items-center gap-2">
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="bg-green-600 text-white text-xs">
-                    {selectedPost.author.split(' ').map(name => name[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-gray-700">{selectedPost.author}</span>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>{selectedPost.publishedAt && new Date(selectedPost.publishedAt).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</span>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <span>{selectedPost.readTime}</span>
-              </div>
-            </div>
-
-            {/* Featured Image */}
-            <div className="rounded-lg overflow-hidden mb-8">
-              <img
-                src={selectedPost.image.replace('w=400&h=300', 'w=800&h=400')}
-                alt={selectedPost.title}
-                className="w-full h-64 md:h-96 object-cover"
-              />
+          {/* Categories Filter */}
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-2">
+              <Badge
+                variant={selectedCategory === null ? 'default' : 'outline'}
+                className="cursor-pointer rounded-full"
+                onClick={() => setSelectedCategory(null)}
+              >
+                All Stories
+              </Badge>
+              {categories.map((category) => (
+                <Badge
+                  key={category}
+                  variant={selectedCategory === category ? 'default' : 'outline'}
+                  className="cursor-pointer rounded-full"
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category}
+                </Badge>
+              ))}
             </div>
           </div>
-        </header>
 
-        {/* Article Content */}
-        <main className="pb-16">
-          <div className="max-w-4xl mx-auto px-4">
-            <div 
-              className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700"
-              dangerouslySetInnerHTML={{ __html: selectedPost.content || '<p>Article content coming soon...</p>' }}
-            />
+          {/* Stories Feed */}
+          <div className="space-y-6">
+            {filteredStories.map((story) => (
+              <Card key={story.id} className="p-6 border border-gray-200 dark:border-gray-800 rounded-xl">
+                {/* Story Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="w-12 h-12">
+                      {story.authorAvatar ? (
+                        <AvatarImage src={story.authorAvatar} />
+                      ) : (
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white">
+                          {story.author.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{story.author}</h3>
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <span>{story.timeAgo}</span>
+                        <span>•</span>
+                        <Badge variant="secondary" className="text-xs rounded-full">
+                          {story.category}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="rounded-full">
+                        <MoreHorizontal className="w-5 h-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Report</DropdownMenuItem>
+                      <DropdownMenuItem>Save</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Story Content */}
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                    {story.title}
+                  </h2>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                    {story.content}
+                  </p>
+                </div>
+
+                {/* Story Image */}
+                {story.image && (
+                  <div className="mb-4 rounded-lg overflow-hidden">
+                    <img
+                      src={story.image}
+                      alt={story.title}
+                      className="w-full h-64 object-cover"
+                    />
+                  </div>
+                )}
+
+                {/* Story Actions */}
+                <div className="flex items-center gap-6 pt-4 border-t border-gray-200 dark:border-gray-800">
+                  <button
+                    onClick={() => handleLike(story.id)}
+                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                  >
+                    <Heart
+                      className={`w-5 h-5 ${story.isLiked ? 'fill-red-500 text-red-500' : ''}`}
+                    />
+                    <span className="text-sm font-medium">{story.likes}</span>
+                  </button>
+                  <button
+                    onClick={() => toggleComments(story.id)}
+                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    <span className="text-sm font-medium">{story.commentsCount}</span>
+                  </button>
+                  <button className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 transition-colors">
+                    <Share2 className="w-5 h-5" />
+                    <span className="text-sm font-medium">Share</span>
+                  </button>
+                </div>
+
+                {/* Comments Section */}
+                {expandedComments.has(story.id) && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 space-y-4">
+                    {/* Existing Comments */}
+                    {story.comments.map((comment) => (
+                      <div key={comment.id} className="flex gap-3">
+                        <Avatar className="w-8 h-8 flex-shrink-0">
+                          <AvatarFallback className="bg-gradient-to-br from-green-500 to-teal-500 text-white text-xs">
+                            {comment.author.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                            <p className="font-semibold text-sm text-gray-900 dark:text-white">
+                              {comment.author}
+                            </p>
+                            <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                              {comment.content}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-4 mt-1 px-3 text-xs text-gray-600 dark:text-gray-400">
+                            <span>{comment.timeAgo}</span>
+                            <button className="hover:text-gray-900 dark:hover:text-white">
+                              Like ({comment.likes})
+                            </button>
+                            <button className="hover:text-gray-900 dark:hover:text-white">Reply</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Add Comment */}
+                    <div className="flex gap-3 pt-2">
+                      <Avatar className="w-8 h-8 flex-shrink-0">
+                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs">
+                          <User className="w-4 h-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 flex gap-2">
+                        <Input
+                          placeholder="Write a comment..."
+                          value={newComment[story.id] || ''}
+                          onChange={(e) => setNewComment({ ...newComment, [story.id]: e.target.value })}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault();
+                              handleAddComment(story.id);
+                            }
+                          }}
+                          className="rounded-full"
+                        />
+                        <Button
+                          size="icon"
+                          onClick={() => handleAddComment(story.id)}
+                          disabled={!newComment[story.id]?.trim()}
+                          className="rounded-full flex-shrink-0"
+                        >
+                          <Send className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Card>
+            ))}
           </div>
-        </main>
 
-        {/* Related Posts Section */}
-        <section className="border-t border-gray-200 py-16">
-          <div className="max-w-4xl mx-auto px-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Related Articles</h2>
-            <div className="text-center text-gray-500">
-              <p>Explore more mental health resources and articles...</p>
-              <Button variant="outline" className="mt-4" onClick={handleBackToList}>
-                Browse All Articles
+          {/* Empty State */}
+          {filteredStories.length === 0 && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <MessageCircle className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                No stories in this category yet
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                Be the first to share your story
+              </p>
+              <Button onClick={() => setShowShareDialog(true)} className="rounded-full">
+                Share Your Story
               </Button>
             </div>
-          </div>
-        </section>
-      </div>
-    );
-  }
-
-  // Default blog listing view
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="text-center py-16 px-4">
-        <h1 className="text-5xl font-bold text-gray-900 mb-4">
-          Mental Wellness Hub
-        </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Your trusted resource for mental health insights, wellness tips, and personal growth strategies.
-        </p>
-      </header>
-
-      {/* Categories Filter */}
-      <div className="max-w-7xl mx-auto px-4 mb-8">
-        <div className="flex flex-wrap gap-2 justify-center">
-          <Badge variant="outline" className="hover:bg-gray-100 cursor-pointer">
-            All Posts
-          </Badge>
-          {categories.map((category) => (
-            <Badge key={category} variant="outline" className="hover:bg-gray-100 cursor-pointer">
-              {category}
-            </Badge>
-          ))}
+          )}
         </div>
-      </div>
-
-      {/* Blog Grid */}
-      <main className="max-w-7xl mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogPosts.map((post) => (
-            <article key={post.id} className="group cursor-pointer" onClick={() => handlePostClick(post)}>
-              <div className="block">
-                {/* Image */}
-                <div className="relative overflow-hidden rounded-lg mb-4 aspect-[4/3]">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="space-y-3">
-                  {/* Meta info */}
-                  <div className="flex items-center gap-3 text-sm text-gray-500">
-                    <span>{post.timeAgo}</span>
-                    {post.category && (
-                      <>
-                        <span>•</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {post.category}
-                        </Badge>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Title */}
-                  <h2 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {post.title}
-                  </h2>
-
-                  {/* Description */}
-                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                    {post.description}
-                  </p>
-
-                  {/* Author */}
-                  <div className="flex items-center gap-2 pt-2">
-                    <Avatar className="w-6 h-6">
-                      <AvatarFallback className="bg-gradient-to-r from-green-500 to-blue-500 text-white text-xs">
-                        {post.author.split(' ').map(name => name[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm text-gray-700">{post.author}</span>
-                  </div>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </main>
-    </div>
+      </PageLayout>
+    </>
   );
 };
 
