@@ -27,8 +27,6 @@ const MeditatePage: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([70]);
   const [isMuted, setIsMuted] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [mouseTimeout, setMouseTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const calmingSounds: CalmingSoundCard[] = [
     {
@@ -95,18 +93,9 @@ const MeditatePage: React.FC = () => {
     }
   }, [volume, isMuted]);
 
-  useEffect(() => {
-    return () => {
-      if (mouseTimeout) {
-        clearTimeout(mouseTimeout);
-      }
-    };
-  }, [mouseTimeout]);
-
   const handleSoundClick = (soundId: string) => {
     setSelectedSound(soundId);
     setIsPlaying(false);
-    setShowControls(true);
   };
 
   const handlePlayPause = () => {
@@ -137,22 +126,6 @@ const MeditatePage: React.FC = () => {
     }
     setSelectedSound(null);
     setIsPlaying(false);
-  };
-
-  const handleMouseMove = () => {
-    setShowControls(true);
-
-    if (mouseTimeout) {
-      clearTimeout(mouseTimeout);
-    }
-
-    const timeout = setTimeout(() => {
-      if (isPlaying) {
-        setShowControls(false);
-      }
-    }, 3000);
-
-    setMouseTimeout(timeout);
   };
 
   return (
@@ -186,10 +159,9 @@ const MeditatePage: React.FC = () => {
                     alt={sound.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-br ${sound.gradient} opacity-30 group-hover:opacity-40 transition-opacity duration-300`} />
 
                   {/* Play Icon Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
                     <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
                       <Play className="w-8 h-8 text-gray-900 ml-1" fill="currentColor" />
                     </div>
@@ -257,120 +229,81 @@ const MeditatePage: React.FC = () => {
 
       {/* Fullscreen Video Overlay */}
       {selectedSound && (
-        <div
-          className="fixed inset-0 z-50 bg-black"
-          onMouseMove={handleMouseMove}
-          onMouseEnter={() => setShowControls(true)}
-        >
+        <div className="fixed inset-0 z-50 bg-black">
           {/* Fullscreen Video Background */}
           <video
             ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover opacity-40"
             loop
             muted={isMuted}
             playsInline
             src={waterflowVideo}
           />
 
-          {/* Transparent Dark Overlay */}
-          <div className="absolute inset-0 bg-black/30" />
+          {/* Opaque Dark Overlay */}
+          <div className="absolute inset-0 bg-black/50" />
 
-          {/* Floating Controls */}
-          <div
-            className={`absolute top-0 left-0 right-0 z-10 transition-opacity duration-500 ${
-              showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
-          >
-            <div className="max-w-7xl mx-auto px-6 py-6">
-              <div className="flex items-center justify-between backdrop-blur-md bg-black/30 rounded-2xl px-6 py-4 shadow-2xl border border-white/10">
-                {/* Left: Close Button */}
+          {/* Centered Video Player Controls */}
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="text-center">
+              {/* Close Button - Top Right */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClose}
+                className="absolute top-6 right-6 text-white hover:bg-white/20 rounded-full"
+              >
+                <X className="w-6 h-6" />
+              </Button>
+
+              {/* Title */}
+              <h1 className="text-white text-3xl font-semibold mb-4">
+                {selectedSoundData?.title}
+              </h1>
+
+              {/* Description */}
+              <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto px-4">
+                {selectedSoundData?.description}
+              </p>
+
+              {/* Play/Pause Button */}
+              <Button
+                onClick={handlePlayPause}
+                size="lg"
+                className="rounded-full w-20 h-20 bg-white/90 hover:bg-white text-gray-900 shadow-2xl hover:scale-110 transition-all duration-300 mb-8"
+              >
+                {isPlaying ? (
+                  <Pause className="w-10 h-10" fill="currentColor" />
+                ) : (
+                  <Play className="w-10 h-10 ml-1" fill="currentColor" />
+                )}
+              </Button>
+
+              {/* Volume Control */}
+              <div className="flex items-center justify-center gap-4 backdrop-blur-md bg-black/30 rounded-full px-6 py-3 border border-white/10 max-w-xs mx-auto">
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleClose}
-                  className="text-white hover:bg-white/20 rounded-full"
+                  onClick={toggleMute}
+                  className="text-white hover:bg-white/20 rounded-full flex-shrink-0"
                 >
-                  <X className="w-5 h-5" />
+                  {isMuted || volume[0] === 0 ? (
+                    <VolumeX className="w-5 h-5" />
+                  ) : (
+                    <Volume2 className="w-5 h-5" />
+                  )}
                 </Button>
 
-                {/* Center: Title and Play/Pause */}
-                <div className="flex items-center gap-6">
-                  <h1 className="text-white text-2xl font-semibold hidden sm:block">
-                    {selectedSoundData?.title}
-                  </h1>
-
-                  <Button
-                    onClick={handlePlayPause}
-                    size="lg"
-                    className="rounded-full w-14 h-14 bg-white/90 hover:bg-white text-gray-900 shadow-lg hover:scale-105 transition-transform"
-                  >
-                    {isPlaying ? (
-                      <Pause className="w-6 h-6" fill="currentColor" />
-                    ) : (
-                      <Play className="w-6 h-6 ml-0.5" fill="currentColor" />
-                    )}
-                  </Button>
-                </div>
-
-                {/* Right: Volume Control */}
-                <div className="flex items-center gap-3 min-w-[180px]">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleMute}
-                    className="text-white hover:bg-white/20 rounded-full flex-shrink-0"
-                  >
-                    {isMuted || volume[0] === 0 ? (
-                      <VolumeX className="w-5 h-5" />
-                    ) : (
-                      <Volume2 className="w-5 h-5" />
-                    )}
-                  </Button>
-
-                  <Slider
-                    value={volume}
-                    onValueChange={handleVolumeChange}
-                    max={100}
-                    step={1}
-                    className="w-24 cursor-pointer"
-                  />
-                </div>
+                <Slider
+                  value={volume}
+                  onValueChange={handleVolumeChange}
+                  max={100}
+                  step={1}
+                  className="w-32 cursor-pointer"
+                />
               </div>
             </div>
           </div>
-
-          {/* Bottom: Description */}
-          <div
-            className={`absolute bottom-0 left-0 right-0 z-10 transition-opacity duration-500 ${
-              showControls ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <div className="max-w-7xl mx-auto px-6 py-8">
-              <div className="backdrop-blur-md bg-black/30 rounded-2xl px-8 py-6 shadow-2xl border border-white/10">
-                <p className="text-white/90 text-lg text-center leading-relaxed">
-                  {selectedSoundData?.description}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Center: Initial Play Prompt */}
-          {!isPlaying && (
-            <div className="absolute inset-0 flex items-center justify-center z-5">
-              <div className="text-center">
-                <Button
-                  onClick={handlePlayPause}
-                  size="lg"
-                  className="rounded-full w-20 h-20 bg-white/90 hover:bg-white text-gray-900 shadow-2xl hover:scale-110 transition-all duration-300"
-                >
-                  <Play className="w-10 h-10 ml-1" fill="currentColor" />
-                </Button>
-                <p className="text-white text-xl mt-6 font-light tracking-wide">
-                  Click to begin
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </>
