@@ -201,35 +201,6 @@ const MeditatePage: React.FC = () => {
               </div>
             ))}
           </div>
-
-          {/* Rotating Autumn Quotes */}
-          <div className="mt-20 text-center">
-            <div className="max-w-3xl mx-auto">
-              <div className="relative">
-                <svg className="absolute -top-6 -left-6 w-12 h-12 text-gray-300 dark:text-gray-700 opacity-50" fill="currentColor" viewBox="0 0 32 32">
-                  <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
-                </svg>
-                <p className="text-2xl md:text-3xl font-light text-gray-800 dark:text-gray-200 italic px-12 leading-relaxed transition-all duration-1000">
-                  {autumnQuotes[currentQuoteIndex]}
-                </p>
-                <svg className="absolute -bottom-6 -right-6 w-12 h-12 text-gray-300 dark:text-gray-700 opacity-50 transform rotate-180" fill="currentColor" viewBox="0 0 32 32">
-                  <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
-                </svg>
-              </div>
-              <div className="mt-8 flex justify-center gap-2">
-                {autumnQuotes.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`h-1.5 rounded-full transition-all duration-500 ${
-                      index === currentQuoteIndex
-                        ? 'w-8 bg-gray-800 dark:bg-gray-200'
-                        : 'w-1.5 bg-gray-300 dark:bg-gray-700'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </PageLayout>
       <Footer />
@@ -272,6 +243,33 @@ const MeditatePage: React.FC = () => {
               <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto px-4">
                 {selectedExperience.description}
               </p>
+
+              {/* Rotating Autumn Quote */}
+              <div className="mb-12 max-w-2xl mx-auto px-6">
+                <div className="relative">
+                  <svg className="absolute -top-4 -left-2 w-8 h-8 text-white/20" fill="currentColor" viewBox="0 0 32 32">
+                    <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                  </svg>
+                  <p className="text-xl md:text-2xl font-light text-white/90 italic px-8 leading-relaxed transition-all duration-1000">
+                    {autumnQuotes[currentQuoteIndex]}
+                  </p>
+                  <svg className="absolute -bottom-4 -right-2 w-8 h-8 text-white/20 transform rotate-180" fill="currentColor" viewBox="0 0 32 32">
+                    <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                  </svg>
+                </div>
+                <div className="mt-6 flex justify-center gap-2">
+                  {autumnQuotes.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`h-1 rounded-full transition-all duration-500 ${
+                        index === currentQuoteIndex
+                          ? 'w-6 bg-white/80'
+                          : 'w-1 bg-white/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
 
               {/* Play/Pause Button */}
               <Button
