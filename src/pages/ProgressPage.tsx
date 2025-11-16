@@ -20,6 +20,7 @@ import {
   Award,
   Calendar,
   Activity,
+  Zap,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -94,11 +95,43 @@ const ProgressPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Your Progress</h1>
+          <h1 className="text-4xl font-bold mb-2">
+            {user?.name ? `Welcome back, ${user.name.split(' ')[0]}! 👋` : 'Your Progress'}
+          </h1>
           <p className="text-muted-foreground">
-            Track your meditation journey and celebrate your achievements
+            {user?.name
+              ? "Here's your wellness journey progress"
+              : 'Track your meditation journey and celebrate your achievements'
+            }
           </p>
         </div>
+
+        {/* Level & XP Card */}
+        <Card className="p-6 mb-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl font-bold border-2 border-white/30">
+                {stats.level}
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-1">Level {stats.level}</h2>
+                <p className="text-white/90">
+                  {stats.totalXP.toLocaleString()} Total XP
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-white/80 mb-2">Next Level</p>
+              <div className="flex items-center gap-2">
+                <Progress
+                  value={((500 - stats.xpToNextLevel) / 500) * 100}
+                  className="h-2 w-32 bg-white/20"
+                />
+                <span className="text-sm font-semibold">{stats.xpToNextLevel} XP</span>
+              </div>
+            </div>
+          </div>
+        </Card>
 
         {/* Top Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

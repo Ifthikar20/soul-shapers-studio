@@ -34,6 +34,11 @@ export interface StreakData {
  * User Statistics
  */
 export interface UserStats {
+  // Points & Level
+  totalXP: number;
+  level: number;
+  xpToNextLevel: number;
+
   // Time-based stats
   totalMeditationMinutes: number;
   totalVideoMinutes: number;

@@ -259,7 +259,23 @@ class ProgressService {
     const joinedDate = new Date();
     joinedDate.setMonth(joinedDate.getMonth() - 2);
 
+    // Calculate XP based on activity
+    const totalMinutes = 247 + 523 + 189; // meditation + video + audio
+    const sessionsXP = 54 * 10; // 10 XP per session
+    const minutesXP = totalMinutes * 2; // 2 XP per minute
+    const coursesXP = 3 * 50; // 50 XP per course completed
+    const totalXP = sessionsXP + minutesXP + coursesXP;
+
+    // Calculate level (every 500 XP = 1 level)
+    const level = Math.floor(totalXP / 500) + 1;
+    const xpToNextLevel = 500 - (totalXP % 500);
+
     return {
+      // Points & Level
+      totalXP,
+      level,
+      xpToNextLevel,
+
       totalMeditationMinutes: 247,
       totalVideoMinutes: 523,
       totalAudioMinutes: 189,
