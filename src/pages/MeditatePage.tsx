@@ -104,29 +104,14 @@ const MeditatePage: React.FC = () => {
   const currentQuotes = selectedSound ? (experienceQuotes[selectedSound] || experienceQuotes['autumn-leaves']) : experienceQuotes['autumn-leaves'];
 
   const meditationExperiences: MeditationExperience[] = [
+    // Sounds of Nature
     {
       id: 'waterflow',
       title: 'Waterfall Meditation',
       description: 'Let the gentle cascade of water wash away your worries',
       videoUrl: waterflowVideo,
       imageUrl: waterfallImage,
-      category: 'Water',
-    },
-    {
-      id: 'autumn-leaves',
-      title: 'Autumn Leaves',
-      description: 'Watch leaves dance gracefully in the autumn breeze',
-      videoUrl: autumnLeavesVideo,
-      imageUrl: autumnLeavesImage,
-      category: 'Seasonal',
-    },
-    {
-      id: 'autumn-wind',
-      title: 'Autumn Wind',
-      description: 'Feel the crisp autumn air and gentle rustling of trees',
-      videoUrl: autumnWindVideo,
-      imageUrl: autumnWindImage,
-      category: 'Seasonal',
+      category: 'Sounds of Nature',
     },
     {
       id: 'ocean-waves',
@@ -134,7 +119,7 @@ const MeditatePage: React.FC = () => {
       description: 'Experience the rhythmic peace of ocean waves at sunset',
       videoUrl: autumnLeavesVideo, // Placeholder
       imageUrl: autumnLeavesImage, // Placeholder
-      category: 'Ocean',
+      category: 'Sounds of Nature',
     },
     {
       id: 'rain-forest',
@@ -142,7 +127,7 @@ const MeditatePage: React.FC = () => {
       description: 'Immerse yourself in the peaceful sounds of a tropical rainforest',
       videoUrl: autumnWindVideo, // Placeholder
       imageUrl: autumnWindImage, // Placeholder
-      category: 'Forest',
+      category: 'Sounds of Nature',
     },
     {
       id: 'mountain-stream',
@@ -150,9 +135,35 @@ const MeditatePage: React.FC = () => {
       description: 'Find serenity in the gentle flow of a mountain stream',
       videoUrl: waterflowVideo, // Placeholder
       imageUrl: waterfallImage, // Placeholder
-      category: 'Mountain',
+      category: 'Sounds of Nature',
+    },
+    // Seasonal Meditations
+    {
+      id: 'autumn-leaves',
+      title: 'Autumn Leaves',
+      description: 'Watch leaves dance gracefully in the autumn breeze',
+      videoUrl: autumnLeavesVideo,
+      imageUrl: autumnLeavesImage,
+      category: 'Seasonal Meditations',
+    },
+    {
+      id: 'autumn-wind',
+      title: 'Autumn Wind',
+      description: 'Feel the crisp autumn air and gentle rustling of trees',
+      videoUrl: autumnWindVideo,
+      imageUrl: autumnWindImage,
+      category: 'Seasonal Meditations',
     },
   ];
+
+  // Group experiences by category
+  const categorizedExperiences = meditationExperiences.reduce((acc, experience) => {
+    if (!acc[experience.category]) {
+      acc[experience.category] = [];
+    }
+    acc[experience.category].push(experience);
+    return acc;
+  }, {} as Record<string, MeditationExperience[]>);
 
   const selectedExperience = meditationExperiences.find(e => e.id === selectedSound);
 
@@ -221,9 +232,9 @@ const MeditatePage: React.FC = () => {
     <>
       <Header />
       <PageLayout hasHero={false}>
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
-          <div className="mb-16">
+          <div className="mb-12">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
               Meditation
             </h1>
@@ -232,59 +243,64 @@ const MeditatePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Meditation Experiences Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {meditationExperiences.map((experience) => (
-              <div
-                key={experience.id}
-                onClick={() => handleSoundClick(experience.id)}
-                className="group relative cursor-pointer"
-              >
-                {/* Card Container */}
-                <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out transform hover:-translate-y-2">
-                  {/* Image */}
-                  <div className="relative h-44 overflow-hidden">
-                    <img
-                      src={experience.imageUrl}
-                      alt={experience.title}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    />
+          {/* Categories with Experiences */}
+          {Object.entries(categorizedExperiences).map(([categoryName, experiences]) => (
+            <div key={categoryName} className="mb-16">
+              {/* Category Header */}
+              <div className="mb-6">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                  {categoryName}
+                </h2>
+              </div>
 
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              {/* Category Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {experiences.map((experience) => (
+                  <div
+                    key={experience.id}
+                    onClick={() => handleSoundClick(experience.id)}
+                    className="group relative cursor-pointer"
+                  >
+                    {/* Card Container */}
+                    <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out transform hover:-translate-y-2">
+                      {/* Image */}
+                      <div className="relative h-44 overflow-hidden">
+                        <img
+                          src={experience.imageUrl}
+                          alt={experience.title}
+                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
 
-                    {/* Category Badge */}
-                    <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1 text-xs font-medium tracking-wide uppercase bg-white/90 text-gray-900 rounded-full backdrop-blur-sm">
-                        {experience.category}
-                      </span>
-                    </div>
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-                    {/* Play Button Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform duration-300">
-                        <Play className="w-7 h-7 text-gray-900 ml-0.5" fill="currentColor" />
+                        {/* Play Button Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-transform duration-300">
+                            <Play className="w-7 h-7 text-gray-900 ml-0.5" fill="currentColor" />
+                          </div>
+                        </div>
+
+                        {/* Title Overlay on Image */}
+                        <div className="absolute bottom-0 left-0 right-0 p-5">
+                          <h3 className="text-xl font-bold text-white">
+                            {experience.title}
+                          </h3>
+                        </div>
+                      </div>
+
+                      {/* Card Content */}
+                      <div className="p-5">
+                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                          {experience.description}
+                        </p>
                       </div>
                     </div>
-
-                    {/* Title Overlay on Image */}
-                    <div className="absolute bottom-0 left-0 right-0 p-5">
-                      <h3 className="text-xl font-bold text-white">
-                        {experience.title}
-                      </h3>
-                    </div>
                   </div>
-
-                  {/* Card Content */}
-                  <div className="p-5">
-                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                      {experience.description}
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </PageLayout>
       <Footer />
