@@ -278,31 +278,6 @@ const ProgressPage: React.FC = () => {
                 <div className="text-sm text-neutral-500">{stats.totalBreaths} breaths</div>
               </Card>
             </div>
-
-            {/* Course Progress */}
-            <Card className="p-6 border-neutral-200">
-              <h4 className="font-medium mb-4 text-neutral-900">Course Completion</h4>
-              <div className="flex items-center gap-4">
-                <div className="text-4xl font-light text-neutral-900">{stats.coursesCompleted}</div>
-                <div className="text-sm text-neutral-500">courses completed</div>
-              </div>
-            </Card>
-
-            {/* Favorite Category */}
-            {stats.favoriteCategory && (
-              <Card className="p-6 border-neutral-200">
-                <h4 className="font-medium mb-4 text-neutral-900">Favorite Category</h4>
-                <div className="text-xl font-medium text-neutral-900">{stats.favoriteCategory}</div>
-              </Card>
-            )}
-
-            {/* Most Watched Expert */}
-            {stats.mostWatchedExpert && (
-              <Card className="p-6 border-neutral-200">
-                <h4 className="font-medium mb-4 text-neutral-900">Most Watched Expert</h4>
-                <div className="text-xl font-medium text-neutral-900">{stats.mostWatchedExpert}</div>
-              </Card>
-            )}
           </TabsContent>
         </Tabs>
       </div>
