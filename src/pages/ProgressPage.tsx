@@ -4,6 +4,7 @@
 // ============================================
 
 import React, { useEffect, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { progressService } from '@/services/progress.service';
 import type { ProgressSummary } from '@/types/progress.types';
@@ -15,28 +16,43 @@ import {
   Brain,
   Calendar,
   Award,
+  ArrowLeft,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import PageLayout from '@/components/Layout/PageLayout';
 import DOMPurify from 'isomorphic-dompurify';
 
 const ProgressPage: React.FC = () => {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [progress, setProgress] = useState<ProgressSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Security: Redirect to login if not authenticated
   useEffect(() => {
-    loadProgressData();
-  }, []);
+    if (!authLoading && !user) {
+      navigate('/login', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    // Only load data if user is authenticated
+    if (user) {
+      loadProgressData();
+    }
+  }, [user]);
 
   const loadProgressData = async () => {
     try {
       setLoading(true);
+      // Security: getProgressSummary uses authenticated session to fetch only current user's data
+      // This prevents IDOR (Insecure Direct Object Reference) attacks
       const data = await progressService.getProgressSummary();
       setProgress(data);
     } catch (err: any) {
@@ -104,6 +120,14 @@ const ProgressPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="mb-4 -ml-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
           <h1 className="text-3xl font-light mb-2 text-neutral-900 dark:text-neutral-100">
             {sanitizedUserName ? `${sanitizedUserName}'s Progress` : 'Your Progress'}
           </h1>
