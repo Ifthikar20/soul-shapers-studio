@@ -51,14 +51,11 @@ const ProgressPage: React.FC = () => {
 
   // Memoize computed values for performance and security
   const badgeData = useMemo(() => {
-    if (!progress?.badges) return { completed: [], next: null };
+    if (!progress?.badges) return { completed: [] };
 
     const completed = progress.badges.filter(b => b.isUnlocked);
-    const next = progress.badges
-      .filter(b => !b.isUnlocked)
-      .sort((a, b) => (b.progress || 0) - (a.progress || 0))[0] || null;
 
-    return { completed, next };
+    return { completed };
   }, [progress?.badges]);
 
   // Sanitize user name to prevent XSS
@@ -151,66 +148,34 @@ const ProgressPage: React.FC = () => {
         </div>
 
         {/* Badges Section */}
-        {(badgeData.completed.length > 0 || badgeData.next) && (
+        {badgeData.completed.length > 0 && (
           <div className="mb-8">
             <h2 className="text-xl font-medium mb-4 text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
               <Award className="w-5 h-5" />
               Achievements
             </h2>
 
-            <div className="grid grid-cols-1 gap-4">
-              {/* Completed Badges */}
-              {badgeData.completed.length > 0 && (
-                <Card className="p-6 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 backdrop-blur">
-                  <h3 className="text-sm font-medium mb-4 text-neutral-700 dark:text-neutral-300">
-                    Completed ({badgeData.completed.length})
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {badgeData.completed.map(badge => (
-                      <div
-                        key={badge.id}
-                        className="text-center p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/50"
-                      >
-                        <div className="text-3xl mb-2">{badge.icon}</div>
-                        <div className="font-medium text-sm text-neutral-900 dark:text-neutral-100 mb-1">
-                          {DOMPurify.sanitize(badge.name)}
-                        </div>
-                        <Badge variant="secondary" className="text-xs">
-                          {DOMPurify.sanitize(badge.tier)}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              )}
-
-              {/* Next Badge */}
-              {badgeData.next && (
-                <Card className="p-6 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 backdrop-blur">
-                  <h3 className="text-sm font-medium mb-4 text-neutral-700 dark:text-neutral-300">
-                    Next Achievement
-                  </h3>
-                  <div className="flex items-center gap-4">
-                    <div className="text-4xl">{badgeData.next.icon}</div>
-                    <div className="flex-1">
-                      <div className="font-medium mb-1 text-neutral-900 dark:text-neutral-100">
-                        {DOMPurify.sanitize(badgeData.next.name)}
-                      </div>
-                      <div className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
-                        {DOMPurify.sanitize(badgeData.next.description)}
-                      </div>
-                      <Progress
-                        value={Math.min(100, Math.max(0, badgeData.next.progress || 0))}
-                        className="h-2 bg-neutral-200 dark:bg-neutral-700"
-                      />
-                      <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                        {Math.min(100, Math.max(0, badgeData.next.progress || 0)).toFixed(0)}% complete
-                      </div>
+            <Card className="p-6 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 backdrop-blur">
+              <h3 className="text-sm font-medium mb-4 text-neutral-700 dark:text-neutral-300">
+                Completed ({badgeData.completed.length})
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {badgeData.completed.map(badge => (
+                  <div
+                    key={badge.id}
+                    className="text-center p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/50"
+                  >
+                    <div className="text-3xl mb-2">{badge.icon}</div>
+                    <div className="font-medium text-sm text-neutral-900 dark:text-neutral-100 mb-1">
+                      {DOMPurify.sanitize(badge.name)}
                     </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {DOMPurify.sanitize(badge.tier)}
+                    </Badge>
                   </div>
-                </Card>
-              )}
-            </div>
+                ))}
+              </div>
+            </Card>
           </div>
         )}
 
@@ -265,32 +230,6 @@ const ProgressPage: React.FC = () => {
               </div>
             </Card>
 
-            {/* Active Goals */}
-            <Card className="p-6 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 backdrop-blur">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">Active Goals</h3>
-              </div>
-
-              <div className="space-y-6">
-                {goals.slice(0, 3).map(goal => {
-                  const safeProgress = Math.min(100, Math.max(0, (goal.current / goal.target) * 100));
-
-                  return (
-                    <div key={goal.id} className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                          {DOMPurify.sanitize(goal.name)}
-                        </span>
-                        <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                          {Math.max(0, goal.current)}/{Math.max(0, goal.target)} {DOMPurify.sanitize(goal.unit)}
-                        </span>
-                      </div>
-                      <Progress value={safeProgress} className="h-2 bg-neutral-100 dark:bg-neutral-800" />
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
           </TabsContent>
 
           {/* Goals Tab */}
