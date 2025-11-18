@@ -4,6 +4,7 @@
 // ============================================
 
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Flame } from 'lucide-react';
 import { progressService } from '@/services/progress.service';
 import type { StreakData } from '@/types/progress.types';
@@ -21,6 +22,7 @@ interface StreakDisplayProps {
 }
 
 const StreakDisplay: React.FC<StreakDisplayProps> = ({ className = '' }) => {
+  const navigate = useNavigate();
   const [streak, setStreak] = useState<StreakData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -47,11 +49,16 @@ const StreakDisplay: React.FC<StreakDisplayProps> = ({ className = '' }) => {
     return null;
   }
 
+  const handleClick = () => {
+    navigate('/progress');
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
           <div
+            onClick={handleClick}
             className={`
               flex items-center gap-2 px-3 py-1.5 rounded-full
               bg-gradient-to-r from-orange-500/10 to-red-500/10
@@ -77,6 +84,7 @@ const StreakDisplay: React.FC<StreakDisplayProps> = ({ className = '' }) => {
             {streak.isActive && (
               <p className="text-xs text-green-500">✓ Active today!</p>
             )}
+            <p className="text-xs text-muted-foreground italic">Click to view progress</p>
           </div>
         </TooltipContent>
       </Tooltip>
