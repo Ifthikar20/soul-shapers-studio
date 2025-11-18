@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, Volume2, VolumeX, ArrowLeft, X } from 'lucide-react';
-import waterflowVideo from '@/assets/waterflow-meditate.mp4';
+import waterflowVideo from '@/assets/stardustvid.mp4';
 
 interface SoundExperience {
   id: string;
