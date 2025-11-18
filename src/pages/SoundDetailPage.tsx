@@ -24,6 +24,7 @@ const SoundDetailPage: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [mouseTimeout, setMouseTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [videoError, setVideoError] = useState(false);
 
   // Sound experiences with video backgrounds
   const soundExperiences: Record<string, SoundExperience> = {
@@ -134,6 +135,10 @@ const SoundDetailPage: React.FC = () => {
     navigate('/meditate');
   };
 
+  const handleVideoError = () => {
+    setVideoError(true);
+  };
+
   useEffect(() => {
     return () => {
       if (mouseTimeout) {
@@ -162,14 +167,31 @@ const SoundDetailPage: React.FC = () => {
       onMouseEnter={() => setShowControls(true)}
     >
       {/* Fullscreen Video Background */}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        loop
-        muted={isMuted}
-        playsInline
-        src={experience.videoUrl}
-      />
+      {!videoError ? (
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          loop
+          muted={isMuted}
+          playsInline
+          src={experience.videoUrl}
+          onError={handleVideoError}
+        />
+      ) : (
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900">
+          <div className="text-center px-8 max-w-2xl">
+            <h2 className="text-white text-4xl font-light mb-6">
+              {experience.title}
+            </h2>
+            <p className="text-white/80 text-xl leading-relaxed mb-8">
+              {experience.description}
+            </p>
+            <div className="text-white/60 text-lg">
+              Immerse yourself in the calming sounds of nature. Close your eyes and let the gentle audio guide you to a place of peace and tranquility.
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dark Overlay for better text readability */}
       <div className="absolute inset-0 bg-black/20" />
