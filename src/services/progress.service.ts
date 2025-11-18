@@ -4,6 +4,7 @@
 // ============================================
 
 import axios, { AxiosInstance } from 'axios';
+import { BADGE_DEFINITIONS } from '@/types/progress.types';
 import type {
   ProgressSummary,
   UserStats,
@@ -16,7 +17,6 @@ import type {
   CategoryStats,
   ExpertStats,
   StreakData,
-  BADGE_DEFINITIONS,
 } from '@/types/progress.types';
 import { checkBadgeUnlock } from '@/types/progress.types';
 
