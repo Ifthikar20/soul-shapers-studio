@@ -57,18 +57,6 @@ const MeditatePage: React.FC = () => {
   const [volume, setVolume] = useState([70]);
   const [isMuted, setIsMuted] = useState(false);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
-  const [currentHeroImageIndex, setCurrentHeroImageIndex] = useState(0);
-
-  // Hero images for slideshow
-  const heroImages = [
-    heroImage1,
-    heroImage2,
-    heroImage3,
-    heroImage4,
-    heroImage5,
-    heroImage6,
-    heroImage7,
-  ];
 
   // Quotes for each meditation experience
   const experienceQuotes: Record<string, string[]> = {
@@ -207,15 +195,6 @@ const MeditatePage: React.FC = () => {
     setCurrentQuoteIndex(0);
   }, [selectedSound]);
 
-  // Rotate hero images every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentHeroImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [heroImages.length]);
-
   const handleSoundClick = (soundId: string) => {
     setSelectedSound(soundId);
     setIsPlaying(false);
@@ -279,26 +258,11 @@ const MeditatePage: React.FC = () => {
           src={heroVideo}
         />
 
-        {/* Image Slideshow Overlay */}
-        <div className="absolute inset-0 bg-black/20">
-          {heroImages.map((image, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                index === currentHeroImageIndex ? 'opacity-30' : 'opacity-0'
-              }`}
-            >
-              <img
-                src={image}
-                alt={`Meditation scene ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
-        </div>
+        {/* Overlay with smooth bottom gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-transparent" />
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+        {/* Bottom blur/frosted effect for smooth transition */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-gray-950 via-white/80 dark:via-gray-950/80 to-transparent backdrop-blur-sm" />
 
         {/* Hero Content */}
         <div className="relative h-full flex items-center justify-center text-center px-4">
