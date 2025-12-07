@@ -9,13 +9,6 @@ import { Play, Pause, Volume2, VolumeX, X, ChevronLeft, ChevronRight } from 'luc
 
 // Import existing assets
 import placeholderVideo from '@/assets/stardustvid.mp4';
-import plant1 from '@/assets/plant1.png';
-import plant4 from '@/assets/plant4.png';
-import plant5 from '@/assets/plant5.png';
-import plant7 from '@/assets/plant7.png';
-import plant8 from '@/assets/plant8.png';
-import plant9 from '@/assets/plant9.png';
-import plant10 from '@/assets/plant10.png';
 
 // Import hero assets
 import heroVideo from '@/assets/women-cudly-video.mp4';
@@ -27,7 +20,7 @@ import heroImage5 from '@/assets/women-cudly-5.png';
 import heroImage6 from '@/assets/women-cudly-6.png';
 import heroImage7 from '@/assets/women-cudly-7.png';
 
-// Placeholder video and images using existing assets
+// Placeholder video and images using women-cudly assets
 const waterflowVideo = placeholderVideo;
 const autumnLeavesVideo = placeholderVideo;
 const autumnWindVideo = placeholderVideo;
@@ -36,13 +29,13 @@ const morningFishingVideo = placeholderVideo;
 const burningWoodVideo = placeholderVideo;
 const thunderstormVillageVideo = placeholderVideo;
 
-const waterfallImage = plant1;
-const autumnLeavesImage = plant4;
-const autumnWindImage = plant5;
-const morningWalkImage = plant7;
-const morningFishingImage = plant8;
-const burningWoodImage = plant9;
-const thunderstormVillageImage = plant10;
+const waterfallImage = heroImage1;
+const autumnLeavesImage = heroImage2;
+const autumnWindImage = heroImage3;
+const morningWalkImage = heroImage4;
+const morningFishingImage = heroImage5;
+const burningWoodImage = heroImage6;
+const thunderstormVillageImage = heroImage7;
 
 interface MeditationExperience {
   id: string;
@@ -261,7 +254,7 @@ const MeditatePage: React.FC = () => {
   const scrollContainer = (categoryId: string, direction: 'left' | 'right') => {
     const container = document.getElementById(`scroll-${categoryId}`);
     if (container) {
-      const scrollAmount = 400;
+      const scrollAmount = 600; // Increased for easier navigation
       container.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
@@ -369,10 +362,10 @@ const MeditatePage: React.FC = () => {
                 </div>
 
                 {/* Horizontal Scrollable Container */}
-                <div className="relative group -mx-4 sm:-mx-6 lg:-mx-8">
+                <div className="relative group">
                   <div
                     id={`scroll-${categoryName.replace(/\s+/g, '-')}`}
-                    className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-6 lg:px-8"
+                    className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4 px-2"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   >
                   {experiences.map((experience) => (
@@ -420,18 +413,20 @@ const MeditatePage: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Scroll Buttons */}
+                {/* Scroll Buttons - Always Visible */}
                 <button
                   onClick={() => scrollContainer(categoryName.replace(/\s+/g, '-'), 'left')}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 z-10"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 z-10 border-2 border-gray-200 dark:border-gray-700"
+                  aria-label="Scroll left"
                 >
-                  <ChevronLeft className="w-5 h-5 text-gray-900 dark:text-white" />
+                  <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-white" />
                 </button>
                 <button
                   onClick={() => scrollContainer(categoryName.replace(/\s+/g, '-'), 'right')}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 z-10"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 z-10 border-2 border-gray-200 dark:border-gray-700"
+                  aria-label="Scroll right"
                 >
-                  <ChevronRight className="w-5 h-5 text-gray-900 dark:text-white" />
+                  <ChevronRight className="w-6 h-6 text-gray-900 dark:text-white" />
                 </button>
               </div>
             </div>
