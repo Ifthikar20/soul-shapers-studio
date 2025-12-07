@@ -262,7 +262,7 @@ const MeditatePage: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-transparent" />
 
         {/* Bottom blur/frosted effect for smooth transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-gray-950 via-white/80 dark:via-gray-950/80 to-transparent backdrop-blur-sm" />
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white/90 dark:from-gray-950/90 via-white/50 dark:via-gray-950/50 to-transparent backdrop-blur-md" />
 
         {/* Hero Content */}
         <div className="relative h-full flex items-center justify-center text-center px-4">
