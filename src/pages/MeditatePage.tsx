@@ -7,23 +7,35 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, Volume2, VolumeX, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Import videos
-import waterflowVideo from '@/assets/waterflow-meditate.mp4';
-import autumnLeavesVideo from '@/assets/autumn-leaves-meditate.mp4';
-import autumnWindVideo from '@/assets/autumn-wind-meditate.mp4';
-import morningWalkVideo from '@/assets/morning-walk-meditate.mp4';
-import morningFishingVideo from '@/assets/morning-fishing-meditate.mp4';
-import burningWoodVideo from '@/assets/burning-wood-meditation.mp4';
-import thunderstormVillageVideo from '@/assets/thunderstorm-village-meditate.mp4';
+// Import existing assets
+import placeholderVideo from '@/assets/stardustvid.mp4';
 
-// Import images
-import waterfallImage from '@/assets/waterfall-meditate-img.jpg';
-import autumnLeavesImage from '@/assets/autumn-leaves-meditate.jpg';
-import autumnWindImage from '@/assets/autumn-wind-img.jpg';
-import morningWalkImage from '@/assets/morning-walk-img.jpg';
-import morningFishingImage from '@/assets/morning-fishing-meditate-img.jpg';
-import burningWoodImage from '@/assets/burning-wood-meditate.jpg';
-import thunderstormVillageImage from '@/assets/thunderstorm-village-meditate.jpg';
+// Import hero assets
+import heroVideo from '@/assets/women-cudly-video.mp4';
+import heroImage1 from '@/assets/women-cudly-1.png';
+import heroImage2 from '@/assets/women-cudly-2.png';
+import heroImage3 from '@/assets/women-cudly-3.png';
+import heroImage4 from '@/assets/women-cudly-4.png';
+import heroImage5 from '@/assets/women-cudly-5.png';
+import heroImage6 from '@/assets/women-cudly-6.png';
+import heroImage7 from '@/assets/women-cudly-7.png';
+
+// Placeholder video and images using women-cudly assets
+const waterflowVideo = placeholderVideo;
+const autumnLeavesVideo = placeholderVideo;
+const autumnWindVideo = placeholderVideo;
+const morningWalkVideo = placeholderVideo;
+const morningFishingVideo = placeholderVideo;
+const burningWoodVideo = placeholderVideo;
+const thunderstormVillageVideo = placeholderVideo;
+
+const waterfallImage = heroImage1;
+const autumnLeavesImage = heroImage2;
+const autumnWindImage = heroImage3;
+const morningWalkImage = heroImage4;
+const morningFishingImage = heroImage5;
+const burningWoodImage = heroImage6;
+const thunderstormVillageImage = heroImage7;
 
 interface MeditationExperience {
   id: string;
@@ -38,6 +50,7 @@ interface MeditationExperience {
 const MeditatePage: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
 
   const [selectedSound, setSelectedSound] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -220,7 +233,7 @@ const MeditatePage: React.FC = () => {
   const scrollContainer = (categoryId: string, direction: 'left' | 'right') => {
     const container = document.getElementById(`scroll-${categoryId}`);
     if (container) {
-      const scrollAmount = 400;
+      const scrollAmount = 600; // Increased for easier navigation
       container.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
@@ -231,15 +244,65 @@ const MeditatePage: React.FC = () => {
   return (
     <>
       <Header />
-      <PageLayout hasHero={false}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3 tracking-tight">
-              Meditation
+
+      {/* Hero Section */}
+      <div className="relative h-[70vh] min-h-[500px] overflow-hidden">
+        {/* Video Background */}
+        <video
+          ref={heroVideoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+          src={heroVideo}
+        />
+
+        {/* Overlay with smooth bottom gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-transparent" />
+
+        {/* Bottom blur/frosted effect for smooth transition */}
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white/90 dark:from-gray-950/90 via-white/50 dark:via-gray-950/50 to-transparent backdrop-blur-md" />
+
+        {/* Hero Content */}
+        <div className="relative h-full flex items-center justify-center text-center px-4">
+          <div className="max-w-4xl">
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight drop-shadow-2xl">
+              Find Your Inner Peace
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              Find your calm. Choose an experience and let nature guide you to peace.
+            <p className="text-xl md:text-2xl text-white/90 mb-8 drop-shadow-lg font-light">
+              Discover tranquility through guided meditations and soothing sounds of nature
+            </p>
+            <Button
+              size="lg"
+              className="bg-white/90 hover:bg-white text-gray-900 font-semibold px-8 py-6 text-lg rounded-full shadow-2xl hover:scale-105 transition-all duration-300"
+              onClick={() => {
+                const categoriesSection = document.getElementById('meditation-categories');
+                categoriesSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Begin Your Journey
+            </Button>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full p-1">
+            <div className="w-1 h-3 bg-white/50 rounded-full mx-auto animate-pulse" />
+          </div>
+        </div>
+      </div>
+
+      <PageLayout hasHero={false}>
+        <div id="meditation-categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Section Header */}
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
+              Explore Meditation Experiences
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Choose from our curated collection of guided meditations and natural soundscapes
             </p>
           </div>
 
@@ -263,10 +326,10 @@ const MeditatePage: React.FC = () => {
                 </div>
 
                 {/* Horizontal Scrollable Container */}
-                <div className="relative group -mx-4 sm:-mx-6 lg:-mx-8">
+                <div className="relative group">
                   <div
                     id={`scroll-${categoryName.replace(/\s+/g, '-')}`}
-                    className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-6 lg:px-8"
+                    className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4 px-2"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   >
                   {experiences.map((experience) => (
@@ -314,18 +377,20 @@ const MeditatePage: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Scroll Buttons */}
+                {/* Scroll Buttons - Always Visible */}
                 <button
                   onClick={() => scrollContainer(categoryName.replace(/\s+/g, '-'), 'left')}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 z-10"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 z-10 border-2 border-gray-200 dark:border-gray-700"
+                  aria-label="Scroll left"
                 >
-                  <ChevronLeft className="w-5 h-5 text-gray-900 dark:text-white" />
+                  <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-white" />
                 </button>
                 <button
                   onClick={() => scrollContainer(categoryName.replace(/\s+/g, '-'), 'right')}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-900/90 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-gray-800 z-10"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 z-10 border-2 border-gray-200 dark:border-gray-700"
+                  aria-label="Scroll right"
                 >
-                  <ChevronRight className="w-5 h-5 text-gray-900 dark:text-white" />
+                  <ChevronRight className="w-6 h-6 text-gray-900 dark:text-white" />
                 </button>
               </div>
             </div>

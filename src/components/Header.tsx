@@ -65,12 +65,14 @@ const NAVIGATION_CONFIG = {
   
   mainNavItems: {
     authenticated: [
+      { label: 'Goals', href: '/' },
       { label: 'Browse', href: '/browse' },
       { label: 'Audio', href: '/audio' },
       { label: 'Meditate', href: '/meditate' },
       { label: 'Read', href: '/read' },
     ],
     guest: [
+      { label: 'Home', href: '/home' },
       { label: 'Browse', href: '/browse' },
       { label: 'Audio', href: '/audio' },
       { label: 'Blog', href: '/blog' }
@@ -208,7 +210,7 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     return (
       <div
         className="flex items-center space-x-4 cursor-pointer group"
-        onClick={() => navigate(isAuthenticated ? '/browse' : '/')}
+        onClick={() => navigate(isAuthenticated ? '/' : '/home')}
       >
         <div className="w-16 h-16 flex items-center justify-center transition-transform group-hover:scale-110">
           <img
