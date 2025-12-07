@@ -7,23 +7,32 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, Volume2, VolumeX, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Import videos
-import waterflowVideo from '@/assets/waterflow-meditate.mp4';
-import autumnLeavesVideo from '@/assets/autumn-leaves-meditate.mp4';
-import autumnWindVideo from '@/assets/autumn-wind-meditate.mp4';
-import morningWalkVideo from '@/assets/morning-walk-meditate.mp4';
-import morningFishingVideo from '@/assets/morning-fishing-meditate.mp4';
-import burningWoodVideo from '@/assets/burning-wood-meditation.mp4';
-import thunderstormVillageVideo from '@/assets/thunderstorm-village-meditate.mp4';
+// Import existing assets
+import placeholderVideo from '@/assets/stardustvid.mp4';
+import plant1 from '@/assets/plant1.png';
+import plant4 from '@/assets/plant4.png';
+import plant5 from '@/assets/plant5.png';
+import plant7 from '@/assets/plant7.png';
+import plant8 from '@/assets/plant8.png';
+import plant9 from '@/assets/plant9.png';
+import plant10 from '@/assets/plant10.png';
 
-// Import images
-import waterfallImage from '@/assets/waterfall-meditate-img.jpg';
-import autumnLeavesImage from '@/assets/autumn-leaves-meditate.jpg';
-import autumnWindImage from '@/assets/autumn-wind-img.jpg';
-import morningWalkImage from '@/assets/morning-walk-img.jpg';
-import morningFishingImage from '@/assets/morning-fishing-meditate-img.jpg';
-import burningWoodImage from '@/assets/burning-wood-meditate.jpg';
-import thunderstormVillageImage from '@/assets/thunderstorm-village-meditate.jpg';
+// Placeholder video and images using existing assets
+const waterflowVideo = placeholderVideo;
+const autumnLeavesVideo = placeholderVideo;
+const autumnWindVideo = placeholderVideo;
+const morningWalkVideo = placeholderVideo;
+const morningFishingVideo = placeholderVideo;
+const burningWoodVideo = placeholderVideo;
+const thunderstormVillageVideo = placeholderVideo;
+
+const waterfallImage = plant1;
+const autumnLeavesImage = plant4;
+const autumnWindImage = plant5;
+const morningWalkImage = plant7;
+const morningFishingImage = plant8;
+const burningWoodImage = plant9;
+const thunderstormVillageImage = plant10;
 
 interface MeditationExperience {
   id: string;
