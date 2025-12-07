@@ -3,509 +3,442 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageLayout from '@/components/Layout/PageLayout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Plus, Target, Calendar, CheckCircle2, Circle, Sparkles, MessageCircle, X } from 'lucide-react';
+import {
+  Target,
+  CheckCircle2,
+  Circle,
+  Sparkles,
+  Play,
+  User,
+  TrendingUp,
+  Award,
+  Calendar,
+  ChevronRight,
+  Zap,
+  Heart,
+  Brain,
+  Dumbbell,
+  Book,
+  Coffee,
+  Moon,
+  Sun,
+  Plus,
+  X
+} from 'lucide-react';
 import Confetti from 'react-confetti';
 import { useWindowSize } from '@/hooks/useWindowSize';
+import { useNavigate } from 'react-router-dom';
 
-// Import character SVG
-import characterSvg from '@/assets/preview.svg';
+// Import Cudly character
+import cudlyCharacter from '@/assets/preview.svg';
 
-interface Goal {
+interface DailyGoal {
   id: string;
   title: string;
-  description: string;
-  category: 'wellness' | 'meditation' | 'learning' | 'personal';
+  icon: React.ReactNode;
   completed: boolean;
-  createdAt: Date;
+  category: 'morning' | 'anytime' | 'evening';
+  points: number;
 }
 
-interface CharacterMessage {
+interface Journey {
+  type: string;
+  goals: string[];
+  suggestedContent: SuggestedContent[];
+}
+
+interface SuggestedContent {
   id: string;
-  text: string;
-  isQuestion: boolean;
-  timestamp: Date;
+  title: string;
+  type: 'video' | 'audio' | 'expert' | 'meditation';
+  thumbnail: string;
+  description: string;
+  link: string;
 }
 
 const GoalsPage: React.FC = () => {
-  const [goals, setGoals] = useState<Goal[]>([
-    {
-      id: '1',
-      title: 'Practice Daily Meditation',
-      description: 'Meditate for 10 minutes every morning',
-      category: 'meditation',
-      completed: false,
-      createdAt: new Date(),
-    },
-  ]);
+  const navigate = useNavigate();
+  const { width, height } = useWindowSize();
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [showJourneySetup, setShowJourneySetup] = useState(false);
+  const [journeyInput, setJourneyInput] = useState('');
+  const [currentStreak, setCurrentStreak] = useState(3);
+  const [totalPoints, setTotalPoints] = useState(245);
+  const [level, setLevel] = useState(4);
 
-  const [showNewGoalForm, setShowNewGoalForm] = useState(false);
-  const [newGoal, setNewGoal] = useState({
-    title: '',
-    description: '',
-    category: 'wellness' as Goal['category'],
+  const [userJourney, setUserJourney] = useState<Journey>({
+    type: 'Wellness & Mindfulness',
+    goals: ['Practice daily meditation', 'Improve sleep quality', 'Reduce stress'],
+    suggestedContent: []
   });
 
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [characterMessages, setCharacterMessages] = useState<CharacterMessage[]>([
-    {
-      id: '1',
-      text: "Welcome! I'm here to support you on your journey. What would you like to achieve today?",
-      isQuestion: true,
-      timestamp: new Date(),
-    },
+  const [dailyGoals, setDailyGoals] = useState<DailyGoal[]>([
+    { id: '1', title: 'Morning meditation', icon: <Sparkles className="w-5 h-5" />, completed: true, category: 'morning', points: 10 },
+    { id: '2', title: 'Drink water', icon: <Coffee className="w-5 h-5" />, completed: true, category: 'morning', points: 5 },
+    { id: '3', title: 'Practice gratitude', icon: <Heart className="w-5 h-5" />, completed: false, category: 'morning', points: 10 },
+    { id: '4', title: 'Take a mindful break', icon: <Brain className="w-5 h-5" />, completed: false, category: 'anytime', points: 10 },
+    { id: '5', title: 'Listen to wellness audio', icon: <Play className="w-5 h-5" />, completed: false, category: 'anytime', points: 15 },
+    { id: '6', title: 'Evening reflection', icon: <Moon className="w-5 h-5" />, completed: false, category: 'evening', points: 10 },
+    { id: '7', title: 'Wind down meditation', icon: <Moon className="w-5 h-5" />, completed: false, category: 'evening', points: 15 },
   ]);
-  const [showCharacterChat, setShowCharacterChat] = useState(true);
-  const { width, height } = useWindowSize();
 
-  // Character questions based on user's journey
-  const journeyQuestions = [
-    "What's one small step you can take today toward your wellness?",
-    "How are you feeling about your progress this week?",
-    "What motivated you to start this journey?",
-    "Is there something holding you back from your goals?",
-    "What would completing this goal mean to you?",
-    "How can I support you better on this journey?",
-  ];
+  const [cudlyMessage, setCudlyMessage] = useState(
+    "Good morning! Ready to make today amazing? I've prepared your daily challenges based on your wellness journey. Let's start! ✨"
+  );
 
-  const encouragingMessages = [
-    "That's amazing progress! Keep going!",
-    "I'm so proud of how far you've come!",
-    "Every small step counts. You're doing great!",
-    "Your dedication is inspiring!",
-    "Remember, progress isn't always linear. You've got this!",
-  ];
+  const completedToday = dailyGoals.filter(g => g.completed).length;
+  const totalGoals = dailyGoals.length;
+  const goalsLeft = totalGoals - completedToday;
+  const progressPercentage = Math.round((completedToday / totalGoals) * 100);
 
-  useEffect(() => {
-    // Add a new encouraging message periodically
-    const messageInterval = setInterval(() => {
-      const randomQuestion = journeyQuestions[Math.floor(Math.random() * journeyQuestions.length)];
-      const newMessage: CharacterMessage = {
-        id: Date.now().toString(),
-        text: randomQuestion,
-        isQuestion: true,
-        timestamp: new Date(),
-      };
-      setCharacterMessages(prev => [...prev, newMessage]);
-    }, 120000); // Every 2 minutes
+  // Suggested content based on user's journey
+  const getSuggestedContent = (journeyType: string): SuggestedContent[] => {
+    const contentMap: Record<string, SuggestedContent[]> = {
+      'weight loss': [
+        { id: '1', title: 'Mindful Eating Meditation', type: 'meditation', thumbnail: '', description: '15-min guided meditation', link: '/meditate' },
+        { id: '2', title: 'Nutrition Expert: Dr. Sarah', type: 'expert', thumbnail: '', description: 'Weight management specialist', link: '/experts/1' },
+        { id: '3', title: 'Healthy Habits Audio', type: 'audio', thumbnail: '', description: '20-min wellness session', link: '/audio' },
+      ],
+      'stress reduction': [
+        { id: '1', title: 'Stress Relief Meditation', type: 'meditation', thumbnail: '', description: '10-min calming session', link: '/meditate' },
+        { id: '2', title: 'Anxiety Management Expert', type: 'expert', thumbnail: '', description: 'Licensed therapist', link: '/experts/2' },
+        { id: '3', title: 'Deep Breathing Exercises', type: 'audio', thumbnail: '', description: 'Guided breathing', link: '/audio' },
+      ],
+      'wellness': [
+        { id: '1', title: 'Morning Energy Meditation', type: 'meditation', thumbnail: '', description: 'Start your day right', link: '/meditate' },
+        { id: '2', title: 'Wellness Coach Session', type: 'audio', thumbnail: '', description: 'Daily wellness tips', link: '/audio' },
+        { id: '3', title: 'Sleep Better Tonight', type: 'meditation', thumbnail: '', description: 'Evening wind-down', link: '/meditate' },
+      ],
+    };
 
-    return () => clearInterval(messageInterval);
-  }, []);
-
-  const handleAddGoal = () => {
-    if (newGoal.title.trim()) {
-      const goal: Goal = {
-        id: Date.now().toString(),
-        title: newGoal.title,
-        description: newGoal.description,
-        category: newGoal.category,
-        completed: false,
-        createdAt: new Date(),
-      };
-      setGoals([goal, ...goals]);
-      setNewGoal({ title: '', description: '', category: 'wellness' });
-      setShowNewGoalForm(false);
-
-      // Character responds
-      const encouragement = "Great! I love that you're setting this goal. Remember, I'm here to help you every step of the way.";
-      setCharacterMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        text: encouragement,
-        isQuestion: false,
-        timestamp: new Date(),
-      }]);
-    }
+    return contentMap[journeyType.toLowerCase()] || contentMap['wellness'];
   };
 
   const toggleGoalComplete = (id: string) => {
-    const goal = goals.find(g => g.id === id);
-    const wasCompleted = goal?.completed;
+    const goal = dailyGoals.find(g => g.id === id);
+    if (!goal) return;
 
-    setGoals(goals.map(goal =>
-      goal.id === id ? { ...goal, completed: !goal.completed } : goal
+    setDailyGoals(dailyGoals.map(g =>
+      g.id === id ? { ...g, completed: !g.completed } : g
     ));
 
-    // If goal was just completed, celebrate!
-    if (!wasCompleted) {
+    if (!goal.completed) {
+      setTotalPoints(totalPoints + goal.points);
       setShowCelebration(true);
-      setTimeout(() => setShowCelebration(false), 5000);
+      setTimeout(() => setShowCelebration(false), 3000);
 
-      const celebration = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
-      setCharacterMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        text: celebration,
-        isQuestion: false,
-        timestamp: new Date(),
-      }]);
+      const encouragements = [
+        "Amazing! You're doing great! 🌟",
+        "Keep it up! Every small step counts! 💪",
+        "Wonderful progress! I'm proud of you! ✨",
+        "You're on fire today! 🔥",
+        "That's the spirit! Keep going! 🎯"
+      ];
+      setCudlyMessage(encouragements[Math.floor(Math.random() * encouragements.length)]);
     }
   };
 
-  const getCategoryColor = (category: Goal['category']) => {
-    const colors = {
-      wellness: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      meditation: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-      learning: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      personal: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-    };
-    return colors[category];
+  const handleJourneySetup = () => {
+    if (journeyInput.trim()) {
+      const newJourney: Journey = {
+        type: journeyInput,
+        goals: [],
+        suggestedContent: getSuggestedContent(journeyInput)
+      };
+      setUserJourney(newJourney);
+      setCudlyMessage(`Perfect! I'll help you with your ${journeyInput} journey. I've found some great content for you! 🎯`);
+      setShowJourneySetup(false);
+      setJourneyInput('');
+    }
   };
 
-  const completedGoals = goals.filter(g => g.completed).length;
-  const totalGoals = goals.length;
-  const completionRate = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
+  const getCategoryGoals = (category: 'morning' | 'anytime' | 'evening') => {
+    return dailyGoals.filter(g => g.category === category);
+  };
+
+  const categoryIcons = {
+    morning: <Sun className="w-5 h-5" />,
+    anytime: <Zap className="w-5 h-5" />,
+    evening: <Moon className="w-5 h-5" />
+  };
+
+  const categoryTitles = {
+    morning: 'Start the Day',
+    anytime: 'Anytime',
+    evening: 'Wind Down'
+  };
 
   return (
     <>
       <Header />
       <PageLayout hasHero={false}>
-        {/* Celebration Confetti */}
         {showCelebration && (
           <Confetti
             width={width}
             height={height}
             recycle={false}
-            numberOfPieces={500}
+            numberOfPieces={200}
             gravity={0.3}
           />
         )}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Page Header with Character */}
-          <div className="mb-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              {/* Left: Header Text */}
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <Target className="w-10 h-10 text-indigo-600 dark:text-indigo-400" />
-                  <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
-                    Your Journey
-                  </h1>
-                </div>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                  Every step forward is progress. I'm here to walk this path with you.
-                </p>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Cudly Character Scene */}
+          <div className="relative h-72 mb-6 rounded-3xl overflow-hidden bg-gradient-to-b from-sky-200 via-green-100 to-green-200 dark:from-sky-900 dark:via-green-900 dark:to-green-800">
+            {/* Decorative elements */}
+            <div className="absolute top-8 right-8 w-16 h-16 bg-yellow-300 rounded-full opacity-90"></div>
+            <div className="absolute top-20 left-10 w-24 h-32 bg-green-600 rounded-full opacity-60"></div>
+            <div className="absolute bottom-10 right-16 w-20 h-28 bg-green-700 rounded-full opacity-50"></div>
 
-                {/* Quick Stats */}
-                <div className="flex gap-4 flex-wrap">
-                  <div className="px-4 py-2 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950 rounded-full border border-indigo-200 dark:border-indigo-800">
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Progress: </span>
-                    <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{completionRate}%</span>
-                  </div>
-                  <div className="px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 rounded-full border border-green-200 dark:border-green-800">
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Completed: </span>
-                    <span className="text-lg font-bold text-green-600 dark:text-green-400">{completedGoals}/{totalGoals}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right: Character Guide */}
+            {/* Cudly Character */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
               <div className="relative">
-                <Card className="border-2 border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-indigo-950/50 dark:to-purple-950/50 overflow-hidden">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      {/* Character Avatar */}
-                      <div className="relative flex-shrink-0">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 p-1 animate-pulse">
-                          <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden">
-                            <img
-                              src={characterSvg}
-                              alt="Your Guide"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                // Fallback if SVG not found
-                                e.currentTarget.style.display = 'none';
-                                e.currentTarget.parentElement!.innerHTML = '<div class="text-4xl">🌟</div>';
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white dark:border-gray-900 animate-bounce">
-                          <Sparkles className="w-4 h-4 text-white m-auto" />
-                        </div>
-                      </div>
+                <div className="w-32 h-32 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow-2xl animate-bounce">
+                  <img
+                    src={cudlyCharacter}
+                    alt="Cudly"
+                    className="w-full h-full object-cover rounded-full"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = '<div class="text-6xl">🌟</div>';
+                    }}
+                  />
+                </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+              </div>
+            </div>
 
-                      {/* Latest Character Message */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-gray-900 dark:text-white">Your Guide</h3>
-                          <MessageCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                        </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl rounded-tl-none p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                          <p className="text-sm text-gray-700 dark:text-gray-300">
-                            {characterMessages[characterMessages.length - 1]?.text}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => setShowCharacterChat(!showCharacterChat)}
-                          className="mt-2 text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
-                        >
-                          <MessageCircle className="w-3 h-3" />
-                          {showCharacterChat ? 'Hide conversation' : 'Show full conversation'}
-                        </button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+            {/* Stats Bar */}
+            <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
+              <div className="flex gap-3">
+                <div className="px-4 py-2 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center gap-2">
+                  <Award className="w-5 h-5 text-yellow-500" />
+                  <span className="font-bold text-gray-900 dark:text-white">Level {level}</span>
+                </div>
+                <div className="px-4 py-2 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-orange-500" />
+                  <span className="font-bold text-gray-900 dark:text-white">{totalPoints} pts</span>
+                </div>
+              </div>
+              <div className="px-4 py-2 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center gap-2">
+                <span className="text-2xl">🔥</span>
+                <span className="font-bold text-gray-900 dark:text-white">{currentStreak} day streak</span>
               </div>
             </div>
           </div>
 
-          {/* Character Chat History - Expandable */}
-          {showCharacterChat && characterMessages.length > 1 && (
-            <Card className="mb-8 border-indigo-200 dark:border-indigo-800 animate-in slide-in-from-top duration-300">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <MessageCircle className="w-5 h-5 text-indigo-600" />
-                    Journey Conversation
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowCharacterChat(false)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
+          {/* Cudly's Message */}
+          <Card className="mb-6 border-2 border-indigo-200 dark:border-indigo-800 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">🌟</span>
                 </div>
-              </CardHeader>
-              <CardContent className="max-h-64 overflow-y-auto space-y-3">
-                {characterMessages.slice(0, -1).reverse().map((message) => (
-                  <div key={message.id} className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex-shrink-0 flex items-center justify-center text-white text-xs">
-                      🌟
-                    </div>
-                    <div className="flex-1">
-                      <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-none p-3">
-                        <p className="text-sm text-gray-700 dark:text-gray-300">{message.text}</p>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Cudly</h3>
+                  <p className="text-gray-700 dark:text-gray-300">{cudlyMessage}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Add New Goal Section */}
-          <div className="mb-8">
-            {!showNewGoalForm && (
-              <Button
-                onClick={() => setShowNewGoalForm(true)}
-                size="lg"
-                className="w-full md:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Set a New Goal
-              </Button>
-            )}
-
-            {/* New Goal Form */}
-            {showNewGoalForm && (
-              <Card className="border-2 border-indigo-200 dark:border-indigo-800 shadow-xl animate-in slide-in-from-top duration-300">
-                <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950">
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-indigo-600" />
-                    What do you want to achieve?
-                  </CardTitle>
-                  <CardDescription>
-                    Let's work together to make this goal a reality
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-6 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Your Goal
-                    </label>
-                    <Input
-                      placeholder="e.g., Meditate every morning for 10 minutes"
-                      value={newGoal.title}
-                      onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })}
-                      className="w-full text-lg"
-                      autoFocus
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Why is this important to you?
-                    </label>
-                    <Textarea
-                      placeholder="Share your reason... This helps keep you motivated!"
-                      value={newGoal.description}
-                      onChange={(e) => setNewGoal({ ...newGoal, description: e.target.value })}
-                      className="w-full"
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Category
-                    </label>
-                    <select
-                      value={newGoal.category}
-                      onChange={(e) => setNewGoal({ ...newGoal, category: e.target.value as Goal['category'] })}
-                      className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="wellness">🌿 Wellness</option>
-                      <option value="meditation">🧘 Meditation</option>
-                      <option value="learning">📚 Learning</option>
-                      <option value="personal">✨ Personal Growth</option>
-                    </select>
-                  </div>
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      onClick={handleAddGoal}
-                      className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg"
-                    >
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Create Goal
-                    </Button>
-                    <Button
-                      onClick={() => setShowNewGoalForm(false)}
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Goals List */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Target className="w-6 h-6 text-indigo-600" />
-                Active Goals
-              </h2>
-              {goals.filter(g => !g.completed).length > 0 && (
-                <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium">
-                  {goals.filter(g => !g.completed).length} in progress
-                </span>
-              )}
-            </div>
-
-            {goals.length === 0 ? (
-              <Card className="border-dashed border-2 bg-gradient-to-br from-gray-50 to-indigo-50/30 dark:from-gray-900 dark:to-indigo-950/30">
-                <CardContent className="py-16 text-center">
-                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center animate-bounce">
-                    <span className="text-4xl">🎯</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    Let's start your journey!
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-                    Setting goals is the first step toward making positive changes. What would you like to work on?
+          {/* Journey Progress */}
+          <Card className="mb-6 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950 border-indigo-200 dark:border-indigo-800">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                    {userJourney.type} Journey
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {goalsLeft} goals left for today!
                   </p>
-                  <Button
-                    onClick={() => setShowNewGoalForm(true)}
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg"
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Set Your First Goal
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                {/* Active Goals */}
-                {goals.filter(g => !g.completed).map((goal) => (
-                  <Card
-                    key={goal.id}
-                    className="transition-all duration-300 hover:shadow-xl border-2 hover:border-indigo-300 dark:hover:border-indigo-700 group animate-in slide-in-from-left"
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <button
-                          onClick={() => toggleGoalComplete(goal.id)}
-                          className="mt-1 flex-shrink-0 group/checkbox"
-                        >
-                          <Circle className="w-7 h-7 text-gray-300 group-hover/checkbox:text-indigo-600 group-hover/checkbox:scale-110 transition-all" />
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-4 mb-2">
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                              {goal.title}
-                            </h3>
-                            <span className={`px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getCategoryColor(goal.category)}`}>
-                              {goal.category === 'wellness' && '🌿'}
-                              {goal.category === 'meditation' && '🧘'}
-                              {goal.category === 'learning' && '📚'}
-                              {goal.category === 'personal' && '✨'}
-                              {' '}
-                              {goal.category.charAt(0).toUpperCase() + goal.category.slice(1)}
-                            </span>
+                </div>
+                <button
+                  onClick={() => setShowJourneySetup(true)}
+                  className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium"
+                >
+                  Change Journey
+                </button>
+              </div>
+              <div className="relative w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div
+                  className="absolute h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 rounded-full"
+                  style={{ width: `${progressPercentage}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-2 text-sm">
+                <span className="text-gray-600 dark:text-gray-400">{completedToday}/{totalGoals} completed</span>
+                <span className="font-bold text-indigo-600 dark:text-indigo-400">{progressPercentage}%</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Daily Goals by Category */}
+          {(['morning', 'anytime', 'evening'] as const).map((category) => {
+            const categoryGoals = getCategoryGoals(category);
+            if (categoryGoals.length === 0) return null;
+
+            return (
+              <div key={category} className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  {categoryIcons[category]}
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    {categoryTitles[category]}
+                  </h3>
+                </div>
+                <div className="space-y-2">
+                  {categoryGoals.map((goal) => (
+                    <Card
+                      key={goal.id}
+                      className={`transition-all duration-300 cursor-pointer hover:shadow-lg ${
+                        goal.completed
+                          ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800'
+                          : 'hover:border-indigo-300 dark:hover:border-indigo-700'
+                      }`}
+                      onClick={() => toggleGoalComplete(goal.id)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                            goal.completed
+                              ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                          }`}>
+                            {goal.icon}
                           </div>
-                          {goal.description && (
-                            <p className="text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
-                              {goal.description}
-                            </p>
-                          )}
-                          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-500">
-                            <Calendar className="w-3 h-3" />
-                            Started {goal.createdAt.toLocaleDateString()}
+                          <div className="flex-1">
+                            <h4 className={`font-semibold ${
+                              goal.completed
+                                ? 'text-gray-600 dark:text-gray-400 line-through'
+                                : 'text-gray-900 dark:text-white'
+                            }`}>
+                              {goal.title}
+                            </h4>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-orange-600 dark:text-orange-400 flex items-center gap-1">
+                              <Zap className="w-4 h-4" />
+                              {goal.points}
+                            </span>
+                            {goal.completed ? (
+                              <CheckCircle2 className="w-6 h-6 text-green-500 animate-pulse" />
+                            ) : (
+                              <Circle className="w-6 h-6 text-gray-300 dark:text-gray-600" />
+                            )}
                           </div>
                         </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Suggested Content */}
+          {userJourney.suggestedContent.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Target className="w-6 h-6 text-indigo-600" />
+                  Recommended for You
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {getSuggestedContent(userJourney.type).map((content) => (
+                  <Card
+                    key={content.id}
+                    className="cursor-pointer hover:shadow-xl transition-all duration-300 group"
+                    onClick={() => navigate(content.link)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="w-full h-32 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 rounded-lg mb-3 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        {content.type === 'meditation' && <Sparkles className="w-12 h-12 text-indigo-600" />}
+                        {content.type === 'audio' && <Play className="w-12 h-12 text-purple-600" />}
+                        {content.type === 'expert' && <User className="w-12 h-12 text-blue-600" />}
+                      </div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2">
+                        {content.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        {content.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                          content.type === 'meditation' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300' :
+                          content.type === 'audio' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' :
+                          'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                        }`}>
+                          {content.type}
+                        </span>
+                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition-colors" />
                       </div>
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            </div>
+          )}
 
-                {/* Completed Goals */}
-                {goals.filter(g => g.completed).length > 0 && (
-                  <>
-                    <div className="flex items-center gap-2 mt-8 mb-4">
-                      <CheckCircle2 className="w-5 h-5 text-green-600" />
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        Completed Goals
-                      </h3>
-                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-xs font-medium">
-                        {goals.filter(g => g.completed).length}
-                      </span>
-                    </div>
-                    {goals.filter(g => g.completed).map((goal) => (
-                      <Card
-                        key={goal.id}
-                        className="opacity-70 hover:opacity-100 transition-all duration-300 border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/30"
-                      >
-                        <CardContent className="p-6">
-                          <div className="flex items-start gap-4">
-                            <button
-                              onClick={() => toggleGoalComplete(goal.id)}
-                              className="mt-1 flex-shrink-0"
-                            >
-                              <CheckCircle2 className="w-7 h-7 text-green-500 animate-pulse" />
-                            </button>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-4 mb-2">
-                                <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-400 line-through">
-                                  {goal.title}
-                                </h3>
-                                <span className={`px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap opacity-60 ${getCategoryColor(goal.category)}`}>
-                                  {goal.category.charAt(0).toUpperCase() + goal.category.slice(1)}
-                                </span>
-                              </div>
-                              {goal.description && (
-                                <p className="text-gray-500 dark:text-gray-500 text-sm mb-2">
-                                  {goal.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </>
-                )}
-              </>
-            )}
-          </div>
+          {/* Add Custom Goal Button */}
+          <Button
+            onClick={() => {/* Add custom goal logic */}}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg py-6 text-lg"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Add Custom Goal
+          </Button>
         </div>
+
+        {/* Journey Setup Modal */}
+        {showJourneySetup && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="max-w-md w-full">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    What's your journey about?
+                  </h3>
+                  <button onClick={() => setShowJourneySetup(false)}>
+                    <X className="w-6 h-6 text-gray-400" />
+                  </button>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Tell me what you want to work on, and I'll suggest personalized content!
+                </p>
+                <Input
+                  placeholder="e.g., weight loss, stress reduction, better sleep..."
+                  value={journeyInput}
+                  onChange={(e) => setJourneyInput(e.target.value)}
+                  className="mb-4"
+                  autoFocus
+                />
+                <div className="flex gap-2 flex-wrap mb-4">
+                  {['Weight Loss', 'Stress Reduction', 'Better Sleep', 'Fitness', 'Mindfulness'].map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      onClick={() => setJourneyInput(suggestion)}
+                      className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-colors"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+                <Button
+                  onClick={handleJourneySetup}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                >
+                  Start My Journey
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </PageLayout>
       <Footer />
     </>
