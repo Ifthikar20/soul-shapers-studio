@@ -17,6 +17,16 @@ import plant8 from '@/assets/plant8.png';
 import plant9 from '@/assets/plant9.png';
 import plant10 from '@/assets/plant10.png';
 
+// Import hero assets
+import heroVideo from '@/assets/women-cudly-video.mp4';
+import heroImage1 from '@/assets/women-cudly-1.png';
+import heroImage2 from '@/assets/women-cudly-2.png';
+import heroImage3 from '@/assets/women-cudly-3.png';
+import heroImage4 from '@/assets/women-cudly-4.png';
+import heroImage5 from '@/assets/women-cudly-5.png';
+import heroImage6 from '@/assets/women-cudly-6.png';
+import heroImage7 from '@/assets/women-cudly-7.png';
+
 // Placeholder video and images using existing assets
 const waterflowVideo = placeholderVideo;
 const autumnLeavesVideo = placeholderVideo;
@@ -47,12 +57,25 @@ interface MeditationExperience {
 const MeditatePage: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
 
   const [selectedSound, setSelectedSound] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([70]);
   const [isMuted, setIsMuted] = useState(false);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [currentHeroImageIndex, setCurrentHeroImageIndex] = useState(0);
+
+  // Hero images for slideshow
+  const heroImages = [
+    heroImage1,
+    heroImage2,
+    heroImage3,
+    heroImage4,
+    heroImage5,
+    heroImage6,
+    heroImage7,
+  ];
 
   // Quotes for each meditation experience
   const experienceQuotes: Record<string, string[]> = {
@@ -191,6 +214,15 @@ const MeditatePage: React.FC = () => {
     setCurrentQuoteIndex(0);
   }, [selectedSound]);
 
+  // Rotate hero images every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeroImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
   const handleSoundClick = (soundId: string) => {
     setSelectedSound(soundId);
     setIsPlaying(false);
@@ -240,15 +272,80 @@ const MeditatePage: React.FC = () => {
   return (
     <>
       <Header />
-      <PageLayout hasHero={false}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3 tracking-tight">
-              Meditation
+
+      {/* Hero Section */}
+      <div className="relative h-[70vh] min-h-[500px] overflow-hidden">
+        {/* Video Background */}
+        <video
+          ref={heroVideoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+          src={heroVideo}
+        />
+
+        {/* Image Slideshow Overlay */}
+        <div className="absolute inset-0 bg-black/20">
+          {heroImages.map((image, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentHeroImageIndex ? 'opacity-30' : 'opacity-0'
+              }`}
+            >
+              <img
+                src={image}
+                alt={`Meditation scene ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+
+        {/* Hero Content */}
+        <div className="relative h-full flex items-center justify-center text-center px-4">
+          <div className="max-w-4xl">
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight drop-shadow-2xl">
+              Find Your Inner Peace
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              Find your calm. Choose an experience and let nature guide you to peace.
+            <p className="text-xl md:text-2xl text-white/90 mb-8 drop-shadow-lg font-light">
+              Discover tranquility through guided meditations and soothing sounds of nature
+            </p>
+            <Button
+              size="lg"
+              className="bg-white/90 hover:bg-white text-gray-900 font-semibold px-8 py-6 text-lg rounded-full shadow-2xl hover:scale-105 transition-all duration-300"
+              onClick={() => {
+                const categoriesSection = document.getElementById('meditation-categories');
+                categoriesSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Begin Your Journey
+            </Button>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full p-1">
+            <div className="w-1 h-3 bg-white/50 rounded-full mx-auto animate-pulse" />
+          </div>
+        </div>
+      </div>
+
+      <PageLayout hasHero={false}>
+        <div id="meditation-categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Section Header */}
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
+              Explore Meditation Experiences
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Choose from our curated collection of guided meditations and natural soundscapes
             </p>
           </div>
 
