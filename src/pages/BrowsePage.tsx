@@ -6,7 +6,7 @@ import { useNavigationTracking } from '@/hooks/useNavigationTracking';
 import { contentService } from '@/services/content.service';
 import { Video, normalizeVideo } from '@/types/video.types'; // ✅ Use centralized types
 import { decodeSearchQuery, sanitizeHTML } from '@/utils/search.security';
-import { AlertCircle, X, Search, Shield } from 'lucide-react';
+import { AlertCircle, X, Search, Shield, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -14,7 +14,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/Browse/HeroSection';
 import VideoRow from '@/components/Browse/VideoRow';
-import ContentFilters from '@/components/Browse/ContentFilters';
+import FilterModal from '@/components/Browse/FilterModal';
 
 const BrowsePage = () => {
   const navigate = useNavigate();
@@ -38,6 +38,7 @@ const BrowsePage = () => {
   // Category and interest filters
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   // Validate and sanitize search query from URL
   useEffect(() => {
@@ -459,17 +460,72 @@ const BrowsePage = () => {
           </Alert>
         )}
 
-        {/* Category and Interest Filters */}
+        {/* Filter Button and Active Filters */}
         {!loading && allVideos.length > 0 && (availableCategories.length > 0 || availableInterests.length > 0) && (
-          <ContentFilters
-            selectedCategories={selectedCategories}
-            selectedInterests={selectedInterests}
-            onCategoryToggle={handleCategoryToggle}
-            onInterestToggle={handleInterestToggle}
-            onClearAll={handleClearAllFilters}
-            availableCategories={availableCategories}
-            availableInterests={availableInterests}
-          />
+          <div className="mb-6">
+            <div className="flex items-center gap-3 flex-wrap">
+              <Button
+                variant="outline"
+                onClick={() => setIsFilterModalOpen(true)}
+                className="rounded-full border-2 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Filter Content
+                {(selectedCategories.length > 0 || selectedInterests.length > 0) && (
+                  <Badge variant="secondary" className="ml-2">
+                    {selectedCategories.length + selectedInterests.length}
+                  </Badge>
+                )}
+              </Button>
+
+              {/* Active Filters Display */}
+              {selectedCategories.length > 0 && (
+                <>
+                  {selectedCategories.map(category => (
+                    <Badge
+                      key={category}
+                      variant="secondary"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 cursor-pointer"
+                      onClick={() => handleCategoryToggle(category)}
+                    >
+                      {category}
+                      <X className="w-3 h-3 ml-1" />
+                    </Badge>
+                  ))}
+                </>
+              )}
+
+              {selectedInterests.length > 0 && selectedInterests.slice(0, 5).map(interest => (
+                <Badge
+                  key={interest}
+                  variant="secondary"
+                  className="bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 cursor-pointer"
+                  onClick={() => handleInterestToggle(interest)}
+                >
+                  {interest}
+                  <X className="w-3 h-3 ml-1" />
+                </Badge>
+              ))}
+
+              {selectedInterests.length > 5 && (
+                <Badge variant="outline">
+                  +{selectedInterests.length - 5} more
+                </Badge>
+              )}
+
+              {(selectedCategories.length > 0 || selectedInterests.length > 0) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearAllFilters}
+                  className="text-gray-600 dark:text-gray-400"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Clear All
+                </Button>
+              )}
+            </div>
+          </div>
         )}
 
         {/* Search Results Header */}
@@ -601,6 +657,23 @@ const BrowsePage = () => {
       </main>
 
       <Footer />
+
+      {/* Filter Modal */}
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        selectedCategories={selectedCategories}
+        selectedInterests={selectedInterests}
+        onCategoryToggle={handleCategoryToggle}
+        onInterestToggle={handleInterestToggle}
+        onClearAll={handleClearAllFilters}
+        onApply={() => {
+          // Filters are already applied reactively
+          // Modal will close automatically
+        }}
+        availableCategories={availableCategories}
+        availableInterests={availableInterests}
+      />
     </div>
   );
 };
