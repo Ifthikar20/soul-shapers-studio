@@ -14,6 +14,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/Browse/HeroSection';
 import VideoRow from '@/components/Browse/VideoRow';
+import ContentFilters from '@/components/Browse/ContentFilters';
 
 const BrowsePage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,10 @@ const BrowsePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Category and interest filters
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   // Validate and sanitize search query from URL
   useEffect(() => {
@@ -159,11 +164,100 @@ const BrowsePage = () => {
   const handleClearSearch = () => {
     setSearchParams({});
     setIsSearching(false);
-    
+
     trackNavigationEvent('Search Cleared', {
       source: 'browse_page',
       from: location.pathname,
     });
+  };
+
+  // Extract unique categories and interests from videos
+  const availableCategories = React.useMemo(() => {
+    const categories = new Set(allVideos.map(v => v.category).filter(Boolean));
+    return Array.from(categories).sort();
+  }, [allVideos]);
+
+  const availableInterests = React.useMemo(() => {
+    const interests = new Set<string>();
+
+    // Add common wellness interests as defaults
+    const defaultInterests = [
+      'Meditation',
+      'Mindfulness',
+      'Nutrition',
+      'Fitness',
+      'Sleep',
+      'Stress Relief',
+      'Anxiety',
+      'Depression',
+      'Self-Care',
+      'Yoga',
+      'Breathing',
+      'Mental Health',
+    ];
+
+    defaultInterests.forEach(interest => interests.add(interest));
+
+    // Add interests from video data
+    allVideos.forEach(video => {
+      if (video.relatedTopics) {
+        video.relatedTopics.forEach(topic => interests.add(topic));
+      }
+      if (video.hashtags) {
+        video.hashtags.forEach(tag => interests.add(tag.replace('#', '')));
+      }
+    });
+
+    return Array.from(interests).sort();
+  }, [allVideos]);
+
+  // Filter handlers
+  const handleCategoryToggle = (category: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const handleInterestToggle = (interest: string) => {
+    setSelectedInterests(prev =>
+      prev.includes(interest)
+        ? prev.filter(i => i !== interest)
+        : [...prev, interest]
+    );
+  };
+
+  const handleClearAllFilters = () => {
+    setSelectedCategories([]);
+    setSelectedInterests([]);
+  };
+
+  // Apply category and interest filters
+  const applyFilters = (videos: Video[]): Video[] => {
+    let filtered = [...videos];
+
+    // Apply category filter
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(video =>
+        selectedCategories.includes(video.category)
+      );
+    }
+
+    // Apply interest filter
+    if (selectedInterests.length > 0) {
+      filtered = filtered.filter(video => {
+        const videoInterests = [
+          ...(video.relatedTopics || []),
+          ...(video.hashtags?.map(tag => tag.replace('#', '')) || [])
+        ];
+        return selectedInterests.some(interest =>
+          videoInterests.includes(interest)
+        );
+      });
+    }
+
+    return filtered;
   };
 
   // ✅ Event handlers use Video type with UUID
@@ -232,12 +326,15 @@ const BrowsePage = () => {
     setCurrentFeaturedIndex((prev) => (prev + 1) % featuredVideos.length);
   };
 
-  // Data organization
-  const videosToShow = isSearching ? filteredVideos : allVideos;
-  const trendingVideos = !isSearching ? allVideos.filter(v => v.isTrending).slice(0, 12) : [];
-  const newVideos = !isSearching ? allVideos.filter(v => v.isNew).slice(0, 12) : [];
-  const freeVideos = !isSearching ? allVideos.filter(v => v.accessTier === 'free').slice(0, 12) : [];
-  const premiumVideos = !isSearching ? allVideos.filter(v => v.accessTier === 'premium').slice(0, 12) : [];
+  // Data organization - apply filters
+  const baseVideos = isSearching ? filteredVideos : allVideos;
+  const filteredByCategory = applyFilters(baseVideos);
+  const videosToShow = filteredByCategory;
+
+  const trendingVideos = !isSearching ? applyFilters(allVideos.filter(v => v.isTrending)).slice(0, 12) : [];
+  const newVideos = !isSearching ? applyFilters(allVideos.filter(v => v.isNew)).slice(0, 12) : [];
+  const freeVideos = !isSearching ? applyFilters(allVideos.filter(v => v.accessTier === 'free')).slice(0, 12) : [];
+  const premiumVideos = !isSearching ? applyFilters(allVideos.filter(v => v.accessTier === 'premium')).slice(0, 12) : [];
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-black">
@@ -303,6 +400,19 @@ const BrowsePage = () => {
               ))}
             </AlertDescription>
           </Alert>
+        )}
+
+        {/* Category and Interest Filters */}
+        {!loading && allVideos.length > 0 && (availableCategories.length > 0 || availableInterests.length > 0) && (
+          <ContentFilters
+            selectedCategories={selectedCategories}
+            selectedInterests={selectedInterests}
+            onCategoryToggle={handleCategoryToggle}
+            onInterestToggle={handleInterestToggle}
+            onClearAll={handleClearAllFilters}
+            availableCategories={availableCategories}
+            availableInterests={availableInterests}
+          />
         )}
 
         {/* Search Results Header */}
