@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import bbLogo from "@/assets/b-b-logo.png";
-import StreakDisplay from "@/components/progress/StreakDisplay";
+import GreatFeelPointsDisplay from "@/components/progress/GreatFeelPointsDisplay";
 
 interface HeaderProps {
   onShowAuth?: (mode: 'signin' | 'signup') => void;
@@ -402,9 +402,9 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     if (isAuthenticated && user) {
       return (
         <div className="flex items-center gap-3">
-          {/* Streak Display */}
+          {/* Great Feel Points Display */}
           <div className="hidden md:block">
-            <StreakDisplay />
+            <GreatFeelPointsDisplay />
           </div>
 
           {user.subscription_tier === 'free' && (

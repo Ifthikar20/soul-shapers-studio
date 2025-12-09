@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
+import { useGreatFeelPoints } from '@/contexts/GreatFeelPointsContext';
 
 // Import bird scene video and audio
 import birdSceneVideo from '@/assets/Static_Scene_With_Flying_Birds.mp4';
@@ -106,6 +107,7 @@ const MeditateAudioPage: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { addPoints } = useGreatFeelPoints();
 
   const [isPlaying, setIsPlaying] = useState(true); // Auto-play on load
   const [volume, setVolume] = useState([70]);
@@ -113,6 +115,7 @@ const MeditateAudioPage: React.FC = () => {
   const [showControls, setShowControls] = useState(true);
   const [mouseTimeout, setMouseTimeout] = useState<NodeJS.Timeout | null>(null);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [pointsAwarded, setPointsAwarded] = useState(false);
 
   const experience = id ? meditationExperiences[id] : null;
 
@@ -141,6 +144,14 @@ const MeditateAudioPage: React.FC = () => {
           await audioRef.current.play();
         }
         setIsPlaying(true);
+
+        // Award points after 3 seconds of playback
+        if (!pointsAwarded) {
+          setTimeout(() => {
+            addPoints(10); // Award 10 Great Feel Points
+            setPointsAwarded(true);
+          }, 3000);
+        }
       } catch (error) {
         console.log('Auto-play prevented:', error);
         setIsPlaying(false);

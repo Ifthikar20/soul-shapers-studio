@@ -11,6 +11,7 @@ import NewsletterOnlyPage from "./pages/NewsletterOnlyPage";
 
 // Lazy load ALL other components to prevent unnecessary loading
 const AuthProvider = lazy(() => import("@/contexts/AuthContext").then(module => ({ default: module.AuthProvider })));
+const GreatFeelPointsProvider = lazy(() => import("@/contexts/GreatFeelPointsContext").then(module => ({ default: module.GreatFeelPointsProvider })));
 const ProtectedRoute = lazy(() => import("@/components/ProtectedRoute").then(module => ({ default: module.ProtectedRoute })));
 const PublicOnlyRoute = lazy(() => import("@/components/PublicOnlyRoute").then(module => ({ default: module.PublicOnlyRoute })));
 
@@ -106,7 +107,8 @@ const App = () => {
         <BrowserRouter>
           <Suspense fallback={<LoadingSpinner />}>
             <AuthProvider>
-              <Routes>
+              <GreatFeelPointsProvider>
+                <Routes>
                 {/* Landing Page */}
                 <Route
                   path="/"
@@ -279,6 +281,7 @@ const App = () => {
                 {/* Catch all - 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </GreatFeelPointsProvider>
             </AuthProvider>
           </Suspense>
         </BrowserRouter>
