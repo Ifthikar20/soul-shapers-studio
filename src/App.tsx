@@ -30,6 +30,7 @@ const AudioBrowsePage = lazy(() => import("./pages/AudioBrowsePage")); // ✅ NE
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 const MeditatePage = lazy(() => import("./pages/MeditatePage"));
 const SoundDetailPage = lazy(() => import("./pages/SoundDetailPage"));
+const MeditateAudioPage = lazy(() => import("./pages/MeditateAudioPage"));
 const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
 const ExpertsPage = lazy(() => import("./pages/ExpertsPage")); // ✅ NEW: Experts listing page
 const ExpertProfilePage = lazy(() => import("./pages/ExpertProfilePage")); // ✅ NEW: Expert profile page
@@ -171,6 +172,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <MeditatePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/meditate/audio/:id"
+                  element={
+                    <ProtectedRoute>
+                      <MeditateAudioPage />
                     </ProtectedRoute>
                   }
                 />
