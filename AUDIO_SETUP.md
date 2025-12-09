@@ -1,54 +1,65 @@
-# Audio File Setup Instructions
+# Meditation Audio & Video Setup
 
-## Adding the Firewood Audio File
+## Quick Setup
 
-To enable audio playback on the meditation page, please follow these steps:
+Run this script to copy the media files:
 
-### 1. Copy the Audio File
+```bash
+chmod +x copy-media-files.sh
+./copy-media-files.sh
+```
 
-Copy your audio file to the assets directory:
+## Manual Setup
+
+If you prefer to copy the files manually:
+
+### 1. Copy the Video File
+
+```bash
+cp /Users/ifthikaraliseyed/Desktop/soul-shapers-studio/src/assets/burning_fire.mp4 ./src/assets/
+```
+
+### 2. Copy the Audio File
+
 ```bash
 cp /Users/ifthikaraliseyed/Desktop/soul-shapers-studio/src/assets/firewood-burning-sound-179862.mp3 ./src/assets/
 ```
 
-### 2. Update the MeditateAudioPage Component
+### 3. Test the Experience
 
-Once the audio file is in place, uncomment the import line in `/src/pages/MeditateAudioPage.tsx`:
+1. Start your development server: `npm run dev`
+2. Navigate to `/meditate`
+3. Click on **any meditation card**
+4. You'll be taken to `/meditate/audio/{id}` where:
+   - The burning fire video plays in the background
+   - The firewood crackling audio plays automatically
+   - Volume controls are available
+   - Meditation quotes rotate every 30 seconds
 
-```typescript
-// Change this line:
-// import firewoodAudio from '@/assets/firewood-burning-sound-179862.mp3';
+## What's Been Configured
 
-// To this:
-import firewoodAudio from '@/assets/firewood-burning-sound-179862.mp3';
-```
+✅ **Audio player page** created (`src/pages/MeditateAudioPage.tsx`)
+✅ **All meditation cards** now navigate to audio player
+✅ **Video background**: burning_fire.mp4
+✅ **Audio**: firewood-burning-sound-179862.mp3
+✅ **Auto-play** enabled for both video and audio
+✅ **Cards enlarged** to w-80 (20rem) and h-48 (12rem)
+✅ **All meditation experiences** mapped (70+ different meditations)
+✅ **Routing** configured at `/meditate/audio/:id`
 
-And uncomment the audioUrl in the meditation experience:
+## Features
 
-```typescript
-// Change this:
-// audioUrl: firewoodAudio,
+- 🎥 Fullscreen video background
+- 🔊 Auto-playing meditation audio
+- 🎨 Beautiful UI with controls that fade on inactivity
+- 📝 Rotating meditation quotes
+- 🎚️ Volume controls with mute toggle
+- ✨ Smooth animations and transitions
+- 📱 Responsive design
 
-// To this:
-audioUrl: firewoodAudio,
-```
+## File Locations
 
-### 3. Test the Audio
-
-1. Navigate to the meditate page: `/meditate`
-2. Click on any meditation card
-3. The audio should auto-play in the background along with the video
-
-### Current Status
-
-✅ Audio player page created
-✅ Routing configured for `/meditate/audio/:id`
-✅ Cards updated to navigate to audio player
-✅ Cards made bigger (w-80, h-48)
-⏳ Audio file needs to be added to assets folder
-
-### File Locations
-
-- Audio player component: `src/pages/MeditateAudioPage.tsx`
-- Meditate page: `src/pages/MeditatePage.tsx`
-- Routing: `src/App.tsx`
+- **Audio player**: `src/pages/MeditateAudioPage.tsx`
+- **Meditate page**: `src/pages/MeditatePage.tsx`
+- **Routing**: `src/App.tsx`
+- **Copy script**: `copy-media-files.sh`

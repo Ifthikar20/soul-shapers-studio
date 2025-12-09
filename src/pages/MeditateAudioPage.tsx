@@ -4,11 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
 
-// Import placeholder video for background
-import placeholderVideo from '@/assets/stardustvid.mp4';
-
-// Audio file - User should replace this with their actual audio file path
-// import firewoodAudio from '@/assets/firewood-burning-sound-179862.mp3';
+// Import burning fire video and audio
+import burningFireVideo from '@/assets/burning_fire.mp4';
+import firewoodAudio from '@/assets/firewood-burning-sound-179862.mp3';
 
 interface MeditationAudioExperience {
   id: string;
@@ -19,30 +17,88 @@ interface MeditationAudioExperience {
   category: string;
 }
 
-// Sample meditation experiences
+// Helper function to create meditation experience
+const createExperience = (id: string, title: string, description: string, category: string): MeditationAudioExperience => ({
+  id,
+  title,
+  description,
+  videoUrl: burningFireVideo,
+  audioUrl: firewoodAudio,
+  category,
+});
+
+// All meditation experiences use the burning fire video and audio
 const meditationExperiences: Record<string, MeditationAudioExperience> = {
-  '1': {
-    id: '1',
-    title: 'Crackling Fireplace',
-    description: 'Warm, soothing sounds of a crackling fireplace to help you relax and unwind',
-    videoUrl: placeholderVideo,
-    // audioUrl: firewoodAudio, // Uncomment when audio file is added
-    category: 'Sounds of Nature',
-  },
-  'waterflow': {
-    id: 'waterflow',
-    title: 'Waterfall Meditation',
-    description: 'Gentle cascade of water flowing peacefully',
-    videoUrl: placeholderVideo,
-    category: 'Sounds of Nature',
-  },
-  'burning-wood': {
-    id: 'burning-wood',
-    title: 'Crackling Fireplace',
-    description: 'Warm fire sounds for deep relaxation',
-    videoUrl: placeholderVideo,
-    category: 'Sounds of Nature',
-  },
+  // Sounds of Nature
+  'waterflow': createExperience('waterflow', 'Waterfall Meditation', 'Gentle cascade of water', 'Sounds of Nature'),
+  'morning-walk': createExperience('morning-walk', 'Morning Walk', 'Peaceful nature stroll', 'Sounds of Nature'),
+  'morning-fishing': createExperience('morning-fishing', 'Morning Fishing', 'Tranquil lakeside sounds', 'Sounds of Nature'),
+  'thunder-rain': createExperience('thunder-rain', 'Village Thunderstorm', 'Powerful storm ambience', 'Sounds of Nature'),
+  'burning-wood': createExperience('burning-wood', 'Crackling Fireplace', 'Warm fire sounds', 'Sounds of Nature'),
+  'ocean-waves': createExperience('ocean-waves', 'Ocean Waves', 'Rhythmic peace of ocean', 'Sounds of Nature'),
+  'rain-forest': createExperience('rain-forest', 'Rain Forest', 'Tropical rainforest sounds', 'Sounds of Nature'),
+  'mountain-stream': createExperience('mountain-stream', 'Mountain Stream', 'Gentle mountain flow', 'Sounds of Nature'),
+
+  // Seasonal Meditations
+  'autumn-leaves': createExperience('autumn-leaves', 'Autumn Leaves', 'Leaves dancing in breeze', 'Seasonal Meditations'),
+  'autumn-wind': createExperience('autumn-wind', 'Autumn Wind', 'Crisp autumn air', 'Seasonal Meditations'),
+  'winter-snow': createExperience('winter-snow', 'Winter Snowfall', 'Peaceful falling snow', 'Seasonal Meditations'),
+  'spring-garden': createExperience('spring-garden', 'Spring Garden', 'Blooming flowers', 'Seasonal Meditations'),
+  'summer-meadow': createExperience('summer-meadow', 'Summer Meadow', 'Warm sunny fields', 'Seasonal Meditations'),
+
+  // Guided Meditation for Professionals
+  'focus-boost': createExperience('focus-boost', 'Focus Boost', 'Enhance concentration', 'Guided Meditation for Professionals'),
+  'stress-release': createExperience('stress-release', 'Stress Release', 'Let go of tension', 'Guided Meditation for Professionals'),
+  'decision-clarity': createExperience('decision-clarity', 'Decision Clarity', 'Clear mind guidance', 'Guided Meditation for Professionals'),
+  'leadership-mindset': createExperience('leadership-mindset', 'Leadership Mindset', 'Executive presence', 'Guided Meditation for Professionals'),
+  'creativity-flow': createExperience('creativity-flow', 'Creativity Flow', 'Unlock innovation', 'Guided Meditation for Professionals'),
+  'work-life-balance': createExperience('work-life-balance', 'Work-Life Balance', 'Find equilibrium', 'Guided Meditation for Professionals'),
+
+  // Sleep & Relaxation
+  'deep-sleep': createExperience('deep-sleep', 'Deep Sleep', 'Drift into slumber', 'Sleep & Relaxation'),
+  'insomnia-relief': createExperience('insomnia-relief', 'Insomnia Relief', 'Overcome sleeplessness', 'Sleep & Relaxation'),
+  'bedtime-story': createExperience('bedtime-story', 'Bedtime Journey', 'Guided sleep story', 'Sleep & Relaxation'),
+  'power-nap': createExperience('power-nap', 'Power Nap', '20-minute refresh', 'Sleep & Relaxation'),
+  'evening-unwind': createExperience('evening-unwind', 'Evening Unwind', 'Release the day', 'Sleep & Relaxation'),
+
+  // Focus & Concentration
+  'study-focus': createExperience('study-focus', 'Study Focus', 'Academic concentration', 'Focus & Concentration'),
+  'work-productivity': createExperience('work-productivity', 'Work Productivity', 'Peak performance', 'Focus & Concentration'),
+  'exam-preparation': createExperience('exam-preparation', 'Exam Preparation', 'Calm test anxiety', 'Focus & Concentration'),
+  'deep-work': createExperience('deep-work', 'Deep Work', 'Eliminate distractions', 'Focus & Concentration'),
+  'memory-boost': createExperience('memory-boost', 'Memory Boost', 'Enhance recall', 'Focus & Concentration'),
+
+  // Stress Relief
+  'anxiety-calm': createExperience('anxiety-calm', 'Anxiety Calm', 'Soothe worried mind', 'Stress Relief'),
+  'panic-relief': createExperience('panic-relief', 'Panic Relief', 'Ground yourself', 'Stress Relief'),
+  'tension-release': createExperience('tension-release', 'Tension Release', 'Body scan relaxation', 'Stress Relief'),
+  'overwhelm-support': createExperience('overwhelm-support', 'Overwhelm Support', 'Find your center', 'Stress Relief'),
+  'burnout-recovery': createExperience('burnout-recovery', 'Burnout Recovery', 'Restore energy', 'Stress Relief'),
+
+  // Morning Meditations
+  'morning-energy': createExperience('morning-energy', 'Morning Energy', 'Start day right', 'Morning Meditations'),
+  'gratitude-practice': createExperience('gratitude-practice', 'Gratitude Practice', 'Count blessings', 'Morning Meditations'),
+  'intention-setting': createExperience('intention-setting', 'Intention Setting', 'Define your day', 'Morning Meditations'),
+  'sunrise-meditation': createExperience('sunrise-meditation', 'Sunrise Meditation', 'Greet the dawn', 'Morning Meditations'),
+  'positive-affirmations': createExperience('positive-affirmations', 'Positive Affirmations', 'Build confidence', 'Morning Meditations'),
+
+  // Evening Wind Down
+  'sunset-reflection': createExperience('sunset-reflection', 'Sunset Reflection', "Day's end peace", 'Evening Wind Down'),
+  'gratitude-evening': createExperience('gratitude-evening', 'Evening Gratitude', 'Reflect with thanks', 'Evening Wind Down'),
+  'letting-go': createExperience('letting-go', 'Letting Go', 'Release the day', 'Evening Wind Down'),
+  'night-peace': createExperience('night-peace', 'Night Peace', 'Prepare for rest', 'Evening Wind Down'),
+
+  // Mindfulness Practice
+  'present-moment': createExperience('present-moment', 'Present Moment', 'Be here now', 'Mindfulness Practice'),
+  'body-awareness': createExperience('body-awareness', 'Body Awareness', 'Connect with self', 'Mindfulness Practice'),
+  'mindful-eating': createExperience('mindful-eating', 'Mindful Eating', 'Savor each bite', 'Mindfulness Practice'),
+  'walking-meditation': createExperience('walking-meditation', 'Walking Meditation', 'Mindful movement', 'Mindfulness Practice'),
+
+  // Breathing Exercises
+  'box-breathing': createExperience('box-breathing', 'Box Breathing', '4-4-4-4 technique', 'Breathing Exercises'),
+  '478-breathing': createExperience('478-breathing', '4-7-8 Breathing', 'Rapid relaxation', 'Breathing Exercises'),
+  'alternate-nostril': createExperience('alternate-nostril', 'Alternate Nostril', 'Balance energy', 'Breathing Exercises'),
+  'diaphragmatic': createExperience('diaphragmatic', 'Deep Belly Breathing', 'Full breath', 'Breathing Exercises'),
 };
 
 const MeditateAudioPage: React.FC = () => {
