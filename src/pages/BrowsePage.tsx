@@ -463,20 +463,22 @@ const BrowsePage = () => {
         {/* Filter Button and Active Filters */}
         {!loading && allVideos.length > 0 && (availableCategories.length > 0 || availableInterests.length > 0) && (
           <div className="mb-6">
-            <div className="flex items-center gap-3 flex-wrap">
-              <Button
-                variant="outline"
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Custom Filter Button */}
+              <button
                 onClick={() => setIsFilterModalOpen(true)}
-                className="rounded-full border-2 hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium text-sm transition-all shadow-md hover:shadow-lg hover:scale-105"
               >
-                <Filter className="w-4 h-4 mr-2" />
-                Filter Content
+                <div className="w-5 h-5 rounded-md bg-white/20 flex items-center justify-center">
+                  <Filter className="w-3 h-3" />
+                </div>
+                <span>Filters</span>
                 {(selectedCategories.length > 0 || selectedInterests.length > 0) && (
-                  <Badge variant="secondary" className="ml-2">
+                  <span className="bg-white/30 text-white px-2 py-0.5 rounded-full text-xs font-bold">
                     {selectedCategories.length + selectedInterests.length}
-                  </Badge>
+                  </span>
                 )}
-              </Button>
+              </button>
 
               {/* Active Filters Display */}
               {selectedCategories.length > 0 && (
@@ -485,7 +487,7 @@ const BrowsePage = () => {
                     <Badge
                       key={category}
                       variant="secondary"
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 cursor-pointer"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 cursor-pointer px-2.5 py-1 text-xs"
                       onClick={() => handleCategoryToggle(category)}
                     >
                       {category}
@@ -499,7 +501,7 @@ const BrowsePage = () => {
                 <Badge
                   key={interest}
                   variant="secondary"
-                  className="bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 cursor-pointer"
+                  className="bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 cursor-pointer px-2.5 py-1 text-xs"
                   onClick={() => handleInterestToggle(interest)}
                 >
                   {interest}
@@ -508,7 +510,7 @@ const BrowsePage = () => {
               ))}
 
               {selectedInterests.length > 5 && (
-                <Badge variant="outline">
+                <Badge variant="outline" className="text-xs px-2 py-1">
                   +{selectedInterests.length - 5} more
                 </Badge>
               )}
@@ -518,9 +520,9 @@ const BrowsePage = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleClearAllFilters}
-                  className="text-gray-600 dark:text-gray-400"
+                  className="text-gray-600 dark:text-gray-400 text-xs h-7"
                 >
-                  <X className="w-4 h-4 mr-1" />
+                  <X className="w-3 h-3 mr-1" />
                   Clear All
                 </Button>
               )}
