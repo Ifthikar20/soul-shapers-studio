@@ -20,8 +20,6 @@ import collectionPlant from '@/assets/collection-plant.png';
 import audioPage1 from '@/assets/audio-page-1.png';
 import audioPage2 from '@/assets/audio-page-2.png';
 import morningBliss from '@/assets/morningbliss.png';
-import happyLady from '@/assets/happylady.png';
-import watercolorBg from '@/assets/audio-watercolor-background.png';
 
 interface AudioContentItem {
   id: string;
@@ -232,40 +230,6 @@ const AudioBrowsePage = () => {
                   No audio found for this duration filter
                 </div>
               )}
-            </div>
-
-            {/* Recommendations Section */}
-            <div
-              className="rounded-3xl p-10 mb-10 shadow-2xl flex flex-col md:flex-row items-center gap-10 relative overflow-hidden"
-              style={{
-                backgroundImage: `url(${watercolorBg})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            >
-              {/* Subtle overlay for text readability */}
-              <div className="absolute inset-0 bg-white/10 dark:bg-black/20"></div>
-
-              <div className="flex-shrink-0 w-full md:w-80 h-52 rounded-2xl overflow-hidden relative z-10 shadow-xl">
-                <img
-                  src={happyLady}
-                  alt="Happy person meditating"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <div className="flex-1 relative z-10">
-                <h2 className="text-gray-900 dark:text-white text-3xl font-bold mb-4">Your growth journey awaits</h2>
-                <p className="text-gray-800 dark:text-gray-200 text-lg mb-6 leading-relaxed">
-                  Go beyond browsing — get tailored recommendations based on your growth goals.
-                </p>
-                <button
-                  onClick={() => navigate('/settings')}
-                  className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-lg"
-                >
-                  Set your goals
-                </button>
-              </div>
             </div>
 
             {/* Favorites Section */}
