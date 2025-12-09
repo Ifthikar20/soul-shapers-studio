@@ -11,12 +11,12 @@ import NewsletterOnlyPage from "./pages/NewsletterOnlyPage";
 
 // Lazy load ALL other components to prevent unnecessary loading
 const AuthProvider = lazy(() => import("@/contexts/AuthContext").then(module => ({ default: module.AuthProvider })));
+const GreatFeelPointsProvider = lazy(() => import("@/contexts/GreatFeelPointsContext").then(module => ({ default: module.GreatFeelPointsProvider })));
 const ProtectedRoute = lazy(() => import("@/components/ProtectedRoute").then(module => ({ default: module.ProtectedRoute })));
 const PublicOnlyRoute = lazy(() => import("@/components/PublicOnlyRoute").then(module => ({ default: module.PublicOnlyRoute })));
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
-const GoalsPage = lazy(() => import("./pages/GoalsPage"));
 const SearchResults = lazy(() => import("./pages/SearchResults"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const BrowsePage = lazy(() => import("./pages/BrowsePage"));
@@ -31,6 +31,7 @@ const AudioBrowsePage = lazy(() => import("./pages/AudioBrowsePage")); // ✅ NE
 const SingleAudioPage = lazy(() => import("./pages/SingleAudioPage"));
 const MeditatePage = lazy(() => import("./pages/MeditatePage"));
 const SoundDetailPage = lazy(() => import("./pages/SoundDetailPage"));
+const MeditateAudioPage = lazy(() => import("./pages/MeditateAudioPage"));
 const WatchPage = lazy(() => import("./pages/WatchPage")); // ✅ NEW: Watch page
 const ExpertsPage = lazy(() => import("./pages/ExpertsPage")); // ✅ NEW: Experts listing page
 const ExpertProfilePage = lazy(() => import("./pages/ExpertProfilePage")); // ✅ NEW: Expert profile page
@@ -106,20 +107,11 @@ const App = () => {
         <BrowserRouter>
           <Suspense fallback={<LoadingSpinner />}>
             <AuthProvider>
-              <Routes>
-                {/* Landing Page - Goals Page (Protected) */}
+              <GreatFeelPointsProvider>
+                <Routes>
+                {/* Landing Page */}
                 <Route
                   path="/"
-                  element={
-                    <ProtectedRoute>
-                      <GoalsPage />
-                    </ProtectedRoute>
-                  }
-                />
-
-                {/* Old landing page - kept for reference */}
-                <Route
-                  path="/home"
                   element={
                     <PublicOnlyRoute>
                       <Index />
@@ -182,6 +174,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <MeditatePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/meditate/audio/:id"
+                  element={
+                    <ProtectedRoute>
+                      <MeditateAudioPage />
                     </ProtectedRoute>
                   }
                 />
@@ -281,6 +281,7 @@ const App = () => {
                 {/* Catch all - 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </GreatFeelPointsProvider>
             </AuthProvider>
           </Suspense>
         </BrowserRouter>

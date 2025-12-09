@@ -196,8 +196,8 @@ const MeditatePage: React.FC = () => {
   }, [selectedSound]);
 
   const handleSoundClick = (soundId: string) => {
-    setSelectedSound(soundId);
-    setIsPlaying(false);
+    // Navigate to the audio player page instead of showing modal
+    navigate(`/meditate/audio/${soundId}`);
   };
 
   const handlePlayPause = () => {
@@ -336,12 +336,12 @@ const MeditatePage: React.FC = () => {
                     <div
                       key={experience.id}
                       onClick={() => handleSoundClick(experience.id)}
-                      className="flex-shrink-0 w-64 cursor-pointer group/card"
+                      className="flex-shrink-0 w-80 cursor-pointer group/card"
                     >
                       {/* Card Container */}
                       <div className="relative overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                         {/* Image */}
-                        <div className="relative h-36 overflow-hidden">
+                        <div className="relative h-48 overflow-hidden">
                           <img
                             src={experience.imageUrl}
                             alt={experience.title}
@@ -353,22 +353,22 @@ const MeditatePage: React.FC = () => {
 
                           {/* Play Button Overlay */}
                           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
-                            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-xl">
-                              <Play className="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" />
+                            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-xl">
+                              <Play className="w-7 h-7 text-gray-900 ml-0.5" fill="currentColor" />
                             </div>
                           </div>
 
                           {/* Title Overlay */}
-                          <div className="absolute bottom-0 left-0 right-0 p-3">
-                            <h3 className="text-sm font-bold text-white line-clamp-1">
+                          <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 className="text-base font-bold text-white line-clamp-1 drop-shadow-lg">
                               {experience.title}
                             </h3>
                           </div>
                         </div>
 
                         {/* Card Content */}
-                        <div className="p-3">
-                          <p className="text-gray-600 dark:text-gray-400 text-xs leading-relaxed line-clamp-2">
+                        <div className="p-4">
+                          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed line-clamp-2">
                             {experience.description}
                           </p>
                         </div>

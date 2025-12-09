@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import bbLogo from "@/assets/b-b-logo.png";
-import StreakDisplay from "@/components/progress/StreakDisplay";
+import GreatFeelPointsDisplay from "@/components/progress/GreatFeelPointsDisplay";
 
 interface HeaderProps {
   onShowAuth?: (mode: 'signin' | 'signup') => void;
@@ -65,14 +65,12 @@ const NAVIGATION_CONFIG = {
   
   mainNavItems: {
     authenticated: [
-      { label: 'Goals', href: '/' },
       { label: 'Browse', href: '/browse' },
       { label: 'Audio', href: '/audio' },
       { label: 'Meditate', href: '/meditate' },
       { label: 'Read', href: '/read' },
     ],
     guest: [
-      { label: 'Home', href: '/home' },
       { label: 'Browse', href: '/browse' },
       { label: 'Audio', href: '/audio' },
       { label: 'Blog', href: '/blog' }
@@ -404,9 +402,9 @@ const Header = ({ onShowAuth }: HeaderProps) => {
     if (isAuthenticated && user) {
       return (
         <div className="flex items-center gap-3">
-          {/* Streak Display */}
+          {/* Great Feel Points Display */}
           <div className="hidden md:block">
-            <StreakDisplay />
+            <GreatFeelPointsDisplay />
           </div>
 
           {user.subscription_tier === 'free' && (
