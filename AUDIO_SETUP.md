@@ -16,13 +16,13 @@ If you prefer to copy the files manually:
 ### 1. Copy the Video File
 
 ```bash
-cp /Users/ifthikaraliseyed/Desktop/soul-shapers-studio/src/assets/burning_fire.mp4 ./src/assets/
+cp /Users/ifthikaraliseyed/Desktop/soul-shapers-studio/src/assets/Static_Scene_With_Flying_Birds.mp4 ./src/assets/
 ```
 
 ### 2. Copy the Audio File
 
 ```bash
-cp /Users/ifthikaraliseyed/Desktop/soul-shapers-studio/src/assets/firewood-burning-sound-179862.mp3 ./src/assets/
+cp /Users/ifthikaraliseyed/Desktop/soul-shapers-studio/src/assets/bird-chipping-426107.mp3 ./src/assets/
 ```
 
 ### 3. Test the Experience
@@ -31,8 +31,8 @@ cp /Users/ifthikaraliseyed/Desktop/soul-shapers-studio/src/assets/firewood-burni
 2. Navigate to `/meditate`
 3. Click on **any meditation card**
 4. You'll be taken to `/meditate/audio/{id}` where:
-   - The burning fire video plays in the background
-   - The firewood crackling audio plays automatically
+   - The peaceful bird scene video plays in the background
+   - The bird chirping audio plays automatically
    - Volume controls are available
    - Meditation quotes rotate every 30 seconds
 
@@ -40,8 +40,8 @@ cp /Users/ifthikaraliseyed/Desktop/soul-shapers-studio/src/assets/firewood-burni
 
 ✅ **Audio player page** created (`src/pages/MeditateAudioPage.tsx`)
 ✅ **All meditation cards** now navigate to audio player
-✅ **Video background**: burning_fire.mp4
-✅ **Audio**: firewood-burning-sound-179862.mp3
+✅ **Video background**: Static_Scene_With_Flying_Birds.mp4
+✅ **Audio**: bird-chipping-426107.mp3
 ✅ **Auto-play** enabled for both video and audio
 ✅ **Cards enlarged** to w-80 (20rem) and h-48 (12rem)
 ✅ **All meditation experiences** mapped (70+ different meditations)

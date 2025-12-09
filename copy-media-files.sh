@@ -2,7 +2,7 @@
 
 # Script to copy meditation audio and video files to the assets folder
 
-echo "🔥 Copying meditation media files to assets..."
+echo "🐦 Copying meditation media files to assets..."
 
 SOURCE_DIR="/Users/ifthikaraliseyed/Desktop/soul-shapers-studio/src/assets"
 DEST_DIR="./src/assets"
@@ -10,22 +10,22 @@ DEST_DIR="./src/assets"
 # Create destination directory if it doesn't exist
 mkdir -p "$DEST_DIR"
 
-# Copy the burning fire video
-if [ -f "$SOURCE_DIR/burning_fire.mp4" ]; then
-    echo "✓ Copying burning_fire.mp4..."
-    cp "$SOURCE_DIR/burning_fire.mp4" "$DEST_DIR/"
+# Copy the bird scene video
+if [ -f "$SOURCE_DIR/Static_Scene_With_Flying_Birds.mp4" ]; then
+    echo "✓ Copying Static_Scene_With_Flying_Birds.mp4..."
+    cp "$SOURCE_DIR/Static_Scene_With_Flying_Birds.mp4" "$DEST_DIR/"
     echo "✓ Video file copied successfully!"
 else
-    echo "✗ Warning: burning_fire.mp4 not found at $SOURCE_DIR"
+    echo "✗ Warning: Static_Scene_With_Flying_Birds.mp4 not found at $SOURCE_DIR"
 fi
 
-# Copy the firewood audio
-if [ -f "$SOURCE_DIR/firewood-burning-sound-179862.mp3" ]; then
-    echo "✓ Copying firewood-burning-sound-179862.mp3..."
-    cp "$SOURCE_DIR/firewood-burning-sound-179862.mp3" "$DEST_DIR/"
+# Copy the bird chirping audio
+if [ -f "$SOURCE_DIR/bird-chipping-426107.mp3" ]; then
+    echo "✓ Copying bird-chipping-426107.mp3..."
+    cp "$SOURCE_DIR/bird-chipping-426107.mp3" "$DEST_DIR/"
     echo "✓ Audio file copied successfully!"
 else
-    echo "✗ Warning: firewood-burning-sound-179862.mp3 not found at $SOURCE_DIR"
+    echo "✗ Warning: bird-chipping-426107.mp3 not found at $SOURCE_DIR"
 fi
 
 echo ""

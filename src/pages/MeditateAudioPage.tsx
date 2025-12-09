@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
 
-// Import burning fire video and audio
-import burningFireVideo from '@/assets/burning_fire.mp4';
-import firewoodAudio from '@/assets/firewood-burning-sound-179862.mp3';
+// Import bird scene video and audio
+import birdSceneVideo from '@/assets/Static_Scene_With_Flying_Birds.mp4';
+import birdChirpingAudio from '@/assets/bird-chipping-426107.mp3';
 
 interface MeditationAudioExperience {
   id: string;
@@ -22,12 +22,12 @@ const createExperience = (id: string, title: string, description: string, catego
   id,
   title,
   description,
-  videoUrl: burningFireVideo,
-  audioUrl: firewoodAudio,
+  videoUrl: birdSceneVideo,
+  audioUrl: birdChirpingAudio,
   category,
 });
 
-// All meditation experiences use the burning fire video and audio
+// All meditation experiences use the bird scene video and bird chirping audio
 const meditationExperiences: Record<string, MeditationAudioExperience> = {
   // Sounds of Nature
   'waterflow': createExperience('waterflow', 'Waterfall Meditation', 'Gentle cascade of water', 'Sounds of Nature'),
