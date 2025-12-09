@@ -65,14 +65,12 @@ const NAVIGATION_CONFIG = {
   
   mainNavItems: {
     authenticated: [
-      { label: 'Goals', href: '/' },
       { label: 'Browse', href: '/browse' },
       { label: 'Audio', href: '/audio' },
       { label: 'Meditate', href: '/meditate' },
       { label: 'Read', href: '/read' },
     ],
     guest: [
-      { label: 'Home', href: '/home' },
       { label: 'Browse', href: '/browse' },
       { label: 'Audio', href: '/audio' },
       { label: 'Blog', href: '/blog' }

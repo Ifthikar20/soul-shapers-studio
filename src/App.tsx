@@ -16,7 +16,6 @@ const PublicOnlyRoute = lazy(() => import("@/components/PublicOnlyRoute").then(m
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
-const GoalsPage = lazy(() => import("./pages/GoalsPage"));
 const SearchResults = lazy(() => import("./pages/SearchResults"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const BrowsePage = lazy(() => import("./pages/BrowsePage"));
@@ -107,19 +106,9 @@ const App = () => {
           <Suspense fallback={<LoadingSpinner />}>
             <AuthProvider>
               <Routes>
-                {/* Landing Page - Goals Page (Protected) */}
+                {/* Landing Page */}
                 <Route
                   path="/"
-                  element={
-                    <ProtectedRoute>
-                      <GoalsPage />
-                    </ProtectedRoute>
-                  }
-                />
-
-                {/* Old landing page - kept for reference */}
-                <Route
-                  path="/home"
                   element={
                     <PublicOnlyRoute>
                       <Index />
