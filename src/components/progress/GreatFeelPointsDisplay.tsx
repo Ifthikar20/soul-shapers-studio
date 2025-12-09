@@ -5,14 +5,22 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, X, Play, Music, Video } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useGreatFeelPoints } from '@/contexts/GreatFeelPointsContext';
 
 interface GreatFeelPointsDisplayProps {
@@ -24,6 +32,7 @@ const GreatFeelPointsDisplay: React.FC<GreatFeelPointsDisplayProps> = ({ classNa
   const { points, isAnimating } = useGreatFeelPoints();
   const [displayPoints, setDisplayPoints] = useState(points);
   const [sparkles, setSparkles] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [showHowToEarn, setShowHowToEarn] = useState(false);
 
   // Animate counter when points change
   useEffect(() => {
@@ -65,7 +74,7 @@ const GreatFeelPointsDisplay: React.FC<GreatFeelPointsDisplayProps> = ({ classNa
   }, [isAnimating]);
 
   const handleClick = () => {
-    navigate('/progress');
+    setShowHowToEarn(true);
   };
 
   return (
@@ -118,7 +127,7 @@ const GreatFeelPointsDisplay: React.FC<GreatFeelPointsDisplayProps> = ({ classNa
             <p className="text-sm text-muted-foreground">
               Earned from watching videos & audio
             </p>
-            <p className="text-xs text-muted-foreground italic">Click to view progress</p>
+            <p className="text-xs text-muted-foreground italic">Click to learn how to earn more</p>
           </div>
         </TooltipContent>
       </Tooltip>
@@ -139,6 +148,99 @@ const GreatFeelPointsDisplay: React.FC<GreatFeelPointsDisplayProps> = ({ classNa
           }
         }
       `}</style>
+
+      {/* How to Earn Points Modal */}
+      <Dialog open={showHowToEarn} onOpenChange={setShowHowToEarn}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-500" />
+              How to Earn Great Feel Points
+            </DialogTitle>
+            <DialogDescription>
+              Accumulate points by engaging with our wellness content
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Current Points Display */}
+            <div className="p-4 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950 dark:to-indigo-950 border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Your Total Points</span>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-500" />
+                  <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {points.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Ways to Earn */}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm text-gray-900 dark:text-white">Ways to Earn Points:</h4>
+
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900">
+                  <Video className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">Watch Meditation Videos</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Earn 10 points per meditation session</p>
+                </div>
+                <span className="text-xs font-bold text-purple-600 dark:text-purple-400">+10 pts</span>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                <div className="p-2 rounded-full bg-indigo-100 dark:bg-indigo-900">
+                  <Music className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">Listen to Audio Content</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Earn points for wellness audio sessions</p>
+                </div>
+                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">+10 pts</span>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900">
+                  <Play className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">Complete Activities</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Engage with wellness exercises and practices</p>
+                </div>
+                <span className="text-xs font-bold text-purple-600 dark:text-purple-400">+10 pts</span>
+              </div>
+            </div>
+
+            {/* Tip */}
+            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800">
+              <p className="text-xs text-blue-900 dark:text-blue-100">
+                <span className="font-semibold">💡 Tip:</span> Points are awarded automatically after 3 seconds of engagement with content!
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowHowToEarn(false)}
+            >
+              Close
+            </Button>
+            <Button
+              onClick={() => {
+                setShowHowToEarn(false);
+                navigate('/meditate');
+              }}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+            >
+              Start Earning Points
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   );
 };
