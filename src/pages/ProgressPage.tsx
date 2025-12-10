@@ -17,6 +17,7 @@ import {
   Calendar,
   Award,
   ArrowLeft,
+  Sparkles,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -26,6 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PageLayout from '@/components/Layout/PageLayout';
 import DOMPurify from 'isomorphic-dompurify';
+import GreatFeelPointsDisplay from '@/components/progress/GreatFeelPointsDisplay';
 
 const ProgressPage: React.FC = () => {
   const navigate = useNavigate();
@@ -134,6 +136,28 @@ const ProgressPage: React.FC = () => {
           <p className="text-neutral-600 dark:text-neutral-400">
             Track your wellness journey
           </p>
+        </div>
+
+        {/* Great Feel Points Banner - Top of Dashboard */}
+        <div className="mb-8 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 border border-purple-200 dark:border-purple-800 rounded-2xl p-6 shadow-lg">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-1">
+                  Your Great Feel Points
+                </h3>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Keep watching wellness content to earn more points and unlock achievements
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <GreatFeelPointsDisplay className="scale-125" />
+            </div>
+          </div>
         </div>
 
         {/* Top Stats Cards */}

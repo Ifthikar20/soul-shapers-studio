@@ -6,7 +6,7 @@ import { useNavigationTracking } from '@/hooks/useNavigationTracking';
 import { contentService } from '@/services/content.service';
 import { Video, normalizeVideo } from '@/types/video.types'; // ✅ Use centralized types
 import { decodeSearchQuery, sanitizeHTML } from '@/utils/search.security';
-import { AlertCircle, X, Search, Shield } from 'lucide-react';
+import { AlertCircle, X, Search, Shield, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -16,6 +16,7 @@ import HeroSection from '@/components/Browse/HeroSection';
 import VideoRow from '@/components/Browse/VideoRow';
 import FilterModal from '@/components/Browse/FilterModal';
 import FilterIcon from '@/components/icons/FilterIcon';
+import GreatFeelPointsDisplay from '@/components/progress/GreatFeelPointsDisplay';
 
 const BrowsePage = () => {
   const navigate = useNavigate();
@@ -413,6 +414,29 @@ const BrowsePage = () => {
       )}
 
       <main className="flex-1 container mx-auto py-10 dark:text-white">
+        {/* Great Feel Points Banner - Top of Dashboard */}
+        {!loading && isAuthenticated && (
+          <div className="mb-8 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 border border-purple-200 dark:border-purple-800 rounded-2xl p-6 shadow-lg">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500">
+                  <Sparkles className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                    Earn Great Feel Points
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Watch more wellness content to earn points and track your progress
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <GreatFeelPointsDisplay className="scale-125" />
+              </div>
+            </div>
+          </div>
+        )}
         {/* Error State */}
         {error && (
           <div className="text-center text-red-600 mb-6 bg-red-50 border border-red-200 rounded-lg p-4">

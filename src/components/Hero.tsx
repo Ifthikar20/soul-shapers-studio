@@ -68,7 +68,7 @@ const Hero = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60"></div>
           
           {/* Content Centered Inside the Backdrop */}
-          <div 
+          <div
             className={`absolute inset-0 flex flex-col items-center justify-center p-8 text-center transition-opacity ${
               isSwiping ? 'opacity-0' : 'opacity-100'
             }`}
@@ -86,9 +86,35 @@ const Hero = () => {
                   Join our wellness community and start your transformation journey
                 </p>
               </div>
-              
+
+              {/* Great Feel Points Info Banner */}
+              <div className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 backdrop-blur-sm border border-white/30 rounded-2xl p-6 shadow-xl">
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+                  <h3 className="text-2xl font-bold text-white">Earn Great Feel Points!</h3>
+                  <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+                </div>
+                <p className="text-white/90 text-lg mb-4">
+                  Watch videos, listen to audio, and complete wellness activities to earn points
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur">
+                    <div className="font-bold text-purple-200 text-lg mb-1">+10 pts</div>
+                    <div className="text-white/80">Per meditation video</div>
+                  </div>
+                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur">
+                    <div className="font-bold text-indigo-200 text-lg mb-1">+10 pts</div>
+                    <div className="text-white/80">Per audio session</div>
+                  </div>
+                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur">
+                    <div className="font-bold text-purple-200 text-lg mb-1">+10 pts</div>
+                    <div className="text-white/80">Per wellness activity</div>
+                  </div>
+                </div>
+              </div>
+
               {/* Explore Content Button */}
-              <button 
+              <button
                 onClick={handleExploreContent}
                 disabled={isSwiping}
                 className="h-16 px-12 rounded-full bg-white hover:bg-gray-100 text-gray-900 font-semibold transition-all flex items-center justify-center gap-3 mx-auto whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-lg hover:scale-105 hover:shadow-2xl group"
@@ -97,7 +123,7 @@ const Hero = () => {
                 Explore Content
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
-              
+
               <div className="flex items-center justify-center gap-2 text-base text-white/90">
                 <Eye className="w-5 h-5" />
                 <span>
