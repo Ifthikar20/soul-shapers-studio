@@ -22,7 +22,7 @@ const BrowsePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { navigateToUpgrade, trackNavigationEvent } = useNavigationTracking();
 
   // Secure search query validation
