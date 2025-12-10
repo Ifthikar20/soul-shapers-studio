@@ -182,7 +182,7 @@ const HybridVideoCard = ({ video, onPlay, onUpgrade }: HybridVideoCardProps) => 
             left: `${modalPosition.left}px`,
             width: '400px',
             maxWidth: '90vw',
-            animation: 'modalEntrance 0.25s ease-out',
+            animation: 'modalEntrance 0.1s ease-out',
           }}
         >
           <Card className="overflow-hidden rounded-2xl bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-xl">

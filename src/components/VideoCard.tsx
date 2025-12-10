@@ -98,11 +98,7 @@ const VideoCard = memo(({ video, videos, onPlay, onUpgrade }: VideoCardProps) =>
       {/* Amazon Prime-style Hover Modal */}
       {isHovered && (
         <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center">
-          <div className="pointer-events-auto animate-in fade-in zoom-in-95 duration-200" style={{
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
+          <div className="pointer-events-auto animate-in fade-in zoom-in-95 duration-100" style={{
             width: '400px',
             maxWidth: '90vw'
           }}>

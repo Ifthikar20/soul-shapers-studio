@@ -14,6 +14,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/Browse/HeroSection';
 import VideoRow from '@/components/Browse/VideoRow';
+import FilterModal from '@/components/Browse/FilterModal';
+import FilterIcon from '@/components/icons/FilterIcon';
 
 const BrowsePage = () => {
   const navigate = useNavigate();
@@ -33,6 +35,11 @@ const BrowsePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Category and interest filters
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   // Validate and sanitize search query from URL
   useEffect(() => {
@@ -159,11 +166,157 @@ const BrowsePage = () => {
   const handleClearSearch = () => {
     setSearchParams({});
     setIsSearching(false);
-    
+
     trackNavigationEvent('Search Cleared', {
       source: 'browse_page',
       from: location.pathname,
     });
+  };
+
+  // Extract unique categories and interests from videos
+  const availableCategories = React.useMemo(() => {
+    const categories = new Set(allVideos.map(v => v.category).filter(Boolean));
+    return Array.from(categories).sort();
+  }, [allVideos]);
+
+  const availableInterests = React.useMemo(() => {
+    const interests = new Set<string>();
+
+    // Add comprehensive wellness interests with emojis
+    const defaultInterests = [
+      'Access (Learning)',
+      'Achievement',
+      '💪 Aging Better',
+      '🪷 Altered States of Consciousness',
+      'Authenticity',
+      'Beauty',
+      '💋Better Sex',
+      '😴 Better Sleep',
+      '🎨 Boost Creativity',
+      '📈 Career Growth',
+      '🏆 Coaching',
+      '🧠 Cognition',
+      '🎤 Communication',
+      '😎 Confidence',
+      'Connection (Sharing)',
+      '👫 Creating Community',
+      '🥄 Eating Well',
+      '😇 Emotional Mastery',
+      'Engagement',
+      '😎 Entrepreneurial Mindset',
+      'Equanimity',
+      '❤️ Finding Relationships',
+      'Fitness',
+      '🏃‍♀️ Fitness',
+      '🏄 Flow',
+      '👨‍💻 Focus',
+      'Freedom',
+      '🥋 Habits & Discipline',
+      '😀 Happiness',
+      '❤️‍🩹 Healing Heartbreak',
+      'Health',
+      '⚡ Impact',
+      '🌞 Influence',
+      'Influence (Teaching)',
+      'Intelligence',
+      '😌 Intuition',
+      '🧗 Leadership',
+      'Legacy (Contribution)',
+      'Lifestyle',
+      '😍 Look Good',
+      '🧘 Meditation',
+      '🍵 Mind-Body Healing',
+      '🧠 Mind Management',
+      '✨ Mind Power',
+      '🧠 Mindset',
+      '💰 Money & Finance',
+      '🌎 Oneness',
+      '👩‍👦‍👦 Parenting',
+      '🌈 Passion',
+      '😊 Positive Optimism',
+      '💡Problem Solving',
+      'Productivity',
+      '🧭 Purpose',
+      '🏄‍♂️ Quality of Life',
+      '🩹 Recovery & Healing',
+      'Resilience',
+      '💪 Resilience',
+      '💼 Running a Business',
+      '💖 Self-Love',
+      '💞 Social Life & Relationships',
+      '🤓 Speed Learning',
+      '🦋 Spirituality',
+      '💌 Strengthening Relationships',
+      '🏅 Strength of Character',
+      '🧑‍🏫 Teaching & Training',
+      'Transcendence',
+      'Vision',
+      '🔭 Vision',
+      '🌿 Wellness',
+    ];
+
+    defaultInterests.forEach(interest => interests.add(interest));
+
+    // Add interests from video data
+    allVideos.forEach(video => {
+      if (video.relatedTopics) {
+        video.relatedTopics.forEach(topic => interests.add(topic));
+      }
+      if (video.hashtags) {
+        video.hashtags.forEach(tag => interests.add(tag.replace('#', '')));
+      }
+    });
+
+    return Array.from(interests).sort();
+  }, [allVideos]);
+
+  // Filter handlers
+  const handleCategoryToggle = (category: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const handleInterestToggle = (interest: string) => {
+    setSelectedInterests(prev =>
+      prev.includes(interest)
+        ? prev.filter(i => i !== interest)
+        : [...prev, interest]
+    );
+  };
+
+  const handleClearAllFilters = () => {
+    setSelectedCategories([]);
+    setSelectedInterests([]);
+  };
+
+  // Apply category and interest filters
+  const applyFilters = (videos: Video[]): Video[] => {
+    let filtered = [...videos];
+
+    // Apply category filter
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(video =>
+        selectedCategories.includes(video.category)
+      );
+    }
+
+    // Apply interest filter
+    if (selectedInterests.length > 0) {
+      filtered = filtered.filter(video => {
+        const videoInterests = [
+          ...(video.relatedTopics || []),
+          ...(video.hashtags?.map(tag => tag.replace('#', '')) || [])
+        ];
+        return selectedInterests.some(interest =>
+          videoInterests.includes(interest)
+        );
+      });
+    }
+
+    return filtered;
   };
 
   // ✅ Event handlers use Video type with UUID
@@ -232,12 +385,15 @@ const BrowsePage = () => {
     setCurrentFeaturedIndex((prev) => (prev + 1) % featuredVideos.length);
   };
 
-  // Data organization
-  const videosToShow = isSearching ? filteredVideos : allVideos;
-  const trendingVideos = !isSearching ? allVideos.filter(v => v.isTrending).slice(0, 12) : [];
-  const newVideos = !isSearching ? allVideos.filter(v => v.isNew).slice(0, 12) : [];
-  const freeVideos = !isSearching ? allVideos.filter(v => v.accessTier === 'free').slice(0, 12) : [];
-  const premiumVideos = !isSearching ? allVideos.filter(v => v.accessTier === 'premium').slice(0, 12) : [];
+  // Data organization - apply filters
+  const baseVideos = isSearching ? filteredVideos : allVideos;
+  const filteredByCategory = applyFilters(baseVideos);
+  const videosToShow = filteredByCategory;
+
+  const trendingVideos = !isSearching ? applyFilters(allVideos.filter(v => v.isTrending)).slice(0, 12) : [];
+  const newVideos = !isSearching ? applyFilters(allVideos.filter(v => v.isNew)).slice(0, 12) : [];
+  const freeVideos = !isSearching ? applyFilters(allVideos.filter(v => v.accessTier === 'free')).slice(0, 12) : [];
+  const premiumVideos = !isSearching ? applyFilters(allVideos.filter(v => v.accessTier === 'premium')).slice(0, 12) : [];
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-black">
@@ -303,6 +459,76 @@ const BrowsePage = () => {
               ))}
             </AlertDescription>
           </Alert>
+        )}
+
+        {/* Filter Button and Active Filters */}
+        {!loading && allVideos.length > 0 && (availableCategories.length > 0 || availableInterests.length > 0) && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Custom Filter Button */}
+              <button
+                onClick={() => setIsFilterModalOpen(true)}
+                className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold text-sm transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              >
+                <div className="w-6 h-6 rounded-xl bg-white/20 flex items-center justify-center">
+                  <FilterIcon className="w-3.5 h-3.5" />
+                </div>
+                <span>Filters</span>
+                {(selectedCategories.length > 0 || selectedInterests.length > 0) && (
+                  <span className="bg-white/30 text-white px-2.5 py-0.5 rounded-full text-xs font-bold">
+                    {selectedCategories.length + selectedInterests.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Active Filters Display */}
+              {selectedCategories.length > 0 && (
+                <>
+                  {selectedCategories.map(category => (
+                    <Badge
+                      key={category}
+                      variant="secondary"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 cursor-pointer px-2.5 py-1 text-xs"
+                      onClick={() => handleCategoryToggle(category)}
+                    >
+                      {category}
+                      <X className="w-3 h-3 ml-1" />
+                    </Badge>
+                  ))}
+                </>
+              )}
+
+              {selectedInterests.length > 0 && selectedInterests.slice(0, 5).map(interest => (
+                <Badge
+                  key={interest}
+                  variant="secondary"
+                  className="bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 cursor-pointer px-2.5 py-1 text-xs"
+                  onClick={() => handleInterestToggle(interest)}
+                >
+                  {interest}
+                  <X className="w-3 h-3 ml-1" />
+                </Badge>
+              ))}
+
+              {selectedInterests.length > 5 && (
+                <Badge variant="outline" className="text-xs px-2 py-1">
+                  +{selectedInterests.length - 5} more
+                </Badge>
+              )}
+
+              {(selectedCategories.length > 0 || selectedInterests.length > 0) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearAllFilters}
+                  className="text-gray-600 dark:text-gray-400 text-xs h-7"
+                >
+                  <X className="w-3 h-3 mr-1" />
+                  Clear All
+                </Button>
+              )}
+            </div>
+          </div>
         )}
 
         {/* Search Results Header */}
@@ -434,6 +660,23 @@ const BrowsePage = () => {
       </main>
 
       <Footer />
+
+      {/* Filter Modal */}
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        selectedCategories={selectedCategories}
+        selectedInterests={selectedInterests}
+        onCategoryToggle={handleCategoryToggle}
+        onInterestToggle={handleInterestToggle}
+        onClearAll={handleClearAllFilters}
+        onApply={() => {
+          // Filters are already applied reactively
+          // Modal will close automatically
+        }}
+        availableCategories={availableCategories}
+        availableInterests={availableInterests}
+      />
     </div>
   );
 };
